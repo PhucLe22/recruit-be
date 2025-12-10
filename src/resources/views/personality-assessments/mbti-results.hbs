@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả MBTI - JobLife</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .result-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .personality-type {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .personality-type::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #FF6B6B, #4ECDC4);
+        }
+
+        .type-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .type-name {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .type-description {
+            font-size: 1.2rem;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .quote {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+            border-left: 5px solid #4ECDC4;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-card h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-card h3 i {
+            color: #4ECDC4;
+        }
+
+        .strengths-list, .careers-list {
+            list-style: none;
+        }
+
+        .strengths-list li, .careers-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .strengths-list li:hover, .careers-list li:hover {
+            background: #f8f9fa;
+            padding-left: 2.5rem;
+        }
+
+        .strengths-list li::before {
+            content: '⭐';
+            position: absolute;
+            left: 0;
+            color: #FFD93D;
+        }
+
+        .careers-list li::before {
+            content: '💼';
+            position: absolute;
+            left: 0;
+            color: #6BCF7F;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF6B6B, #4ECDC4);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(78, 205, 196, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4ECDC4;
+            border: 2px solid #4ECDC4;
+        }
+
+        .btn-secondary:hover {
+            background: #4ECDC4;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #4ECDC4;
+        }
+
+        .share-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .share-facebook { background: #3B5998; }
+        .share-twitter { background: #1DA1F2; }
+        .share-linkedin { background: #0077B5; }
+
+        .score-breakdown {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .score-breakdown h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .score-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .score-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .score-bar {
+            background: #e9ecef;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .personality-type {
+                padding: 2rem;
+            }
+
+            .type-name {
+                font-size: 2rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #FF6B6B;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-header">
+            <h1><i class="fas fa-brain"></i> Kết quả bài kiểm tra MBTI</h1>
+            <p>Chúc mừng bạn đã hoàn thành bài kiểm tra tính cách!</p>
+        </div>
+
+        <div class="personality-type">
+            <div class="type-badge">{{result.type}}</div>
+            <h2 class="type-name">{{profile.name}}</h2>
+            <p class="type-description">{{profile.description}}</p>
+
+            <div class="quote">
+                <i class="fas fa-quote-left"></i> {{profile.quote}} <i class="fas fa-quote-right"></i>
+            </div>
+        </div>
+
+        <div class="score-breakdown">
+            <h3><i class="fas fa-chart-bar"></i> Phân tích chi tiết</h3>
+            
+            <!-- Dimension 1: Extraversion vs Introversion -->
+            <div class="score-item">
+                <div class="score-label">
+                    <span><strong>Năng lượng: Hướng ngoại (E) vs Nội tâm (I)</strong></span>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="flex: 1; text-align: right; font-weight: 600; color: #4ECDC4;">E: {{result.scores.E}}</span>
+                    <div class="score-bar" style="flex: 2;">
+                        {{#ifCond result.scores.E '>=' result.scores.I}}
+                        <div class="score-fill" style="width: {{multiply result.scores.E 25}}%; background: linear-gradient(90deg, #4ECDC4, #44A08D);"></div>
+                        {{else}}
+                        <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #4ECDC4, #44A08D);"></div>
+                        {{/ifCond}}
+                    </div>
+                    <span style="flex: 1; text-align: left; font-weight: 600; color: #FF6B6B;">I: {{result.scores.I}}</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    {{#ifCond result.scores.E '>=' result.scores.I}}
+                    <i class="fas fa-arrow-right"></i> Bạn có xu hướng <strong>hướng ngoại</strong> - thích tương tác xã hội, năng động và thích hoạt động nhóm.
+                    {{else}}
+                    <i class="fas fa-arrow-left"></i> Bạn có xu hướng <strong>nội tâm</strong> - thích suy ngẫm, làm việc độc lập và tập trung vào thế giới nội tâm.
+                    {{/ifCond}}
+                </p>
+            </div>
+
+            <!-- Dimension 2: Sensing vs Intuition -->
+            <div class="score-item">
+                <div class="score-label">
+                    <span><strong>Tiếp nhận: Cảm giác (S) vs Trực giác (N)</strong></span>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="flex: 1; text-align: right; font-weight: 600; color: #FFD93D;">S: {{result.scores.S}}</span>
+                    <div class="score-bar" style="flex: 2;">
+                        {{#ifCond result.scores.S '>=' result.scores.N}}
+                        <div class="score-fill" style="width: {{multiply result.scores.S 25}}%; background: linear-gradient(90deg, #FFD93D, #FFA502);"></div>
+                        {{else}}
+                        <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #FFD93D, #FFA502);"></div>
+                        {{/ifCond}}
+                    </div>
+                    <span style="flex: 1; text-align: left; font-weight: 600; color: #6BCF7F;">N: {{result.scores.N}}</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    {{#ifCond result.scores.S '>=' result.scores.N}}
+                    <i class="fas fa-eye"></i> Bạn có xu hướng <strong>cảm giác</strong> - tập trung vào thông tin cụ thể, thực tế, chi tiết và kinh nghiệm hiện tại.
+                    {{else}}
+                    <i class="fas fa-lightbulb"></i> Bạn có xu hướng <strong>trực giác</strong> - tập trung vào khả năng, ý tưởng, mô hình và tương lai.
+                    {{/ifCond}}
+                </p>
+            </div>
+
+            <!-- Dimension 3: Thinking vs Feeling -->
+            <div class="score-item">
+                <div class="score-label">
+                    <span><strong>Quyết định: Lý trí (T) vs Cảm xúc (F)</strong></span>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="flex: 1; text-align: right; font-weight: 600; color: #95E1D3;">T: {{result.scores.T}}</span>
+                    <div class="score-bar" style="flex: 2;">
+                        {{#ifCond result.scores.T '>=' result.scores.F}}
+                        <div class="score-fill" style="width: {{multiply result.scores.T 25}}%; background: linear-gradient(90deg, #95E1D3, #38B6A8);"></div>
+                        {{else}}
+                        <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #95E1D3, #38B6A8);"></div>
+                        {{/ifCond}}
+                    </div>
+                    <span style="flex: 1; text-align: left; font-weight: 600; color: #FF6B9D;">F: {{result.scores.F}}</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    {{#ifCond result.scores.T '>=' result.scores.F}}
+                    <i class="fas fa-brain"></i> Bạn có xu hướng <strong>lý trí</strong> - dựa vào logic, nguyên tắc khách quan và phân tích khi quyết định.
+                    {{else}}
+                    <i class="fas fa-heart"></i> Bạn có xu hướng <strong>cảm xúc</strong> - dựa vào giá trị, đồng cảm và ảnh hưởng đến người khác khi quyết định.
+                    {{/ifCond}}
+                </p>
+            </div>
+
+            <!-- Dimension 4: Judging vs Perceiving -->
+            <div class="score-item">
+                <div class="score-label">
+                    <span><strong>Lối sống: Có kế hoạch (J) vs Linh hoạt (P)</strong></span>
+                </div>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-bottom: 0.5rem;">
+                    <span style="flex: 1; text-align: right; font-weight: 600; color: #A8E6CF;">J: {{result.scores.J}}</span>
+                    <div class="score-bar" style="flex: 2;">
+                        {{#ifCond result.scores.J '>=' result.scores.P}}
+                        <div class="score-fill" style="width: {{multiply result.scores.J 25}}%; background: linear-gradient(90deg, #A8E6CF, #56AB91);"></div>
+                        {{else}}
+                        <div class="score-fill" style="width: 0%; background: linear-gradient(90deg, #A8E6CF, #56AB91);"></div>
+                        {{/ifCond}}
+                    </div>
+                    <span style="flex: 1; text-align: left; font-weight: 600; color: #FFB6C1;">P: {{result.scores.P}}</span>
+                </div>
+                <p style="font-size: 0.9rem; color: #666; margin-top: 0.5rem;">
+                    {{#ifCond result.scores.J '>=' result.scores.P}}
+                    <i class="fas fa-list-check"></i> Bạn có xu hướng <strong>có kế hoạch</strong> - thích tổ chức, có cấu trúc, hoàn thành công việc và quyết định sớm.
+                    {{else}}
+                    <i class="fas fa-wind"></i> Bạn có xu hướng <strong>linh hoạt</strong> - thích tự phát, thích nghi, khám phá và để mở các lựa chọn.
+                    {{/ifCond}}
+                </p>
+            </div>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h3><i class="fas fa-star"></i> Điểm mạnh của bạn</h3>
+                <ul class="strengths-list">
+                    {{#each profile.strengths}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+
+            <div class="info-card">
+                <h3><i class="fas fa-briefcase"></i> Nghề nghiệp phù hợp</h3>
+                <ul class="careers-list">
+                    {{#each profile.careers}}
+                    <li>{{this}}</li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            {{#if isLogin}}
+            <a href="/personality-assessments/mbti/user-results" class="btn btn-secondary">
+                <i class="fas fa-history"></i> Xem lịch sử
+            </a>
+            {{/if}}
+            <a href="/jobs/search-results" class="btn btn-primary">
+                <i class="fas fa-search"></i> Tìm việc làm phù hợp
+            </a>
+            <a href="/personality-assessments" class="btn btn-outline">
+                <i class="fas fa-redo"></i> Làm bài khác
+            </a>
+        </div>
+
+        <div class="share-section">
+            <h3><i class="fas fa-share-alt"></i> Chia sẻ kết quả</h3>
+            <p>Khám phá bạn bè và người thân có cùng loại tính cách với bạn!</p>
+            <div class="share-buttons">
+                <button class="share-btn share-facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button class="share-btn share-twitter" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i>
+                </button>
+                <button class="share-btn share-linkedin" onclick="shareOnLinkedIn()">
+                    <i class="fab fa-linkedin-in"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function shareOnFacebook() {
+            const url = window.location.href;
+            const text = `Tôi vừa làm bài kiểm tra MBTI và kết quả là {{result.type}} - {{profile.name}}! ${profile.description}`;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareOnTwitter() {
+            const url = window.location.href;
+            const text = `Tôi vừa làm bài kiểm tra MBTI và kết quả là {{result.type}} - {{profile.name}}! ${profile.description}`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function shareOnLinkedIn() {
+            const url = window.location.href;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function createConfetti() {
+            const colors = ['#FF6B6B', '#4ECDC4', '#FFD93D', '#6BCF7F', '#FF9F43'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        // Animate score bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const scoreFills = document.querySelectorAll('.score-fill');
+            scoreFills.forEach((fill, index) => {
+                setTimeout(() => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Create confetti effect
+            setTimeout(createConfetti, 500);
+
+            // Smooth scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Print functionality
+        function printResults() {
+            window.print();
+        }
+
+        // Download as PDF (placeholder - would need additional library)
+        function downloadPDF() {
+            alert('Tính năng tải xuống PDF sẽ sớm có!');
+        }
+    </script>
+</body>
+</html>

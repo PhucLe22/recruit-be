@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả Big Five (OCEAN) - JobLife</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .result-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-summary {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 1s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-summary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .overall-score {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .personality-type {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .score-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .trait-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .trait-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .trait-name {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .trait-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .trait-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .score-bar {
+            background: #e9ecef;
+            height: 15px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 10px;
+            transition: width 1.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .trait-level {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 1rem;
+        }
+
+        .trait-level.high {
+            color: #28a745;
+        }
+
+        .trait-level.medium {
+            color: #ffc107;
+        }
+
+        .trait-level.low {
+            color: #dc3545;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-outline:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .recommendations {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .recommendations h3 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .recommendations h3 i {
+            color: #667eea;
+        }
+
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-list li {
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .recommendation-list li:hover {
+            background: #f8f9fa;
+            padding-left: 2.5rem;
+        }
+
+        .recommendation-list li::before {
+            content: '💡';
+            position: absolute;
+            left: 0;
+            color: #667eea;
+        }
+
+        .share-section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .share-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        .share-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .share-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .share-facebook { background: #3B5998; }
+        .share-twitter { background: #1DA1F2; }
+        .share-linkedin { background: #0077B5; }
+
+        .quote {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            border-left: 5px solid #667eea;
+            padding: 1.5rem;
+            border-radius: 10px;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .result-summary {
+                padding: 2rem;
+            }
+
+            .personality-type {
+                font-size: 1.5rem;
+                padding: 1rem 2rem;
+            }
+
+            .score-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #667eea;
+            position: absolute;
+            animation: confetti-fall 3s linear;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="result-header">
+            <h1><i class="fas fa-brain"></i> Kết quả bài kiểm tra Big Five (OCEAN)</h1>
+            <p>Chúc mừng bạn đã hoàn thành bài kiểm tra tính cách!</p>
+        </div>
+
+        <div class="result-summary">
+            <div class="overall-score">
+                <div class="personality-type">{{profile.type}}</div>
+            </div>
+
+            <div class="quote">
+                <i class="fas fa-quote-left"></i> {{profile.description}} <i class="fas fa-quote-right"></i>
+            </div>
+
+            <div class="score-grid">
+                {{#each result.traits}}
+                <div class="trait-card">
+                    <div class="trait-header">
+                        <div class="trait-name">
+                            <i class="fas fa-star"></i> {{name}}
+                        </div>
+                        <div class="trait-score">{{score}}/100</div>
+                    </div>
+                    <div class="trait-description">{{description}}</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: {{score}}%">
+                            <span>{{score}}%</span>
+                        </div>
+                    </div>
+                    <div class="trait-level {{levelClass}}">{{level}}</div>
+                    <div class="recommendation">{{recommendation}}</div>
+                </div>
+                {{/each}}
+            </div>
+        </div>
+
+        {{#if recommendations}}
+        <div class="recommendations">
+            <h3><i class="fas fa-lightbulb"></i> Đề xuất cho bạn</h3>
+            <ul class="recommendation-list">
+                {{#each recommendations}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ul>
+        </div>
+        {{/if}}
+
+        <div class="action-buttons">
+            <a href="/personality-assessments/mbti" class="btn btn-secondary">
+                <i class="fas fa-redo"></i> Làm MBTI
+            </a>
+            <a href="/personality-assessments/disc" class="btn btn-secondary">
+                <i class="fas fa-redo"></i> Làm DISC
+            </a>
+            <a href="/personality-assessments" class="btn btn-outline">
+                <i class="fas fa-home"></i> Danh sách bài kiểm tra
+            </a>
+        </div>
+
+        <div class="share-section">
+            <h3><i class="fas fa-share-alt"></i> Chia sẻ kết quả</h3>
+            <p>Khám phá bạn bè và người thân có cùng tính cách với bạn!</p>
+            <div class="share-buttons">
+                <button class="share-btn share-facebook" onclick="shareOnFacebook()">
+                    <i class="fab fa-facebook-f"></i>
+                </button>
+                <button class="share-btn share-twitter" onclick="shareOnTwitter()">
+                    <i class="fab fa-twitter"></i>
+                </button>
+                <button class="share-btn share-linkedin" onclick="shareOnLinkedIn()">
+                    <i class="fab fa-linkedin-in"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function shareOnFacebook() {
+            const url = window.location.href;
+            const text = `Tôi vừa làm bài kiểm tra Big Five và có kết quả rất thú vị! ${result.type} - ${profile.description}`;
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(text)}`, '_blank');
+        }
+
+        function shareOnTwitter() {
+            const url = window.location.href;
+            const text = `Tôi vừa làm bài kiểm tra Big Five! ${result.type} - ${profile.description}`;
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function shareOnLinkedIn() {
+            const url = window.location.href;
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
+        }
+
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#ff6b6b', '#4ecdc4', '#ffd93d'];
+
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 3 + 's';
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 50);
+            }
+        }
+
+        // Animate score bars on load
+        document.addEventListener('DOMContentLoaded', function() {
+            const scoreFills = document.querySelectorAll('.score-fill');
+            scoreFills.forEach((fill, index) => {
+                setTimeout(() => {
+                    const width = fill.style.width;
+                    fill.style.width = '0%';
+                    setTimeout(() => {
+                        fill.style.width = width;
+                    }, 100);
+                }, index * 200);
+            });
+
+            // Create confetti effect
+            setTimeout(createConfetti, 500);
+
+            // Smooth scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // Print functionality
+        function printResults() {
+            window.print();
+        }
+
+        // Download as PDF (placeholder - would need additional library)
+        function downloadPDF() {
+            alert('Tính năng tải xuống PDF sẽ sớm có!');
+        }
+    </script>
+</body>
+</html>

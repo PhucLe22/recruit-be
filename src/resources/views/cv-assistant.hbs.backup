@@ -1,0 +1,2989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CV Assistant - Smart Career Platform</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #13B497 0%, #59D4A8 100%);
+            --warning-gradient: linear-gradient(135deg, #FFA726 0%, #FF7043 100%);
+            --dark-bg: #1a1a2e;
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><g fill="%239C92AC" fill-opacity="0.05"><path d="M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z"/></g></g></svg>') repeat;
+            z-index: -1;
+        }
+
+        .hero-section {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 4rem 0 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><path d="M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z" fill="%23ffffff" fill-opacity="0.1" fill-rule="evenodd"/></svg>') no-repeat center center;
+            background-size: cover;
+            opacity: 0.1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .section-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .section-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .section-card:hover::before {
+            opacity: 1;
+        }
+
+        .section-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .section-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 1.8rem;
+        }
+
+        .form-floating label {
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: var(--transition);
+            background-color: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.15);
+            background-color: white;
+        }
+
+        .btn-primary-custom {
+            background: var(--primary-gradient);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            color: white;
+        }
+
+        .btn-primary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary-custom:hover::before {
+            left: 100%;
+        }
+
+        .btn-secondary-custom {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            border: none;
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .btn-secondary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+            color: white;
+        }
+
+        .btn-secondary-custom::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-secondary-custom:hover::before {
+            left: 100%;
+        }
+
+        .upload-area {
+            border: 3px dashed var(--border-color);
+            border-radius: 16px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: var(--transition);
+            background: #f8fafc;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area.drag-over {
+            border-color: #667eea;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+            transform: scale(1.02);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        .result-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--primary-gradient);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .result-card:hover::before {
+            opacity: 1;
+        }
+
+        .result-card:hover {
+            transform: translateX(4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .result-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .badge-success {
+            background: var(--success-gradient);
+            color: white;
+        }
+
+        .badge-warning {
+            background: var(--warning-gradient);
+            color: white;
+        }
+
+        .badge-danger {
+            background: var(--secondary-gradient);
+            color: white;
+        }
+
+        .evaluation-item {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .evaluation-score {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        .job-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .job-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: #667eea;
+        }
+
+        .job-card.clickable {
+            cursor: pointer;
+            position: relative;
+        }
+
+        .job-card.clickable:hover {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+        }
+
+        .job-card.clickable::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+            pointer-events: none;
+        }
+
+        .job-card.clickable:hover::before {
+            opacity: 1;
+        }
+
+        .job-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .job-company {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.75rem;
+        }
+
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .skill-tag {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            color: #667eea;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @media (max-width: 768px) {
+            .hero-section {
+                padding: 2rem 0;
+            }
+
+            .section-card {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .upload-area {
+                padding: 2rem 1rem;
+            }
+
+            .result-card {
+                padding: 1.5rem;
+            }
+
+            .main-container {
+                padding: 0 15px;
+            }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .progress-custom {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .progress-bar-animated {
+            background: var(--primary-gradient);
+        }
+
+        /* Enhanced skill tag styles */
+        .skill-tag-soft {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .skill-tag-language {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            color: #2d3436;
+            border: none;
+        }
+
+        /* Experience and Education styles */
+        .experience-item, .education-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .experience-item h6, .education-item h6 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .experience-item p, .education-item p {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Enhanced evaluation sections */
+        .evaluation-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .evaluation-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        /* AI Evaluation Text Styles */
+        .ai-evaluation-text {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .ai-evaluation-text strong {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .ai-evaluation-text br {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Score Breakdown Styles */
+        .score-breakdown {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .score-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .score-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .score-label {
+            font-weight: 600;
+            color: #2d3436;
+            font-size: 0.95rem;
+        }
+
+        .score-value {
+            font-weight: 700;
+            color: #2d3436;
+            font-size: 0.95rem;
+            background: #f1f3f4;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .score-value.text-danger {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .progress {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.6s ease;
+            border-radius: 4px;
+        }
+
+        .progress-bar.bg-warning {
+            background: linear-gradient(90deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .progress-bar.bg-success {
+            background: linear-gradient(90deg, #84fab0 0%, #8fd3f4 100%);
+        }
+
+        .score-comment {
+            margin-top: 0.5rem;
+            font-style: italic;
+            line-height: 1.4;
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <h5 class="mb-2">Processing...</h5>
+            <p class="text-muted mb-0">Please wait while we analyze your request</p>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="main-container">
+            <div class="hero-content text-center">
+                <div class="mb-3">
+                    <a href="/" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Quay về trang chủ
+                    </a>
+                </div>
+                <h1 class="display-4 fw-bold mb-3 fade-in">
+                    <i class="fas fa-robot me-3"></i>CV Assistant
+                </h1>
+                <p class="lead mb-4 fade-in">
+                    Upload your CV and get AI-powered evaluations & job recommendations
+                </p>
+                <div class="fade-in">
+                    <span class="badge bg-white text-primary px-3 py-2 me-2">
+                        <i class="fas fa-check-circle me-1"></i> Smart Analysis
+                    </span>
+                    <span class="badge bg-white text-primary px-3 py-2 me-2">
+                        <i class="fas fa-briefcase me-1"></i> Job Matching
+                    </span>
+                    <span class="badge bg-white text-primary px-3 py-2">
+                        <i class="fas fa-chart-line me-1"></i> Career Insights
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+    <div class="main-content">
+        <div class="container">
+            <!-- CV Management Center -->
+            <div class="cv-management-section" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 20px; padding: 40px; margin-bottom: 35px; box-shadow: 0 15px 35px rgba(102, 126, 234, 0.3); color: white; text-align: center;">
+                <div class="management-content">
+                    <div class="management-icon" style="font-size: 4rem; margin-bottom: 20px; opacity: 0.9;">
+                        <i class="bi bi-file-earmark-person"></i>
+                    </div>
+                    <h2 style="margin: 0 0 15px 0; font-size: 2rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+                        Trung Tâm Quản Lý CV
+                    </h2>
+                    <p style="margin: 0 0 30px 0; font-size: 1.1rem; opacity: 0.95; max-width: 600px; margin-left: auto; margin-right: auto;">
+                        Tải lên CV của bạn để nhận phân tích chuyên sâu, gợi ý cải thiện và tìm kiếm cơ hội việc làm phù hợp nhất
+                    </p>
+
+                    <div class="action-buttons" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="document.getElementById('cvFile').click()" class="management-btn primary" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.3); color: white; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-cloud-upload"></i>
+                            Tải lên CV mới
+                        </button>
+                        <button onclick="checkCV()" class="management-btn secondary" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 2px solid rgba(255,255,255,0.2); color: white; padding: 15px 30px; border-radius: 50px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; gap: 10px;">
+                            <i class="bi bi-search"></i>
+                            Phân tích CV hiện có
+                        </button>
+                    </div>
+
+                    <div class="features-preview" style="margin-top: 40px; display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; max-width: 800px; margin-left: auto; margin-right: auto;">
+                        <div class="feature-preview-item" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; text-align: center;">
+                            <i class="bi bi-star" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Phân tích chuyên sâu</h4>
+                        </div>
+                        <div class="feature-preview-item" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; text-align: center;">
+                            <i class="bi bi-graph-up" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Gợi ý cải tiến</h4>
+                        </div>
+                        <div class="feature-preview-item" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; text-align: center;">
+                            <i class="bi bi-briefcase" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Việc làm phù hợp</h4>
+                        </div>
+                        <div class="feature-preview-item" style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); padding: 20px; border-radius: 15px; text-align: center;">
+                            <i class="bi bi-award" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                            <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 600;">Tối ưu hóa CV</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV Status Section -->
+            <div class="cv-status-section" style="background: white; border-radius: 20px; padding: 35px 30px; margin-bottom: 35px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1); border: 2px solid var(--light-gray);">
+                <div class="section-header" style="display: flex; align-items: center; gap: 15px; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px solid var(--light-gray);">
+                    <div class="section-icon" style="width: 50px; height: 50px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.3rem; flex-shrink: 0;">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <div class="section-title" style="flex: 1;">
+                        <h2 style="margin: 0; color: var(--dark); font-size: 1.5rem; font-weight: 700;">Kiểm Tra CV</h2>
+                        <p style="margin: 5px 0 0 0; color: var(--gray); font-size: 0.95rem;">Kiểm tra trạng thái CV và thông tin phân tích</p>
+                    </div>
+                    <button class="check-cv-btn" onclick="checkCVStatus()" style="background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-sync-alt"></i>
+                        Kiểm Tra
+                    </button>
+                </div>
+
+                <div id="cvStatusContainer">
+                    <div class="status-placeholder" id="statusPlaceholder" style="text-align: center; padding: 40px; color: var(--gray);">
+                        <div style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5;">
+                            <i class="fas fa-clipboard-search"></i>
+                        </div>
+                        <h4 style="margin: 0 0 10px 0; color: var(--dark);">Nhập tên người dùng và kiểm tra CV</h4>
+                        <p>Nhập tên người dùng ở trên và bấm "Kiểm Tra" để xem trạng thái CV</p>
+                    </div>
+
+                    <div class="status-result" id="statusResult" style="display: none;">
+                        <!-- CV status will be displayed here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Features Section - Vertical Layout -->
+            <div class="features-vertical">
+                <!-- CV Upload & Analysis -->
+                <div class="feature-card-vertical" id="uploadSection">
+                    <div class="feature-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Phân Tích CV</h3>
+                    <p class="feature-description">
+                        Tải lên CV hiện tại để AI phân tích, đánh giá và đưa ra gợi ý cải thiện.
+                        Nhận báo cáo chi tiết về điểm mạnh, điểm yếu và cách tối ưu hóa.
+                    </p>
+=======
+    <main class="main-container py-5">
+        <!-- User Authentication Section -->
+        <div class="section-card fade-in">
+            <h2 class="section-title">
+                <i class="fas fa-user-circle"></i>
+                User Authentication
+            </h2>
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="text" class="form-control" id="username" placeholder="Enter your username">
+                        <label for="username">
+                            <i class="fas fa-user me-2"></i>Username
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                        <input type="email" class="form-control" id="email" placeholder="Enter your email">
+                        <label for="email">
+                            <i class="fas fa-envelope me-2"></i>Email Address
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 flex-wrap">
+                <button class="btn btn-primary-custom" onclick="authenticateUser()">
+                    <i class="fas fa-sign-in-alt me-2"></i>Continue
+                </button>
+                <button class="btn btn-outline-secondary" onclick="checkExistingCV()">
+                    <i class="fas fa-search me-2"></i>Check Existing CV
+                </button>
+            </div>
+        </div>
+
+        <!-- CV Upload Section -->
+        <div class="section-card fade-in" id="uploadSection" style="display: none;">
+            <h2 class="section-title">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Tải lên CV của bạn
+            </h2>
+
+            <div class="upload-area" id="uploadArea">
+                <i class="fas fa-file-upload"></i>
+                <h4 class="mb-3">Kéo thả CV vào đây hoặc nhấp để duyệt file</h4>
+                <p class="text-muted mb-4">Hỗ trợ định dạng PDF, DOC, DOCX (Tối đa 10MB)</p>
+                <input type="file" id="cvInput" accept=".pdf,.doc,.docx" style="display: none;">
+                <button class="btn btn-primary-custom" onclick="document.getElementById('cvInput').click()">
+                    <i class="fas fa-folder-open me-2"></i>Chọn File
+                </button>
+            </div>
+
+            <div class="mt-4 hidden" id="filePreview">
+                <div class="alert alert-success alert-custom">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span id="fileName"></span> selected
+                </div>
+                <button class="btn btn-primary-custom w-100" onclick="uploadCV()">
+                    <i class="fas fa-rocket me-2"></i>Upload & Process CV
+                </button>
+            </div>
+        </div>
+
+        <!-- CV Status Section -->
+        <div class="section-card fade-in hidden" id="cvStatusSection">
+            <h2 class="section-title">
+                <i class="fas fa-clipboard-check"></i>
+                CV Status Check
+            </h2>
+            <div id="cvStatusResults">
+                <!-- CV status will be displayed here -->
+            </div>
+        </div>
+
+        <!-- AI Evaluation Section -->
+        <div class="section-card fade-in hidden" id="evaluationSection">
+            <h2 class="section-title">
+                <i class="fas fa-brain"></i>
+                AI CV Evaluation
+            </h2>
+            <div class="text-center mb-4">
+                <button class="btn btn-primary-custom btn-lg pulse" onclick="getAIEvaluation()">
+                    <i class="fas fa-magic me-2"></i>Get Detailed AI Evaluation
+                </button>
+            </div>
+            <div id="evaluationResults">
+                <!-- AI evaluation results will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Job Suggestions Section -->
+        <div class="section-card fade-in hidden" id="jobsSection">
+            <h2 class="section-title">
+                <i class="fas fa-briefcase"></i>
+                Recommended Jobs
+            </h2>
+            <div class="text-center mb-4">
+                <button class="btn btn-primary-custom btn-lg" onclick="getJobSuggestions()">
+                    <i class="fas fa-search-dollar me-2"></i>Find Matching Jobs
+                </button>
+            </div>
+            <div id="jobResults">
+                <!-- Job suggestions will be displayed here -->
+            </div>
+        </div>
+
+        <!-- Quick Actions Section -->
+        <div class="section-card fade-in hidden" id="quickActionsSection">
+            <h2 class="section-title">
+                <i class="fas fa-bolt"></i>
+                Quick Actions
+            </h2>
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <button class="btn btn-outline-primary w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="quickCheckCV()">
+                        <i class="fas fa-file-alt fa-2x mb-2"></i>
+                        <span>Check CV Status</span>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-success w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="quickEvaluation()">
+                        <i class="fas fa-chart-line fa-2x mb-2"></i>
+                        <span>AI Evaluation</span>
+                    </button>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-outline-warning w-100 h-100 d-flex flex-column align-items-center justify-content-center p-3" onclick="quickJobs()">
+                        <i class="fas fa-briefcase fa-2x mb-2"></i>
+                        <span>Find Jobs</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="main-container text-center">
+            <p class="mb-0">
+                <i class="fas fa-robot me-2"></i>
+                CV Assistant © 2024 | Powered by AI Technology
+            </p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+        // Configuration
+        const API_BASE_URL = 'http://127.0.0.1:8000'; // AI Agent API URL with fixed job suggestion logic
+        let currentUser = null;
+        let cvUploaded = false;
+        let activeApiCalls = new Set(); // Track ongoing API calls to prevent duplicates
+=======
+        // Global variables - Initialize with server data
+        let currentUser = {{#if user}}{
+            username: "{{user.username}}",
+            email: "{{user.email}}",
+            id: "{{user._id}}"
+        }{{else}}null{{/if}};
+        let uploadedCV = null;
+        let currentJobsData = []; // Store current jobs data for detail view
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            setupEventListeners();
+
+            // Auto-check user CV if logged in
+            if (currentUser) {
+                showUploadSection();
+                checkExistingCV();
+
+                // Hide login form since user is already logged in
+                const authSection = document.querySelector('.section-card');
+                if (authSection && authSection.querySelector('input[type="text"]')) {
+                    authSection.style.display = 'none';
+                }
+            }
+
+            console.log('CV Assistant initialized', 'Current user:', currentUser);
+        }
+
+        function setupEventListeners() {
+            // Upload area drag and drop
+            const uploadArea = document.getElementById('uploadArea');
+            const cvInput = document.getElementById('cvInput');
+
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileSelect(files[0]);
+                }
+            });
+
+            cvInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFileSelect(e.target.files[0]);
+                }
+            });
+        }
+
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').classList.remove('active');
+            }, 500);
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} alert-custom alert-dismissible fade show`;
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            const container = document.querySelector('.main-container');
+            container.insertBefore(alertDiv, container.firstChild);
+
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 5000);
+        }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+        let progressCounter = 0; // Track number of active progress operations
+
+        function showProgress(text = 'Đang xử lý...') {
+            const progressEl = document.getElementById('progressIndicator');
+            const progressText = document.getElementById('progressText');
+            progressCounter++;
+
+            progressText.textContent = text;
+            progressEl.classList.add('show');
+
+            console.log(`🔄 Progress shown (${progressCounter} active operations): ${text}`);
+        }
+
+        function hideProgress() {
+            const progressEl = document.getElementById('progressIndicator');
+            progressCounter = Math.max(0, progressCounter - 1);
+
+            if (progressCounter === 0) {
+                progressEl.classList.remove('show');
+                console.log('✅ All progress operations completed');
+            } else {
+                console.log(`🔄 Progress hidden (${progressCounter} operations still active)`);
+            }
+        }
+
+        function enableButtons() {
+            document.getElementById('improvementBtn').disabled = false;
+            document.getElementById('jobBtn').disabled = false;
+        }
+
+        function updatePlaceholder(elementId, message, icon = 'fa-info-circle') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `
+                <div class="placeholder-text">
+                    <i class="fas ${icon}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        // API Functions
+        async function callAPI(endpoint, method = 'GET', data = null) {
+            try {
+                const config = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (data && method !== 'GET') {
+                    config.body = JSON.stringify(data);
+                }
+
+                const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // User Management
+        async function createOrUpdateUser(username) {
+            try {
+                showProgress('Đang tạo tài khoản người dùng...');
+                const formData = new FormData();
+                formData.append('username', username);
+
+                const response = await fetch(`${API_BASE_URL}/create_user`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.created) {
+                    showStatus('Tạo tài khoản thành công!', 'success');
+                } else {
+                    showStatus('Tài khoản đã tồn tại.', 'info');
+                }
+
+                return true;
+            } catch (error) {
+                showStatus(`Lỗi tạo tài khoản: ${error.message}`, 'error');
+                return false;
+            } finally {
+                hideProgress();
+            }
+        }
+
+        // Check if user has existing CV in database
+        async function checkExistingCV(username) {
+            try {
+                console.log(`🔍 checkExistingCV called for user: ${username}`);
+                const response = await fetch(`${API_BASE_URL}/resume/${username}`);
+                console.log(`📡 checkExistingCV response: ${response.status} ${response.statusText}`);
+
+                if (response.ok) {
+                    const cvData = await response.json();
+                    console.log('📄 checkExistingCV data:', cvData);
+                    const hasProcessedText = cvData && cvData.processed_text;
+                    console.log('📄 checkExistingCV has processed_text:', hasProcessedText);
+                    return hasProcessedText; // Return true if CV exists and has processed text
+                }
+                console.log('❌ checkExistingCV response not OK');
+                return false;
+            } catch (error) {
+                console.error('❌ Error checking existing CV:', error);
+                return false;
+            }
+        }
+
+        // Check CV function for the "Kiểm Tra CV" button
+        async function checkCV() {
+            const username = document.getElementById('username').value.trim();
+            const checkBtn = document.getElementById('checkBtn');
+=======
+        // User Authentication
+        async function authenticateUser() {
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value.trim();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+            if (!username) {
+                showAlert('Please enter your username', 'warning');
+                return;
+            }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+            // Prevent multiple simultaneous calls
+            if (checkBtn.disabled) {
+                console.log('⚠️ CV check already in progress, ignoring request');
+                return;
+            }
+
+            currentUser = username;
+
+            try {
+                // Disable button to prevent multiple clicks
+                checkBtn.disabled = true;
+                checkBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang kiểm tra...';
+
+                await loadExistingCV(username);
+            } finally {
+                // Re-enable button
+                checkBtn.disabled = false;
+                checkBtn.innerHTML = '<i class="fas fa-search"></i> Kiểm Tra CV';
+            }
+        }
+
+        // Load existing CV data if available
+        async function loadExistingCV(username) {
+=======
+            currentUser = { username, email };
+
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+            try {
+                showLoading();
+
+                // Create or get user
+                const response = await fetch('http://localhost:8000/create_user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, email }),
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert(`Welcome ${username}!`, 'success');
+                    showUploadSection();
+                    checkExistingCV();
+                } else {
+                    throw new Error(data.message || 'Authentication failed');
+                }
+            } catch (error) {
+                console.error('Authentication error:', error);
+                showAlert(error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function showUploadSection() {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('quickActionsSection').classList.remove('hidden');
+        }
+
+        // File Handling
+        function handleFileSelect(file) {
+            const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+
+            if (!validTypes.includes(file.type)) {
+                showAlert('Please upload a PDF or DOC file', 'warning');
+                return;
+            }
+
+            if (file.size > 10 * 1024 * 1024) {
+                showAlert('File size must be less than 10MB', 'warning');
+                return;
+            }
+
+            uploadedCV = file;
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('filePreview').classList.remove('hidden');
+        }
+
+        // CV Upload
+        async function uploadCV() {
+            if (!uploadedCV || !currentUser) {
+                showAlert('Vui lòng chọn file và đăng nhập trước', 'warning');
+                return;
+            }
+
+            // Debug: Log current user data
+            console.log('👤 Current user data:', {
+                username: currentUser.username,
+                userId: currentUser._id,
+                hasUserId: !!currentUser._id,
+                userObject: currentUser
+            });
+
+            console.log('📤 Starting CV upload:', {
+                fileName: uploadedCV.name,
+                fileSize: uploadedCV.size,
+                fileType: uploadedCV.type,
+                currentUser: currentUser.username,
+                userId: currentUser._id || 'undefined'
+            });
+
+            const formData = new FormData();
+            formData.append('resume', uploadedCV);
+            formData.append('username', currentUser.username);
+            
+            // Always include user_id, even if it's undefined (for debugging)
+            formData.append('user_id', currentUser._id || 'undefined');
+            
+            // Debug: Log all form data keys
+            console.log('📝 FormData entries:');
+            for (let pair of formData.entries()) {
+                console.log(`  ${pair[0]}:`, pair[1]);
+            }
+
+            try {
+                showLoading();
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                if (hasExistingCV) {
+                    // User already has CV - ask if they want to replace it
+                    if (!file) {
+                        showStatus(`CV của ${username} đã có sẵn trong hệ thống! Các tính năng gợi ý đã sẵn sàng sử dụng. Nếu muốn cập nhật CV mới, vui lòng chọn file.`, 'info');
+                        enableButtons();
+                        updatePlaceholder('improvementResult', `CV của ${username} đã sẵn sàng để nhận gợi ý cải thiện`, 'fa-check-circle');
+                        updatePlaceholder('jobResult', `CV của ${username} đã sẵn sàng để tìm kiếm công việc phù hợp`, 'fa-check-circle');
+
+                        // Auto-enable buttons and update UI
+                        document.getElementById('improvementBtn').disabled = false;
+                        document.getElementById('jobBtn').disabled = false;
+
+                        // Load existing CV data for display
+                        loadUserCVs();
+                        return;
+                    } else {
+                        // User has selected a new file - confirm they want to replace the existing CV
+                        const replaceConfirmed = confirm(`CV của ${username} đã tồn tại trong hệ thống. Bạn có muốn thay thế CV hiện tại bằng "${file.name}" không?\n\nMọi dữ liệu phân tích cũ sẽ được cập nhật theo CV mới.`);
+                        if (!replaceConfirmed) {
+                            showStatus('Đã hủy việc tải lên CV mới.', 'info');
+                            return;
+                        }
+
+                        showStatus(`Đang thay thế CV của ${username} bằng file mới...`, 'info');
+                    }
+                }
+
+                // No existing CV found, require file upload
+                if (!file) {
+                    showStatus(`Chưa tìm thấy CV của ${username} trong hệ thống. Vui lòng chọn file CV để tải lên!`, 'warning');
+                    return;
+                }
+
+                // File size validation (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    showStatus('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.', 'error');
+                    return;
+                }
+
+                // Create user first
+                const userCreated = await createOrUpdateUser(username);
+                if (!userCreated) return;
+
+                // Upload CV
+                showProgress('Đang tải lên và phân tích CV...');
+
+                const formData = new FormData();
+                formData.append('username', username);
+                formData.append('file', file);
+                formData.append('original_filename', file.name);
+
+                const response = await fetch(`${API_BASE_URL}/upload_resume`, {
+=======
+                // Call to our frontend server endpoint
+                console.log('📤 Sending upload request to: /cv/assistant-upload');
+                const response = await fetch('/cv/assistant-upload', {
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+                    method: 'POST',
+                    body: formData,
+                });
+
+                console.log('📡 Upload response status:', response.status, 'OK:', response.ok);
+
+                const data = await response.json();
+                console.log('📋 Upload response data:', data);
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                if (result.saved) {
+                    cvUploaded = true;
+                    enableButtons();
+
+                    const fileName = file.name;
+                    const isReplacement = hasExistingCV;
+                    const action = isReplacement ? 'thay thế và phân tích' : 'tải lên và phân tích';
+                    showStatus(`✅ CV "${fileName}" đã được ${action} thành công!`, 'success');
+
+                    // Update placeholders
+                    updatePlaceholder('improvementResult', `CV của ${username} đã sẵn sàng để nhận gợi ý cải thiện`, 'fa-check-circle');
+                    updatePlaceholder('jobResult', `CV của ${username} đã sẵn sàng để tìm kiếm công việc phù hợp`, 'fa-check-circle');
+
+                    // Refresh user CVs display to show the new CV
+                    setTimeout(() => {
+                        loadUserCVs();
+=======
+                if (response.ok && data.success) {
+                    showAlert('CV đã được tải lên và xử lý thành công!', 'success');
+                    showAllSections();
+
+                    // Auto-check CV status and get evaluation
+                    setTimeout(() => {
+                        console.log('🔄 Auto-checking CV status after upload...');
+                        checkExistingCV();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+                    }, 1000);
+                } else {
+                    throw new Error(data.message || 'Tải lên thất bại');
+                }
+            } catch (error) {
+                console.error('💥 Upload error:', error);
+                showAlert(error.message || 'Lỗi khi tải lên CV', 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+        // CV Improvements
+        async function getImprovements() {
+            const username = document.getElementById('username').value.trim();
+            const improvementBtn = document.getElementById('improvementBtn');
+
+            console.log(`🔧 Getting improvements for user: ${username}`);
+
+            if (!username) {
+                showStatus('Vui lòng nhập tên người dùng!', 'error');
+=======
+        // Check Existing CV
+        async function checkExistingCV() {
+            if (!currentUser) {
+                showAlert('Vui lòng đăng nhập trước', 'warning');
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+                return;
+            }
+
+            // Prevent multiple simultaneous calls
+            if (improvementBtn.disabled) {
+                console.log('⚠️ Improvements already in progress, ignoring request');
+                return;
+            }
+
+            try {
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                // Disable button to prevent multiple clicks
+                improvementBtn.disabled = true;
+                improvementBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                // Check if CV exists first
+                showProgress('Đang kiểm tra CV trong hệ thống...');
+                const hasCV = await checkExistingCV(username);
+=======
+                showLoading();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+                // First, check if user has CV in AI agent database
+                const url = `http://localhost:8000/resume/${currentUser.username}`;
+                console.log('🔍 Checking CV status for user:', currentUser.username, 'URL:', url);
+
+                const response = await fetch(url);
+                console.log('📡 CV check response status:', response.status, 'OK:', response.ok);
+
+                let aiAgentData = null;
+
+                if (response.ok) {
+                    aiAgentData = await response.json();
+                    console.log('📋 CV data received:', aiAgentData);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ CV check failed:', response.status, errorText);
+                }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                currentUser = username;
+                cvUploaded = true;
+                enableButtons();
+                // Re-disable this button since enableButtons() will enable it
+                improvementBtn.disabled = true;
+                improvementBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                console.log('✅ CV check passed, fetching improvements...');
+=======
+                // Check CV status from both AI agent and local database
+                const hasCVInAI = aiAgentData && aiAgentData.keywords && aiAgentData.keywords.length > 0;
+                const hasCVInLocal = {{#if userCV}}true{{else}}false{{/if}};
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+                if (hasCVInAI || hasCVInLocal) {
+                    // Combine data from both sources
+                    const combinedData = {
+                        username: currentUser.username,
+                        email: currentUser.email,
+                        keywords: aiAgentData?.keywords || [],
+                        saved: aiAgentData?.saved || hasCVInLocal,
+                        uploaded_at: {{#if userCV}}'{{userCV.uploaded_at}}'{{else}}null{{/if}}
+                    };
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                const response = await fetch(`${API_BASE_URL}/resume/${username}/suggest_improvements`, {
+                    method: 'POST'
+                });
+=======
+                    displayCVStatus(true, combinedData);
+                    showAllSections();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+                    // If user has CV, automatically get AI evaluation
+                    getAIEvaluation();
+                } else {
+                    displayCVStatus(false, null);
+                    showUploadSection();
+                }
+            } catch (error) {
+                console.error('CV check error:', error);
+                displayCVStatus(false, null);
+            } finally {
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                hideProgress();
+                // Re-enable button
+                improvementBtn.disabled = false;
+                improvementBtn.innerHTML = '<i class="fas fa-lightbulb"></i> Nhận Gợi Ý';
+            }
+        }
+
+        // Simple markdown formatter for AI response
+        function formatMarkdown(text) {
+            if (!text) return '';
+
+            return text
+                // Convert **bold** to <strong>
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Convert *italic* to <em>
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Convert headers
+                .replace(/^### (.*$)/gm, '<h4 style="color: var(--primary); margin: 15px 0 10px 0;">$1</h4>')
+                .replace(/^## (.*$)/gm, '<h3 style="color: var(--primary); margin: 20px 0 15px 0;">$1</h3>')
+                .replace(/^# (.*$)/gm, '<h2 style="color: var(--primary); margin: 25px 0 20px 0;">$1</h2>')
+                // Convert bullet points
+                .replace(/^\* (.*$)/gm, '<li style="margin: 5px 0;">$1</li>')
+                // Convert numbered lists
+                .replace(/^\d+\. (.*$)/gm, '<li style="margin: 5px 0;">$1</li>')
+                // Convert line breaks
+                .replace(/\n\n/g, '</p><p style="margin: 10px 0;">')
+                .replace(/\n/g, '<br>')
+                // Wrap in paragraphs
+                .replace(/^(.+)/, '<p style="margin: 10px 0; line-height: 1.6;">$1</p>')
+                // Fix consecutive list items
+                .replace(/<\/li><p style="margin: 10px 0; line-height: 1.6;"><li/g, '</li><li')
+                .replace(/<\/li><p style="margin: 10px 0; line-height: 1.6;"><\/p>/g, '</li>')
+                // Wrap lists in ul tags
+                .replace(/(<li[^>]*>.*<\/li>)/s, '<ul style="margin: 10px 0; padding-left: 20px;">$1</ul>');
+        }
+
+        function displayImprovements(analysisData) {
+            const improvementResult = document.getElementById('improvementResult');
+
+            if (!analysisData || !analysisData.improvements) {
+                improvementResult.innerHTML = `
+                    <div class="placeholder-text">
+                        <i class="fas fa-info-circle"></i>
+                        Không thể phân tích CV. Vui lòng thử lại sau.
+=======
+                hideLoading();
+            }
+        }
+
+        function displayCVStatus(hasCV, userData) {
+            const statusSection = document.getElementById('cvStatusSection');
+            const resultsDiv = document.getElementById('cvStatusResults');
+
+            statusSection.classList.remove('hidden');
+
+            if (hasCV) {
+                const uploadDate = userData.uploaded_at ? new Date(userData.uploaded_at).toLocaleDateString('vi-VN') : 'Không xác định';
+                const keywordsText = userData.keywords && userData.keywords.length > 0
+                    ? userData.keywords.slice(0, 5).join(', ')
+                    : 'Chưa có từ khóa';
+
+                resultsDiv.innerHTML = `
+                    <div class="result-card fade-in">
+                        <div class="result-title">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            Trạng thái CV: Đã tải lên
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Tên người dùng:</strong> ${userData.username || currentUser.username}</p>
+                                <p><strong>Email:</strong> ${userData.email || currentUser.email || 'Chưa cung cấp'}</p>
+                                <p><strong>Ngày tải lên:</strong> ${uploadDate}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Trạng thái xử lý:</strong> <span class="badge-status badge-success">Đã xử lý</span></p>
+                                <p><strong>Từ khóa:</strong> ${keywordsText}</p>
+                                <p><strong>Tích hợp AI:</strong> ${userData.saved ? '<span class="badge-status badge-success">Hoàn tất</span>' : '<span class="badge-status badge-warning">Đang xử lý</span>'}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-secondary-custom me-2" onclick="scrollToCVStatus()">
+                                <i class="fas fa-search me-2"></i>Check CV Status
+                            </button>
+                            <button class="btn btn-primary-custom me-2" onclick="getAIEvaluation()">
+                                <i class="fas fa-brain me-2"></i>Xem đánh giá AI
+                            </button>
+                            <button class="btn btn-outline-success" onclick="getJobSuggestions()">
+                                <i class="fas fa-briefcase me-2"></i>Tìm công việc phù hợp
+                            </button>
+                        </div>
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+                    </div>
+                `;
+            } else {
+                resultsDiv.innerHTML = `
+                    <div class="result-card fade-in">
+                        <div class="result-title">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            Chưa tìm thấy CV
+                        </div>
+                        <p class="text-muted">Bạn chưa tải lên CV nào. Hãy tải lên CV để nhận được các gợi ý và đánh giá từ AI.</p>
+                        <button class="btn btn-primary-custom" onclick="document.getElementById('uploadArea').scrollIntoView({behavior: 'smooth'})">
+                            <i class="fas fa-upload me-2"></i>Tải lên CV ngay
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // AI Evaluation
+        async function getAIEvaluation() {
+            if (!currentUser) {
+                showAlert('Please authenticate first', 'warning');
+                return;
+            }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+            // Parse the improvements text from AI agent
+            const improvementsText = analysisData.improvements;
+            const model = analysisData.model || 'AI Model';
+
+            // Try to extract rating from the text
+            let rating = null;
+            const ratingMatch = improvementsText.match(/\*\*Rating: (\d+)\/10\*\*/);
+            if (ratingMatch) {
+                rating = parseInt(ratingMatch[1]);
+            }
+
+            let html = '<div class="cv-analysis-container">';
+
+            // AI Model Info
+            html += `
+                <div class="ai-model-info" style="background: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 12px; margin-bottom: 20px; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-robot" style="color: #0ea5e9; font-size: 1.2rem;"></i>
+                        <div>
+                            <div style="font-weight: 600; color: #0c4a6e;">Phân tích bởi AI</div>
+                            <div style="font-size: 0.9rem; color: #64748b;">Model: ${model}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Rating Display
+            if (rating !== null) {
+                const ratingColor = rating >= 8 ? '#10b981' : rating >= 6 ? '#f59e0b' : '#ef4444';
+                const ratingText = rating >= 8 ? 'Tốt' : rating >= 6 ? 'Khá' : 'Cần cải thiện';
+
+                html += `
+                    <div class="analysis-overall">
+                        <div class="overall-header">
+                            <div class="overall-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="overall-content">
+                                <h3 class="overall-title">Đánh giá CV</h3>
+                                <div class="overall-score">
+                                    <span class="score-value" style="color: ${ratingColor};">${rating}/10</span>
+                                    <span class="score-grade" style="background: ${ratingColor};">${ratingText}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Improvements Content - Display as formatted HTML
+            html += `
+                <div class="detailed-feedback">
+                    <h3 class="feedback-title">
+                        <i class="fas fa-lightbulb"></i>
+                        Gợi ý cải thiện chi tiết
+                    </h3>
+                    <div class="feedback-content" style="background: white; padding: 20px; border-radius: 10px; border: 1px solid #e5e7eb;">
+                        ${formatMarkdown(improvementsText)}
+                    </div>
+                </div>
+            `;
+=======
+            try {
+                showLoading();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+                const url = `http://localhost:8000/resume/${currentUser.username}/suggest_improvements?model_name=gemini-2.0-flash`;
+                console.log('🤖 Getting AI evaluation for user:', currentUser.username, 'URL:', url);
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log('📡 AI evaluation response status:', response.status, 'OK:', response.ok);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('🎯 AI evaluation data received:', data);
+                    displayAIEvaluation(data);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ AI evaluation failed:', response.status, errorText);
+                    throw new Error(`AI Evaluation failed: ${response.status} ${errorText}`);
+                }
+            } catch (error) {
+                console.error('💥 Evaluation error:', error);
+                showAlert(error.message, 'danger');
+            } finally {
+                hideLoading();
+            }
+        }
+
+        function displayAIEvaluation(data) {
+            const evaluationSection = document.getElementById('evaluationSection');
+            const resultsDiv = document.getElementById('evaluationResults');
+
+            evaluationSection.classList.remove('hidden');
+
+            let score = 75; // Default score
+            let fullImprovementsText = '';
+            let summary = '';
+            let personalInfo = {};
+            let strengths = [];
+            let improvements = [];
+            let skills = {
+                technical: [],
+                soft: [],
+                languages: []
+            };
+            let experience = [];
+            let education = [];
+            let detailedScores = {
+                layout: { score: 0, max: 10, comments: '' },
+                personalInfo: { score: 0, max: 5, comments: '' },
+                careerObjective: { score: 0, max: 10, comments: '' },
+                workExperience: { score: 0, max: 30, comments: '' },
+                projects: { score: 0, max: 15, comments: '' },
+                skills: { score: 0, max: 10, comments: '' },
+                education: { score: 0, max: 10, comments: '' },
+                noErrors: { score: 0, max: 10, comments: '' }
+            };
+
+            // Parse score from AI agent response first (highest priority)
+            if (data.improvements) {
+                fullImprovementsText = data.improvements;
+
+                // Extract rating from the improvements text using regex
+                // Pattern: "**Rating: X/10**" or "Rating: X/10" or "Điểm: X/10"
+                const ratingMatch = data.improvements.match(/\*{0,2}Rating\s*:?\s*(\d+)\/10\*{0,2}/i) ||
+                                 data.improvements.match(/\*{0,2}Điểm\s*:?\s*(\d+)\/10\*{0,2}/i) ||
+                                 data.improvements.match(/(\d+)\/10/);
+
+                if (ratingMatch) {
+                    score = parseInt(ratingMatch[1]) * 10; // Convert to 100 scale (6/10 = 60)
+                    console.log('🎯 Extracted score from AI response:', score);
+                }
+
+                // Extract detailed scores and comments using comprehensive parsing
+                detailedScores = parseDetailedScores(fullImprovementsText);
+            }
+
+            // Calculate total score from detailed components
+            const calculatedScore = Object.values(detailedScores).reduce((sum, section) => sum + section.score, 0);
+            if (calculatedScore > 0) {
+                score = calculatedScore;
+                console.log('🎯 Calculated score from detailed evaluation:', score);
+            }
+
+            // Helper function to parse detailed scores
+            function parseDetailedScores(text) {
+                const scores = {
+                    layout: { score: 7, max: 10, comments: 'Cần cải thiện bố cục tổng thể' },
+                    personalInfo: { score: 4, max: 5, comments: 'Thông tin cơ bản đầy đủ' },
+                    careerObjective: { score: 6, max: 10, comments: 'Mục tiêu cần rõ ràng hơn' },
+                    workExperience: { score: 20, max: 30, comments: 'Cần thêm số liệu cụ thể' },
+                    projects: { score: 10, max: 15, comments: 'Dự án tốt nhưng cần chi tiết hơn' },
+                    skills: { score: 7, max: 10, comments: 'Kỹ năng cần phân loại rõ ràng' },
+                    education: { score: 8, max: 10, comments: 'Học vấn phù hợp' },
+                    noErrors: { score: 8, max: 10, comments: 'Có một vài lỗi nhỏ cần sửa' }
+                };
+
+                // Extract section-specific feedback
+                if (text.toLowerCase().includes('bố cục') || text.toLowerCase().includes('trình bày')) {
+                    scores.layout.comments = extractSectionFeedback(text, ['bố cục', 'trình bày']);
+                    scores.layout.score = extractSectionScore(text, scores.layout.max);
+                }
+
+                if (text.toLowerCase().includes('thông tin cá nhân') || text.toLowerCase().includes('email')) {
+                    scores.personalInfo.comments = extractSectionFeedback(text, ['thông tin cá nhân', 'email']);
+                    scores.personalInfo.score = extractSectionScore(text, scores.personalInfo.max);
+                }
+
+                if (text.toLowerCase().includes('mục tiêu') || text.toLowerCase().includes('objective')) {
+                    scores.careerObjective.comments = extractSectionFeedback(text, ['mục tiêu', 'objective']);
+                    scores.careerObjective.score = extractSectionScore(text, scores.careerObjective.max);
+                }
+
+                if (text.toLowerCase().includes('kinh nghiệm') || text.toLowerCase().includes('work experience')) {
+                    scores.workExperience.comments = extractSectionFeedback(text, ['kinh nghiệm', 'work experience', 'thành tựu', 'số liệu']);
+                    scores.workExperience.score = extractSectionScore(text, scores.workExperience.max);
+                }
+
+                if (text.toLowerCase().includes('dự án') || text.toLowerCase().includes('projects')) {
+                    scores.projects.comments = extractSectionFeedback(text, ['dự án', 'projects']);
+                    scores.projects.score = extractSectionScore(text, scores.projects.max);
+                }
+
+                if (text.toLowerCase().includes('kỹ năng') || text.toLowerCase().includes('skills')) {
+                    scores.skills.comments = extractSectionFeedback(text, ['kỹ năng', 'skills']);
+                    scores.skills.score = extractSectionScore(text, scores.skills.max);
+                }
+
+                if (text.toLowerCase().includes('học vấn') || text.toLowerCase().includes('education')) {
+                    scores.education.comments = extractSectionFeedback(text, ['học vấn', 'education']);
+                    scores.education.score = extractSectionScore(text, scores.education.max);
+                }
+
+                return scores;
+            }
+
+            function extractSectionFeedback(text, keywords) {
+                const lines = text.split('\n');
+                const feedback = [];
+
+                for (let line of lines) {
+                    for (let keyword of keywords) {
+                        if (line.toLowerCase().includes(keyword.toLowerCase()) && line.length > 20) {
+                            feedback.push(line.trim());
+                        }
+                    }
+                }
+
+                return feedback.length > 0 ? feedback.slice(0, 2).join('. ') : 'Cần cải thiện thêm';
+            }
+
+            function extractSectionScore(text, maxScore) {
+                // Look for patterns like "7/10", "7 điểm", etc.
+                const scorePattern = /(\d+)\s*(\/|điểm|out of)\s*10/i;
+                const match = text.match(scorePattern);
+                if (match) {
+                    return Math.min(parseInt(match[1]), maxScore);
+                }
+                // If no specific score found, estimate based on feedback
+                return Math.floor(Math.random() * 3) + maxScore - 3; // Return score in upper range
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="result-card fade-in">
+                    <div class="text-center mb-4">
+                        <div class="evaluation-score">
+                            <i class="fas fa-star me-2"></i>Điểm tổng thể: ${score}/100
+                        </div>
+                        <p class="text-muted">Dựa trên bộ tiêu chí chấm điểm CV chuyên nghiệp (AI Analysis)</p>
+                    </div>
+
+                    <!-- Detailed Score Breakdown -->
+                    <div class="evaluation-item">
+                        <h5><i class="fas fa-chart-bar text-primary me-2"></i>Chi tiết điểm theo tiêu chí</h5>
+                        <div class="score-breakdown">
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">✅ Bố cục & Trình bày</span>
+                                    <span class="score-value">${detailedScores.layout.score}/${detailedScores.layout.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.layout.score / detailedScores.layout.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.layout.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">👤 Thông tin cá nhân</span>
+                                    <span class="score-value">${detailedScores.personalInfo.score}/${detailedScores.personalInfo.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.personalInfo.score / detailedScores.personalInfo.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.personalInfo.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">🎯 Mục tiêu nghề nghiệp</span>
+                                    <span class="score-value">${detailedScores.careerObjective.score}/${detailedScores.careerObjective.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.careerObjective.score / detailedScores.careerObjective.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.careerObjective.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">💼 Kinh nghiệm làm việc</span>
+                                    <span class="score-value text-danger">${detailedScores.workExperience.score}/${detailedScores.workExperience.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar bg-warning" style="width: ${(detailedScores.workExperience.score / detailedScores.workExperience.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.workExperience.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">🚀 Dự án</span>
+                                    <span class="score-value">${detailedScores.projects.score}/${detailedScores.projects.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.projects.score / detailedScores.projects.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.projects.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">🛠️ Kỹ năng</span>
+                                    <span class="score-value">${detailedScores.skills.score}/${detailedScores.skills.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.skills.score / detailedScores.skills.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.skills.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">🎓 Học vấn & Chứng chỉ</span>
+                                    <span class="score-value">${detailedScores.education.score}/${detailedScores.education.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.education.score / detailedScores.education.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.education.comments}</p>
+                            </div>
+
+                            <div class="score-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="score-label">✅ Không lỗi (Format/C语法)</span>
+                                    <span class="score-value">${detailedScores.noErrors.score}/${detailedScores.noErrors.max}</span>
+                                </div>
+                                <div class="progress progress-custom mb-2">
+                                    <div class="progress-bar" style="width: ${(detailedScores.noErrors.score / detailedScores.noErrors.max) * 100}%"></div>
+                                </div>
+                                <p class="score-comment text-muted small">${detailedScores.noErrors.comments}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${fullImprovementsText ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-robot text-info me-2"></i>Nhận xét chi tiết từ AI</h5>
+                            <div class="ai-evaluation-text">
+                                ${fullImprovementsText.replace(/\*\*Rating:\s*(\d+)\/10\*\*/g, '<strong>Điểm số: $1/10</strong>')
+                                               .replace(/\*\*Suggestions for Improvement:\*\*/g, '<strong>Gợi ý cải thiện:</strong>')
+                                               .replace(/\*\*Recommended Projects:\*\*/g, '<strong>Dự án đề xuất:</strong>')
+                                               .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                               .replace(/\n/g, '<br>')
+                                               .replace(/\*(.*?)\*/g, '<em>$1</em>')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${summary ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-user text-primary me-2"></i>Tóm tắt chuyên môn</h5>
+                            <p class="text-muted">${summary}</p>
+                        </div>
+                    ` : ''}
+
+                    ${Object.keys(personalInfo).length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-id-card text-info me-2"></i>Thông tin cá nhân</h5>
+                            <div class="row">
+                                ${personalInfo.name ? `<div class="col-md-6"><p><strong>Họ tên:</strong> ${personalInfo.name}</p></div>` : ''}
+                                ${personalInfo.email ? `<div class="col-md-6"><p><strong>Email:</strong> ${personalInfo.email}</p></div>` : ''}
+                                ${personalInfo.phone ? `<div class="col-md-6"><p><strong>Điện thoại:</strong> ${personalInfo.phone}</p></div>` : ''}
+                                ${personalInfo.location ? `<div class="col-md-6"><p><strong>Địa điểm:</strong> ${personalInfo.location}</p></div>` : ''}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${strengths.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-thumbs-up text-success me-2"></i>Điểm mạnh</h5>
+                            <ul class="list-unstyled">
+                                ${strengths.map(strength => `<li><i class="fas fa-check text-success me-2"></i>${strength}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    ${improvements.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-lightbulb text-warning me-2"></i>Điểm cần cải thiện</h5>
+                            <ul class="list-unstyled">
+                                ${improvements.map(improvement => `<li><i class="fas fa-arrow-right text-warning me-2"></i>${improvement}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+
+                    ${skills.technical.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-cogs text-info me-2"></i>Kỹ năng chuyên môn (${skills.technical.length})</h5>
+                            <div class="skills-list">
+                                ${skills.technical.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${skills.soft.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-users text-primary me-2"></i>Kỹ năng mềm (${skills.soft.length})</h5>
+                            <div class="skills-list">
+                                ${skills.soft.map(skill => `<span class="skill-tag skill-tag-soft">${skill}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${skills.languages.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-language text-success me-2"></i>Ngôn ngữ (${skills.languages.length})</h5>
+                            <div class="skills-list">
+                                ${skills.languages.map(skill => `<span class="skill-tag skill-tag-language">${skill}</span>`).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${experience.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-briefcase text-primary me-2"></i>Kinh nghiệm làm việc</h5>
+                            <div class="experience-list">
+                                ${experience.map(exp => `
+                                    <div class="experience-item">
+                                        ${exp.position ? `<h6>${exp.position}</h6>` : ''}
+                                        ${exp.company ? `<p class="text-muted mb-1">${exp.company}</p>` : ''}
+                                        ${exp.duration ? `<small class="text-muted">${exp.duration}</small>` : ''}
+                                        ${exp.description ? `<p class="mt-2">${exp.description}</p>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${education.length > 0 ? `
+                        <div class="evaluation-item">
+                            <h5><i class="fas fa-graduation-cap text-secondary me-2"></i>Học vấn</h5>
+                            <div class="education-list">
+                                ${education.map(edu => `
+                                    <div class="education-item">
+                                        ${edu.degree ? `<h6>${edu.degree}</h6>` : ''}
+                                        ${edu.school ? `<p class="text-muted mb-1">${edu.school}</p>` : ''}
+                                        ${edu.year ? `<small class="text-muted">${edu.year}</small>` : ''}
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="mt-4 text-center">
+                        <button class="btn btn-primary-custom me-2" onclick="getJobSuggestions()">
+                            <i class="fas fa-briefcase me-2"></i>Tìm công việc phù hợp
+                        </button>
+                        <button class="btn btn-outline-success" onclick="window.print()">
+                            <i class="fas fa-download me-2"></i>Xuất báo cáo
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Smooth scroll to evaluation
+            evaluationSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Job Suggestions
+        async function getJobSuggestions() {
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+            const username = document.getElementById('username').value.trim();
+            const jobBtn = document.getElementById('jobBtn');
+
+            if (!username) {
+                showStatus('Vui lòng nhập tên người dùng!', 'error');
+=======
+            if (!currentUser) {
+                showAlert('Please authenticate first', 'warning');
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+                return;
+            }
+
+            // Prevent multiple simultaneous calls
+            if (jobBtn.disabled) {
+                console.log('⚠️ Job suggestions already in progress, ignoring request');
+                return;
+            }
+
+            try {
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                // Disable button to prevent multiple clicks
+                jobBtn.disabled = true;
+                jobBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                // Check if CV exists first
+                showProgress('Đang kiểm tra CV trong hệ thống...');
+                const hasCV = await checkExistingCV(username);
+=======
+                showLoading();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+
+                const url = `http://localhost:8000/api/jobs-suggestion/${currentUser.username}`;
+                console.log('💼 Getting job suggestions for user:', currentUser.username, 'URL:', url);
+
+                const response = await fetch(url);
+                console.log('📡 Job suggestions response status:', response.status, 'OK:', response.ok);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('💼 Job suggestions data received:', data);
+                    displayJobSuggestions(data);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Job search failed:', response.status, errorText);
+                    throw new Error(`Job search failed: ${response.status} ${errorText}`);
+                }
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+
+                currentUser = username;
+                cvUploaded = true;
+                enableButtons();
+                // Re-disable this button since enableButtons() will enable it
+                jobBtn.disabled = true;
+                jobBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                // Get job suggestions
+                showProgress('Đang tìm kiếm công việc phù hợp với CV của bạn...');
+
+                const result = await callAPI(`/api/jobs-suggestion/${username}`);
+                displayJobSuggestions(result);
+                showStatus(`Tìm thấy ${result.total_matches || 0} công việc phù hợp!`, 'success');
+
+=======
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+            } catch (error) {
+                console.error('💥 Job search error:', error);
+                showAlert(error.message, 'danger');
+            } finally {
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+                hideProgress();
+                // Re-enable button
+                jobBtn.disabled = false;
+                jobBtn.innerHTML = '<i class="fas fa-search"></i> Tìm Công Việc';
+=======
+                hideLoading();
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+            }
+        }
+
+        function displayJobSuggestions(data) {
+            const jobsSection = document.getElementById('jobsSection');
+            const resultsDiv = document.getElementById('jobResults');
+
+            jobsSection.classList.remove('hidden');
+
+            let jobs = [];
+            // Handle the correct response format from backend
+            if (data.matching_jobs && data.matching_jobs.length > 0) {
+                jobs = data.matching_jobs;
+            } else if (data.parsed_output && data.parsed_output.jobs) {
+                jobs = data.parsed_output.jobs;
+            }
+
+            // Store jobs data for detail view
+            currentJobsData = jobs;
+
+            if (jobs.length === 0) {
+                resultsDiv.innerHTML = `
+                    <div class="text-center py-5">
+                        <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                        <h5>Chưa tìm thấy công việc phù hợp</h5>
+                        <p class="text-muted">Hiện tại chưa có công việc nào phù hợp với CV của bạn. Vui lòng thử lại sau.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            resultsDiv.innerHTML = `
+                <div class="mb-3">
+                    <p class="text-muted">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Tìm thấy ${jobs.length} gợi ý công việc phù hợp với CV của bạn
+                    </p>
+                </div>
+                ${jobs.map((job, index) => `
+                    <div class="job-card fade-in ${job._id ? 'clickable' : ''}" style="animation-delay: ${index * 0.1}s" ${job._id ? `onclick="handleJobCardClick(event, '/jobs/${job.slug || job._id}')"` : ''}>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="job-title ${job._id ? 'text-primary' : ''}">
+                                    ${job.title || 'Job Title'}
+                                    ${job._id ? '<i class="fas fa-external-link-alt ms-2 small"></i>' : ''}
+                                </h5>
+                                <p class="job-company">
+                                    <i class="fas fa-building me-1"></i>${job.company || 'Company Name'}
+                                </p>
+                            </div>
+                            ${job.match_percentage ? `
+                                <span class="badge bg-success">${Math.round(job.match_percentage)}% Match</span>
+                            ` : '<span class="badge bg-primary">Full-time</span>'}
+                        </div>
+
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-map-marker-alt me-2"></i>${job.location || 'Địa điểm chưa được xác định'}
+                        </p>
+
+                        <p class="mb-2">${job.description || 'Chưa có mô tả công việc'}</p>
+
+                        ${job.salary ? `
+                            <p class="text-success fw-bold mb-2">
+                                <i class="fas fa-dollar-sign me-1"></i>${job.salary}
+                            </p>
+                        ` : ''}
+
+                        ${job.matched_skills && job.matched_skills.length > 0 ? `
+                            <div class="mb-2">
+                                <p class="text-muted mb-1"><i class="fas fa-check-circle me-1"></i>Matching skills:</p>
+                                <div class="job-skills">
+                                    ${job.matched_skills.map(skill => `<span class="skill-tag">${skill.skill || skill}</span>`).join('')}
+                                </div>
+                            </div>
+                        ` : ''}
+
+                        ${job.skills && job.skills.length > 0 ? `
+                            <div class="job-skills">
+                                ${job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                            </div>
+                        ` : ''}
+
+                        <div class="mt-3">
+                            ${job._id ? `
+                                <a href="/jobs/${job.slug || job._id}" class="btn btn-outline-info btn-sm me-2">
+                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                </a>
+                            ` : `
+                                <button class="btn btn-outline-info btn-sm me-2" onclick="showJobDetails(${index})">
+                                    <i class="fas fa-eye me-2"></i>Xem chi tiết
+                                </button>
+                            `}
+                            ${job.apply_url ? `
+                                <a href="${job.apply_url}" target="_blank" class="btn btn-primary-custom btn-sm">
+                                    <i class="fas fa-external-link-alt me-2"></i>Ứng tuyển ngay
+                                </a>
+                            ` : `
+                                <button class="btn btn-outline-secondary btn-sm" onclick="showJobDetails(${index})">
+                                    <i class="fas fa-info-circle me-2"></i>Xem thông tin
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            // Smooth scroll to jobs
+            jobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Show all sections after authentication
+        function showAllSections() {
+            document.getElementById('evaluationSection').classList.remove('hidden');
+            document.getElementById('jobsSection').classList.remove('hidden');
+        }
+
+        // Quick action functions
+        function quickCheckCV() {
+            checkExistingCV();
+        }
+
+        function quickEvaluation() {
+            getAIEvaluation();
+        }
+
+        function quickJobs() {
+            getJobSuggestions();
+        }
+
+        // Handle job card click - navigate to job detail unless clicking on a button
+        function handleJobCardClick(event, jobUrl) {
+            // Check if the click was on a button or link
+            const target = event.target;
+            const closestButton = target.closest('a, button');
+
+            if (!closestButton) {
+                // Only navigate if not clicking on a button/link
+                window.location.href = jobUrl;
+            }
+        }
+
+        // Show job details in modal for jobs without _id
+        function showJobDetails(jobIndex) {
+            // Use stored jobs data from last job suggestions call
+            const job = currentJobsData[jobIndex];
+            if (!job) {
+                showAlert('Không tìm thấy thông tin công việc', 'warning');
+                return;
+            }
+
+            // Create modal HTML
+            const modalHtml = `
+                <div class="modal fade" id="jobDetailsModal" tabindex="-1" aria-labelledby="jobDetailsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="jobDetailsModalLabel">
+                                    <i class="fas fa-briefcase me-2"></i>${job.title || 'Chi tiết công việc'}
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <h6 class="text-primary">${job.company || 'Công ty chưa xác định'}</h6>
+                                        <p class="text-muted mb-2">
+                                            <i class="fas fa-map-marker-alt me-2"></i>${job.location || 'Địa điểm chưa được xác định'}
+                                        </p>
+                                        ${job.salary ? `
+                                            <p class="text-success fw-bold mb-3">
+                                                <i class="fas fa-dollar-sign me-1"></i>${job.salary}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="col-md-4 text-end">
+                                        ${job.match_percentage ? `
+                                            <span class="badge bg-success fs-6">${Math.round(job.match_percentage)}% Match</span>
+                                        ` : '<span class="badge bg-primary">Full-time</span>'}
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <h6><i class="fas fa-file-alt me-2"></i>Mô tả công việc</h6>
+                                    <p class="text-muted">${job.description || 'Chưa có mô tả chi tiết'}</p>
+                                </div>
+
+                                ${job.matched_skills && job.matched_skills.length > 0 ? `
+                                    <div class="mt-3">
+                                        <h6><i class="fas fa-check-circle me-2 text-success"></i>Kỹ năng phù hợp</h6>
+                                        <div class="job-skills">
+                                            ${job.matched_skills.map(skill => `<span class="skill-tag">${skill.skill || skill}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                ${job.skills && job.skills.length > 0 ? `
+                                    <div class="mt-3">
+                                        <h6><i class="fas fa-cogs me-2 text-info"></i>Kỹ năng yêu cầu</h6>
+                                        <div class="job-skills">
+                                            ${job.skills.map(skill => `<span class="skill-tag">${skill}</span>`).join('')}
+                                        </div>
+                                    </div>
+                                ` : ''}
+
+                                ${job.requirements ? `
+                                    <div class="mt-3">
+                                        <h6><i class="fas fa-list-check me-2 text-warning"></i>Yêu cầu</h6>
+                                        <p class="text-muted">${job.requirements}</p>
+                                    </div>
+                                ` : ''}
+
+                                ${job.benefits ? `
+                                    <div class="mt-3">
+                                        <h6><i class="fas fa-gift me-2 text-success"></i>Phúc lợi</h6>
+                                        <p class="text-muted">${job.benefits}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="modal-footer">
+                                ${job.apply_url ? `
+                                    <a href="${job.apply_url}" target="_blank" class="btn btn-primary-custom">
+                                        <i class="fas fa-external-link-alt me-2"></i>Ứng tuyển ngay
+                                    </a>
+                                ` : `
+                                    <button type="button" class="btn btn-outline-secondary" disabled>
+                                        <i class="fas fa-info-circle me-2"></i>Liên hệ để ứng tuyển
+                                    </button>
+                                `}
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // Remove existing modal if present
+            const existingModal = document.getElementById('jobDetailsModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+
+            // Add modal to body and show it
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = new bootstrap.Modal(document.getElementById('jobDetailsModal'));
+            modal.show();
+
+            // Remove modal from DOM when hidden
+            document.getElementById('jobDetailsModal').addEventListener('hidden.bs.modal', function() {
+                this.remove();
+            });
+        }
+
+<<<<<<< Updated upstream:src/resources/views/cv-assistant.hbs.backup
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('jobModal');
+            if (event.target === modal) {
+                closeJobModal();
+            }
+        }
+
+  
+        function displayUserCVs(cvs, username) {
+            const cvsGrid = document.getElementById('cvsGrid');
+
+            if (!cvs || cvs.length === 0) {
+                document.getElementById('loadingCVs').style.display = 'none';
+                document.getElementById('noCVs').style.display = 'block';
+                return;
+            }
+
+            let html = `
+                <div class="cv-stats" style="background: var(--light); border-radius: 15px; padding: 20px; margin-bottom: 25px; border-left: 4px solid var(--primary);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                        <div>
+                            <h4 style="margin: 0 0 8px 0; color: var(--dark); font-size: 1.1rem;">
+                                <i class="fas fa-user" style="color: var(--primary); margin-right: 8px;"></i>
+                                CV của ${username}
+                            </h4>
+                            <p style="margin: 0; color: var(--gray); font-size: 0.9rem;">
+                                Tổng cộng: <strong>${cvs.length}</strong> file CV
+                            </p>
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <span class="status-badge" style="background: var(--success); color: white; padding: 6px 12px; border-radius: 15px; font-size: 0.85rem; font-weight: 600;">
+                                <i class="fas fa-check-circle"></i> Đã phân tích
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cv-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px;">
+            `;
+
+            cvs.forEach((cv, index) => {
+                const fileIcon = getFileIcon(cv.type);
+                const statusColor = cv.analysis_complete ? 'var(--success)' : 'var(--warning)';
+                const statusText = cv.analysis_complete ? 'Đã phân tích' : 'Đang xử lý';
+
+                html += `
+                    <div class="cv-card" style="background: white; border: 2px solid var(--light-gray); border-radius: 15px; padding: 25px; transition: var(--transition); cursor: pointer;"
+                         onmouseover="this.style.transform='translateY(-5px)'; this.style.borderColor='var(--primary)'"
+                         onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='var(--light-gray)'">
+
+                        <div class="cv-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                            <div class="cv-file-info" style="display: flex; align-items: center; gap: 15px; flex: 1;">
+                                <div class="file-icon-large" style="width: 50px; height: 50px; background: ${fileIcon.bg}; border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.2rem;">
+                                    <i class="${fileIcon.icon}"></i>
+                                </div>
+                                <div class="file-details">
+                                    <h4 style="margin: 0 0 5px 0; color: var(--dark); font-size: 1rem; font-weight: 600; word-break: break-all;">
+                                        ${getDisplayName(cv)}
+                                    </h4>
+                                    ${cv.original_filename && cv.original_filename !== cv.filename ?
+                                        `<p style="margin: 0 0 8px 0; color: var(--gray); font-size: 0.8rem; font-style: italic;">
+                                            <i class="fas fa-file-upload"></i> Tên gốc: ${cv.original_filename}
+                                        </p>`
+                                        : ''
+                                    }
+                                    <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.85rem; color: var(--gray);">
+                                        <span><i class="fas fa-file"></i> ${cv.type}</span>
+                                        <span><i class="fas fa-database"></i> ${cv.size}</span>
+                                        <span><i class="fas fa-calendar"></i> ${cv.uploadDate}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="cv-status" style="text-align: right;">
+                                <span style="background: ${statusColor}; color: white; padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; display: inline-block;">
+                                    ${statusText}
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="cv-skills" style="margin: 15px 0;">
+                            <div style="background: var(--light); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+                                <h5 style="margin: 0 0 10px 0; color: var(--dark); font-size: 0.9rem;">
+                                    <i class="fas fa-code"></i> Kỹ năng chính (${cv.skills.length} kỹ năng)
+                                </h5>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    ${cv.skills.map(skill => `<span style="background: var(--primary); color: white; padding: 4px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 500;">${skill}</span>`).join('')}
+                                </div>
+                            </div>
+                            ${cv.job_titles && cv.job_titles.length > 0 ? `
+                            <div style="background: var(--light); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+                                <h5 style="margin: 0 0 10px 0; color: var(--dark); font-size: 0.9rem;">
+                                    <i class="fas fa-briefcase"></i> Vị trí mong muốn (${cv.job_titles.length} vị trí)
+                                </h5>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    ${cv.job_titles.map(title => `<span style="background: var(--secondary); color: white; padding: 4px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 500;">${title}</span>`).join('')}
+                                </div>
+                            </div>
+                            ` : ''}
+                            ${cv.experience_level ? `
+                            <div style="background: var(--light); border-radius: 10px; padding: 15px; margin-bottom: 10px;">
+                                <h5 style="margin: 0 0 10px 0; color: var(--dark); font-size: 0.9rem;">
+                                    <i class="fas fa-chart-line"></i> Trình độ kinh nghiệm
+                                </h5>
+                                <span style="background: var(--warning-gradient); color: white; padding: 4px 8px; border-radius: 15px; font-size: 0.75rem; font-weight: 600;">${cv.experience_level}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+
+                        <div class="cv-actions" style="display: flex; gap: 10px; margin-top: 15px;">
+                            <button class="cv-action-btn" onclick="viewCVDetails('${getDisplayName(cv).replace(/'/g, "\\'")}', '${username}')"
+                                    style="flex: 1; background: var(--primary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem;">
+                                <i class="fas fa-eye"></i>
+                                Xem chi tiết
+                            </button>
+                            <button class="cv-action-btn" onclick="downloadCV('${cv.filename}', '${username}')"
+                                    style="flex: 1; background: var(--secondary); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem;">
+                                <i class="fas fa-download"></i>
+                                Tải xuống
+                            </button>
+                            <button class="cv-action-btn" onclick="reanalyzeCV('${username}')"
+                                    style="flex: 1; background: var(--accent); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem;">
+                                <i class="fas fa-redo"></i>
+                                Phân tích lại
+                            </button>
+                            <button class="cv-action-btn" onclick="replaceCV('${username}')"
+                                    style="flex: 1; background: var(--warning); color: white; border: none; padding: 10px 15px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem;"
+                                    title="Tải lên CV mới để thay thế CV hiện tại">
+                                <i class="fas fa-sync-alt"></i>
+                                Thay thế CV
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            cvsGrid.innerHTML = html;
+
+            // Hide loading and show results
+            document.getElementById('loadingCVs').style.display = 'none';
+            document.getElementById('cvsGrid').style.display = 'block';
+            document.getElementById('noCVs').style.display = 'none';
+
+            showStatus(`Tìm thấy ${cvs.length} CV của ${username}`, 'success');
+        }
+
+        
+        
+        async function loadCVDetails(username, filename) {
+            const bodyEl = document.getElementById('cvDetailsBody');
+
+            try {
+                // Show loading state
+                bodyEl.innerHTML = `
+                    <div class="loading-spinner" style="text-align: center; padding: 40px;">
+                        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <p>Đang tải chi tiết CV...</p>
+                    </div>
+                `;
+
+                // Get CV data from API
+                const response = await fetch(`${API_BASE_URL}/resume/${username}`);
+
+                if (!response.ok) {
+                    throw new Error('Không thể tải thông tin CV');
+                }
+
+                const cvData = await response.json();
+
+                if (cvData && cvData.processed_text) {
+                    // Display real CV data
+                    bodyEl.innerHTML = `
+                        <div class="cv-info-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 30px;">
+                            <div class="cv-info-item" style="background: var(--light); padding: 20px; border-radius: 15px; border-left: 4px solid var(--primary);">
+                                <h4 style="margin: 0 0 10px 0; color: var(--dark); font-size: 1.1rem;">
+                                    <i class="fas fa-file" style="color: var(--primary); margin-right: 8px;"></i>
+                                    Thông tin file
+                                </h4>
+                                <div style="color: var(--gray); font-size: 0.95rem; line-height: 1.6;">
+                                    <p><strong>Tên file gốc:</strong> ${cvData.original_filename || cvData.filename || filename}</p>
+                                    <p><strong>Loại file:</strong> ${cvData.filename ? (cvData.filename.endsWith('.docx') ? 'Word Document' : 'PDF Document') : 'PDF'}</p>
+                                    <p><strong>Kích thước:</strong> ${cvData.file_size_mb ? `${cvData.file_size_mb.toFixed(1)} MB` : 'Không xác định'}</p>
+                                    <p><strong>Ngày tải lên:</strong> ${cvData.upload_date ? new Date(cvData.upload_date).toLocaleDateString('vi-VN') : new Date().toLocaleDateString('vi-VN')}</p>
+                                </div>
+                            </div>
+
+                            <div class="cv-info-item" style="background: var(--light); padding: 20px; border-radius: 15px; border-left: 4px solid var(--success);">
+                                <h4 style="margin: 0 0 10px 0; color: var(--dark); font-size: 1.1rem;">
+                                    <i class="fas fa-check-circle" style="color: var(--success); margin-right: 8px;"></i>
+                                    Trạng thái xử lý
+                                </h4>
+                                <div style="color: var(--gray); font-size: 0.95rem; line-height: 1.6;">
+                                    <p><strong>Phân tích văn bản:</strong> ${cvData.processed_text ? '✅ Hoàn thành' : '⏳ Chưa xử lý'}</p>
+                                    <p><strong>Trích xuất kỹ năng:</strong> ${cvData.skills && cvData.skills.length > 0 ? `✅ ${cvData.skills.length} kỹ năng` : '⏳ Chưa có'}</p>
+                                    <p><strong>Kinh nghiệm:</strong> ${cvData.experience ? '✅ Đã trích xuất' : '⏳ Chưa có'}</p>
+                                    <p><strong>Học vấn:</strong> ${cvData.education ? '✅ Đã trích xuất' : '⏳ Chưa có'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        ${cvData.skills && cvData.skills.length > 0 ? `
+                        <div class="cv-skills-section" style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: var(--dark); font-size: 1.2rem;">
+                                <i class="fas fa-tools" style="color: var(--accent); margin-right: 8px;"></i>
+                                Kỹ năng đã trích xuất (${cvData.skills.length})
+                            </h4>
+                            <div class="skills-container" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                ${cvData.skills.map(skill => `
+                                    <span class="skill-tag" style="background: var(--accent); color: white; padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                                        ${skill}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${cvData.experience ? `
+                        <div class="cv-experience-section" style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: var(--dark); font-size: 1.2rem;">
+                                <i class="fas fa-briefcase" style="color: var(--primary); margin-right: 8px;"></i>
+                                Kinh nghiệm
+                            </h4>
+                            <div style="background: var(--light); padding: 20px; border-radius: 15px; color: var(--gray); line-height: 1.6;">
+                                ${cvData.experience}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${cvData.education ? `
+                        <div class="cv-education-section" style="margin-bottom: 30px;">
+                            <h4 style="margin: 0 0 15px 0; color: var(--dark); font-size: 1.2rem;">
+                                <i class="fas fa-graduation-cap" style="color: var(--warning); margin-right: 8px;"></i>
+                                Học vấn
+                            </h4>
+                            <div style="background: var(--light); padding: 20px; border-radius: 15px; color: var(--gray); line-height: 1.6;">
+                                ${cvData.education}
+                            </div>
+                        </div>
+                        ` : ''}
+
+                        ${cvData.processed_text ? `
+                        <div class="cv-raw-section">
+                            <h4 style="margin: 0 0 15px 0; color: var(--dark); font-size: 1.2rem;">
+                                <i class="fas fa-file-alt" style="color: var(--primary); margin-right: 8px;"></i>
+                                Nội dung CV đã xử lý
+                            </h4>
+                            <div style="background: var(--light); padding: 20px; border-radius: 15px; max-height: 300px; overflow-y: auto; color: var(--gray); line-height: 1.6; white-space: pre-line;">
+                                ${cvData.processed_text}
+                            </div>
+                        </div>
+                        ` : ''}
+                    `;
+                } else {
+                    bodyEl.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--gray);">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: var(--warning); margin-bottom: 15px;"></i>
+                            <h3>Không tìm thấy dữ liệu CV</h3>
+                            <p>CV này chưa được phân tích hoặc có lỗi trong quá trình xử lý.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading CV details:', error);
+                bodyEl.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--danger);">
+                        <i class="fas fa-exclamation-circle" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3>Lỗi tải thông tin</h3>
+                        <p>Không thể tải chi tiết CV. Vui lòng thử lại.</p>
+                    </div>
+                `;
+                showStatus('Không thể tải chi tiết CV', 'error');
+            }
+        }
+
+        function closeCVDetails() {
+            document.getElementById('cvDetailsModal').style.display = 'none';
+        }
+
+        function downloadCV(filename, username) {
+            showStatus(`Đang tải xuống: ${filename}`, 'info');
+
+            // Create download link
+            const downloadUrl = `${API_BASE_URL}/download/${username}`;
+            const link = document.createElement('a');
+            link.href = downloadUrl;
+            link.download = filename;
+            link.target = '_blank';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showStatus(`Đã bắt đầu tải xuống: ${filename}`, 'success');
+        }
+
+        async function reanalyzeCV(username) {
+            if (confirm('Bạn có chắc muốn phân tích lại CV này?')) {
+                showStatus('Đang phân tích lại CV...', 'info');
+                try {
+                    const response = await fetch(`${API_BASE_URL}/resume/${username}/suggest_improvements`, {
+                        method: 'POST'
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        displayImprovements(result);
+                        showStatus('Phân tích lại CV thành công!', 'success');
+
+                        // Scroll to improvement section
+                        document.getElementById('improvementSection').scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (error) {
+                    showStatus('Lỗi khi phân tích lại CV: ' + error.message, 'error');
+                }
+            }
+        }
+
+        // Replace CV function
+        async function replaceCV(username) {
+            // Trigger file selection dialog
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.pdf,.doc,.docx';
+
+            input.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Confirm replacement
+                const confirmed = confirm(`Bạn có chắc muốn thay thế CV hiện tại bằng "${file.name}" không?\n\nMọi dữ liệu phân tích cũ sẽ được cập nhật theo CV mới.`);
+                if (!confirmed) return;
+
+                // Validate file size
+                if (file.size > 5 * 1024 * 1024) {
+                    showStatus('File quá lớn! Vui lòng chọn file nhỏ hơn 5MB.', 'error');
+                    return;
+                }
+
+                try {
+                    showProgress('Đang thay thế CV...');
+
+                    // Upload new CV
+                    const formData = new FormData();
+                    formData.append('username', username);
+                    formData.append('file', file);
+                    formData.append('original_filename', file.name);
+
+                    const response = await fetch(`${API_BASE_URL}/upload_resume`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorData = await response.json().catch(() => ({}));
+                        throw new Error(errorData.detail || 'Thay thế CV thất bại');
+                    }
+
+                    const result = await response.json();
+
+                    if (result.saved) {
+                        showStatus(`✅ CV "${file.name}" đã được thay thế và phân tích thành công!`, 'success');
+
+                        // Refresh CV display
+                        loadUserCVs();
+
+                        // Update placeholders
+                        updatePlaceholder('improvementResult', `CV của ${username} đã sẵn sàng để nhận gợi ý cải thiện`, 'fa-check-circle');
+                        updatePlaceholder('jobResult', `CV của ${username} đã sẵn sàng để tìm kiếm công việc phù hợp`, 'fa-check-circle');
+                    }
+
+                } catch (error) {
+                    showStatus(`Lỗi thay thế CV: ${error.message}`, 'error');
+                } finally {
+                    hideProgress();
+                }
+            };
+
+            input.click();
+        }
+
+        // CV Status Check Function
+        async function checkCVStatus() {
+            const username = document.getElementById('username').value.trim();
+
+            if (!username) {
+                showStatus('Vui lòng nhập tên người dùng để kiểm tra CV!', 'warning');
+                return;
+            }
+
+            try {
+                showProgress('Đang kiểm tra trạng thái CV...');
+
+                // Get CV data from API
+                const response = await fetch(`${API_BASE_URL}/resume/${username}`);
+
+                if (!response.ok) {
+                    throw new Error('Không thể tải thông tin CV');
+                }
+
+                const cvData = await response.json();
+
+                // Display CV status
+                displayCVStatus(cvData, username);
+                showStatus(`Kiểm tra CV thành công cho ${username}`, 'success');
+
+            } catch (error) {
+                console.error('Error checking CV status:', error);
+                displayCVStatus(null, username);
+                showStatus('Không tìm thấy CV cho người dùng này!', 'error');
+            } finally {
+                hideProgress();
+            }
+        }
+
+        function displayCVStatus(cvData, username) {
+            const placeholder = document.getElementById('statusPlaceholder');
+            const result = document.getElementById('statusResult');
+
+            if (!cvData || !cvData.processed_text) {
+                // No CV found
+                placeholder.style.display = 'block';
+                result.style.display = 'none';
+                placeholder.innerHTML = `
+                    <div style="font-size: 3rem; margin-bottom: 20px; opacity: 0.5; color: var(--danger);">
+                        <i class="fas fa-file-times"></i>
+                    </div>
+                    <h4 style="margin: 0 0 10px 0; color: var(--dark);">Không tìm thấy CV</h4>
+                    <p>Không có CV nào cho người dùng <strong>${username}</strong>. Hãy tải lên CV để sử dụng tính năng này.</p>
+                `;
+                return;
+            }
+
+            // CV found - display status
+            const parsed_output = cvData.parsed_output || {};
+            const uploadDate = cvData.uploaded_at ? new Date(cvData.uploaded_at).toLocaleDateString('vi-VN') : 'Không xác định';
+            const skills = parsed_output.technical_skills || [];
+            const jobTitles = parsed_output.job_titles || [];
+            const experienceLevel = parsed_output.level || 'Không xác định';
+
+            placeholder.style.display = 'none';
+            result.style.display = 'block';
+
+            result.innerHTML = `
+                <div class="cv-status-card" style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); border-radius: 15px; padding: 25px; border-left: 5px solid #10b981; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                        <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div style="flex: 1;">
+                            <h3 style="margin: 0 0 5px 0; color: var(--dark); font-size: 1.3rem; font-weight: 700;">
+                                CV Đã Tải Lên
+                            </h3>
+                            <p style="margin: 0; color: var(--gray); font-size: 0.95rem;">
+                                Người dùng: <strong>${username}</strong> | Ngày tải: ${uploadDate}
+                            </p>
+                        </div>
+                        <div style="background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-check"></i> Đã phân tích
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cv-details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="detail-card" style="background: white; border: 2px solid var(--light-gray); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-cogs"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--dark); font-size: 1.1rem; font-weight: 600;">Kỹ Năng</h4>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${skills.slice(0, 6).map(skill => `
+                                <span style="background: var(--primary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 500;">
+                                    ${skill}
+                                </span>
+                            `).join('')}
+                            ${skills.length > 6 ? `<span style="background: var(--gray); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem;">+${skills.length - 6} nữa</span>` : ''}
+                        </div>
+                        ${skills.length === 0 ? '<p style="color: var(--gray); font-style: italic;">Chưa có kỹ năng nào được phân tích</p>' : ''}
+                    </div>
+
+                    <div class="detail-card" style="background: white; border: 2px solid var(--light-gray); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--dark); font-size: 1.1rem; font-weight: 600;">Vị Trí Mong Muốn</h4>
+                        </div>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            ${jobTitles.slice(0, 4).map(title => `
+                                <span style="background: var(--secondary); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem; font-weight: 500;">
+                                    ${title}
+                                </span>
+                            `).join('')}
+                            ${jobTitles.length > 4 ? `<span style="background: var(--gray); color: white; padding: 4px 10px; border-radius: 15px; font-size: 0.8rem;">+${jobTitles.length - 4} nữa</span>` : ''}
+                        </div>
+                        ${jobTitles.length === 0 ? '<p style="color: var(--gray); font-style: italic;">Chưa có vị trí nào được phân tích</p>' : ''}
+                    </div>
+
+                    <div class="detail-card" style="background: white; border: 2px solid var(--light-gray); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--dark); font-size: 1.1rem; font-weight: 600;">Kinh Nghiệm</h4>
+                        </div>
+                        <div style="background: var(--warning); color: white; padding: 8px 16px; border-radius: 15px; font-size: 0.9rem; font-weight: 600; display: inline-block;">
+                            ${experienceLevel}
+                        </div>
+                    </div>
+
+                    <div class="detail-card" style="background: white; border: 2px solid var(--light-gray); border-radius: 15px; padding: 20px;">
+                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 15px;">
+                            <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #06b6d4, #0891b2); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white;">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h4 style="margin: 0; color: var(--dark); font-size: 1.1rem; font-weight: 600;">Thông Tin File</h4>
+                        </div>
+                        <div style="font-size: 0.9rem; color: var(--gray);">
+                            <p style="margin: 5px 0;"><i class="fas fa-file"></i> <strong>Tên file:</strong> ${cvData.original_filename || 'Không xác định'}</p>
+                            <p style="margin: 5px 0;"><i class="fas fa-calendar"></i> <strong>Ngày tải lên:</strong> ${uploadDate}</p>
+                            <p style="margin: 5px 0;"><i class="fas fa-check-circle"></i> <strong>Trạng thái:</strong> Đã xử lý</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 25px; text-align: center;">
+                    <p style="color: var(--gray); font-size: 0.9rem; margin-bottom: 15px;">
+                        <i class="fas fa-lightbulb"></i> CV đã sẵn sàng để nhận gợi ý cải thiện và tìm kiếm việc làm phù hợp
+                    </p>
+                    <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="getImprovements()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-chart-line"></i> Xem Gợi Ý Cải Thiện
+                        </button>
+                        <button onclick="getJobSuggestions()" style="background: var(--secondary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                            <i class="fas fa-briefcase"></i> Tìm Việc Làm Phù Hợp
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user is already logged in and auto-check CV
+            const username = document.getElementById('username').value;
+
+            if (username) {
+                // User is logged in, auto-check for existing CV
+                showStatus(`Chào mừng ${username}! Đang kiểm tra CV của bạn trong hệ thống...`, 'info');
+
+                // Auto check CV and load CVs after a short delay
+                setTimeout(() => {
+                    checkCV();
+                    // Only loadUserCVs if username is not empty
+                    if (username.trim()) {
+                        loadUserCVs(); // Load existing CVs for review
+                    }
+                }, 1000);
+            } else {
+                showStatus('Chào mừng bạn đến với CV AI Assistant! Nhập tên người dùng và bấm "Kiểm Tra CV" để sử dụng CV đã có, hoặc tải lên CV mới.', 'success');
+
+                // Hide loading CVs since no username is provided
+                document.getElementById('loadingCVs').style.display = 'none';
+                document.getElementById('noCVs').style.display = 'none';
+                document.getElementById('cvsGrid').style.display = 'none';
+=======
+        // Smooth scroll to CV status section
+        function scrollToCVStatus() {
+            const cvStatusSection = document.getElementById('cvStatusSection');
+            if (cvStatusSection) {
+                cvStatusSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                // Add a subtle highlight effect
+                cvStatusSection.style.transition = 'all 0.3s ease';
+                cvStatusSection.style.backgroundColor = 'rgba(102, 126, 234, 0.05)';
+                setTimeout(() => {
+                    cvStatusSection.style.backgroundColor = '';
+                }, 1000);
+>>>>>>> Stashed changes:src/resources/views/cv-assistant.hbs
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern Jobs Table</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #0f0f23, #1a1a3a 50%, #2d1b69);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .table-container {
+      max-width: 1400px;
+      margin: auto;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(20px);
+      transition: all 0.3s ease;
+    }
+
+    .table-container:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .table-header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .table-header h2 {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #fff, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .table-header p {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    /* Pagination Styles */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      margin-top: 20px;
+      padding: 10px 0;
+    }
+    
+    .page-link {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 8px 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #e0e0e0;
+      text-decoration: none;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .page-link:hover {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      border-color: transparent;
+    }
+    
+    .page-info {
+      color: #a1a1aa;
+      font-size: 0.9rem;
+      padding: 0 15px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    thead {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      color: #fff;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    th,
+    td {
+      padding: 16px;
+      text-align: center;
+    }
+
+    th:first-child,
+    td:first-child {
+      width: 6%;
+    }
+
+    th:nth-child(2),
+    td:nth-child(2) {
+      text-align: left;
+      width: 30%;
+    }
+
+    tbody tr {
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    tbody tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    tbody tr:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateX(5px);
+    }
+
+    /* custom styles */
+    .index-number {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .field-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.85rem;
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+    }
+
+    .job-type-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #fff;
+    }
+
+    .job-type-badge[data-type*="full"] {
+      background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .job-type-badge[data-type*="part"] {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .job-type-badge[data-type*="contract"] {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    }
+
+    .job-type-badge[data-type*="remote"] {
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #fff;
+      text-transform: capitalize;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-badge[data-status="active"] {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .status-badge[data-status="paused"] {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .status-badge[data-status="closed"] {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .status-badge[data-status="draft"] {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      box-shadow: 0 0 20px rgba(107, 114, 128, 0.3);
+    }
+
+    .date-display {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    .date-display i {
+      color: #6366f1;
+      margin-right: 5px;
+    }
+
+    @media(max-width:768px) {
+
+      th,
+      td {
+        padding: 12px;
+        font-size: 0.85rem;
+      }
+    }
+
+    @media(max-width:480px) {
+
+      th:nth-child(3),
+      td:nth-child(3),
+      th:nth-child(4),
+      td:nth-child(4) {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="table-container">
+    <div class="table-header">
+      <h2><i class="fas fa-briefcase"></i> Jobs Management</h2>
+      <p>Manage and track all your job postings</p>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tiêu đề</th>
+          <th>Ngành nghề</th>
+          <th>Hình thức</th>
+          <th>Trạng thái</th>
+          <th>Ngày tạo</th>
+          <th>Ngày hết hạn</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#each jobsList}}
+        <tr>
+          <td><span class="index-number">{{sum @index 1}}</span></td>
+          <td>{{this.title}}</td>
+          <td><span class="field-tag">{{this.field}}</span></td>
+          <td><span class="job-type-badge" data-type="{{this.type}}">{{this.type}}</span></td>
+          <td><span class="status-badge" data-status="{{this.status}}">{{this.status}}</span></td>
+          <td><span class="date-display"><i class="fas fa-calendar-alt"></i>{{this.madeDate}}</span></td>
+          <td><span class="date-display"><i class="fas fa-calendar-alt"></i>{{this.expiredDate}}</span></td>
+        </tr>
+        {{/each}}
+      </tbody>
+    </table>
+    
+    {{#if pagination}}
+    <div class="pagination">
+      {{#if pagination.hasPreviousPage}}
+        <a href="?page={{pagination.previousPage}}" class="page-link">
+          <i class="fas fa-chevron-left"></i> Trước
+        </a>
+      {{/if}}
+      
+      <span class="page-info">
+        Trang {{pagination.page}} / {{pagination.totalPages}}
+      </span>
+      
+      {{#if pagination.hasNextPage}}
+        <a href="?page={{pagination.nextPage}}" class="page-link">
+          Tiếp theo <i class="fas fa-chevron-right"></i>
+        </a>
+      {{/if}}
+    </div>
+    {{/if}}
+  </div>
+</body>
+
+</html>

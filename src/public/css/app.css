@@ -1,0 +1,35 @@
+/* Global styles */
+body {
+  padding-top: 55px; /* Header height */
+}
+
+h3 {
+  color: blue;
+}
+
+h2 {
+  color: orange;
+}
+
+/* Jobs section - wider container */
+.jobs-section .container {
+  max-width: 95% !important;
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+@media (min-width: 768px) {
+  .jobs-section .container {
+    max-width: 90% !important;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .jobs-section .container {
+    max-width: 1400px !important;
+    padding-left: 30px;
+    padding-right: 30px;
+  }
+}

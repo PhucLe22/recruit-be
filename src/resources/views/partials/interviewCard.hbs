@@ -1,0 +1,37 @@
+<div class="interview-card {{status}}" data-id="{{_id}}">
+  <div class="card-header">
+    <img src="{{defaultAvatar avatar}}" alt="{{name}}" class="applicant-avatar">
+    <div class="applicant-info">
+      <h4>{{name}}</h4>
+      <p class="text-muted">{{email}}</p>
+      <div class="job-title">{{jobName}}</div>
+    </div>
+  </div>
+  <div class="card-body">
+    {{#if interviewTime}}
+      <div class="interview-time">
+        <i class="far fa-calendar-alt"></i>
+        <div>
+          <div class="time">{{formattedInterviewTime}}</div>
+          {{#if timeUntil}}
+            <div class="time-until">Còn {{timeUntil}} giờ nữa</div>
+          {{/if}}
+          {{#if minutesRemaining}}
+            <div class="time-remaining">Còn {{minutesRemaining}} phút</div>
+          {{/if}}
+        </div>
+      </div>
+      <a href="{{meetingLink}}" target="_blank" class="btn-join">
+        <i class="fas fa-video"></i> Vào phỏng vấn
+      </a>
+    {{else}}
+      <div class="no-schedule">
+        <i class="far fa-calendar-times"></i>
+        <span>Chưa đặt lịch phỏng vấn</span>
+      </div>
+      <button class="btn-schedule">
+        <i class="far fa-calendar-plus"></i> Đặt lịch
+      </button>
+    {{/if}}
+  </div>
+</div>

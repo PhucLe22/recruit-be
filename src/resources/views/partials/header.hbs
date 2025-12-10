@@ -1,0 +1,553 @@
+<!-- Modern Header Navigation -->
+<style>
+  /* Smooth Dropdown Animations */
+  .nav-item .dropdown-menu,
+  .nav-item .mega-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .nav-item:hover .dropdown-menu,
+  .nav-item:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Dropdown Toggle Smooth Rotation */
+  .dropdown-toggle .dropdown-indicator {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .nav-item:hover .dropdown-toggle .dropdown-indicator {
+    transform: rotate(180deg);
+  }
+
+  /* Dropdown Item Hover Effects */
+  .dropdown-item,
+  .mega-menu-link,
+  .category-item {
+    position: relative;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover,
+  .mega-menu-link:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+    transform: translateX(4px);
+  }
+
+  .category-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Smooth Icon Animation */
+  .dropdown-item .item-icon,
+  .mega-menu-link .link-icon {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .dropdown-item:hover .item-icon,
+  .mega-menu-link:hover .link-icon {
+    transform: scale(1.2);
+  }
+
+  /* Smooth Arrow Animation */
+  .item-arrow {
+    display: inline-block;
+    transition: transform 0.2s ease;
+  }
+
+  .dropdown-item:hover .item-arrow {
+    transform: translateX(4px);
+  }
+
+  /* User Dropdown Smooth Animation */
+  .user-dropdown .dropdown-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.95);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .user-dropdown:hover .dropdown-menu,
+  .user-dropdown.active .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  /* Smooth Mega Menu Animation */
+  .mega-dropdown .mega-menu {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-15px);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+  }
+
+  .mega-dropdown:hover .mega-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* Smooth Mega Menu Link Animation */
+  .mega-menu-link {
+    transition: all 0.2s ease;
+  }
+
+  .mega-menu-link:hover {
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.1), rgba(78, 205, 196, 0.1));
+  }
+
+  /* Dropdown Button Smooth Hover */
+  .dropdown-toggle {
+    transition: all 0.2s ease;
+  }
+
+  .nav-item:hover .dropdown-toggle {
+    color: #4ECDC4;
+  }
+
+  /* Smooth Transition for Dropdown Menu Appearance */
+  .dropdown-menu,
+  .mega-menu {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  /* Prevent flickering on hover */
+  .nav-item {
+    position: relative;
+  }
+
+  .nav-item .dropdown-menu,
+  .nav-item .mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+  }
+
+  /* Smooth Divider Animation */
+  .dropdown-divider {
+    transition: background-color 0.2s ease;
+  }
+
+  /* Smooth Badge Animation */
+  .item-badge,
+  .link-badge {
+    display: inline-block;
+    transition: all 0.2s ease;
+  }
+
+  .dropdown-item:hover .item-badge,
+  .mega-menu-link:hover .link-badge {
+    transform: scale(1.1);
+  }
+</style>
+
+<header class="header">
+  <div class="header-container">
+    <!-- Enhanced Logo -->
+    <a href="/" class="logo">
+      <div class="logo-icon">
+        <i class="fas fa-rocket"></i>
+      </div>
+      <div class="logo-text">
+        <span class="logo-main">JobLife</span>
+        <span class="logo-tagline">Việc làm cho mọi người</span>
+      </div>
+    </a>
+
+    <!-- Enhanced Navigation Menu -->
+    <nav class="main-nav">
+      <ul class="nav-menu">
+        <!-- Jobs Mega Dropdown -->
+        <li class="nav-item mega-dropdown">
+          <button class="dropdown-toggle" type="button">
+            <i class="fas fa-briefcase"></i>
+            <span>Việc Làm</span>
+            <i class="fas fa-chevron-down dropdown-indicator"></i>
+          </button>
+          <div class="mega-menu">
+            <div class="mega-menu-content">
+              <div class="mega-menu-section">
+                <h4 class="mega-menu-title">
+                  <i class="fas fa-search"></i>
+                  Tìm kiếm việc làm
+                </h4>
+                <div class="mega-menu-links">
+                  <a href="/jobs/search-results" class="mega-menu-link">
+                    <span class="link-icon">🔍</span>
+                    <div class="link-content">
+                      <span class="link-title">Tìm kiếm việc làm</span>
+                      <span class="link-desc">Khám phá hàng ngàn cơ hội</span>
+                    </div>
+                  </a>
+                  <a href="/jobs/search-results?sortBy=date&sortOrder=desc" class="mega-menu-link">
+                    <span class="link-icon">🆕</span>
+                    <div class="link-content">
+                      <span class="link-title">Việc làm mới nhất</span>
+                      <span class="link-desc">Cập nhật trong 24h</span>
+                    </div>
+                  </a>
+                  <a href="/jobs/search-results?featured=true" class="mega-menu-link featured">
+                    <span class="link-icon">🔥</span>
+                    <div class="link-content">
+                      <span class="link-title">Việc làm nổi bật</span>
+                      <span class="link-desc">Top công việc hot nhất</span>
+                    </div>
+                    <span class="link-badge">Hot</span>
+                  </a>
+                  <a href="/jobs/search-results?types=remote" class="mega-menu-link">
+                    <span class="link-icon">🏠</span>
+                    <div class="link-content">
+                      <span class="link-title">Làm việc từ xa</span>
+                      <span class="link-desc">Remote & Hybrid</span>
+                    </div>
+                  </a>
+                </div>
+              </div>
+
+              <div class="mega-menu-section">
+                <h4 class="mega-menu-title">
+                  <i class="fas fa-filter"></i>
+                  Theo ngành nghề
+                </h4>
+                <div class="category-grid">
+                  <a href="/jobs/it" class="category-item">
+                    <span class="category-icon">💻</span>
+                    <span class="category-name">IT & Software</span>
+                  </a>
+                  <a href="/jobs/marketing" class="category-item">
+                    <span class="category-icon">📱</span>
+                    <span class="category-name">Marketing</span>
+                  </a>
+                  <a href="/jobs/design" class="category-item">
+                    <span class="category-icon">🎨</span>
+                    <span class="category-name">Design</span>
+                  </a>
+                  <a href="/jobs/sales" class="category-item">
+                    <span class="category-icon">💼</span>
+                    <span class="category-name">Sales</span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <!-- Companies Dropdown -->
+        <li class="nav-item dropdown">
+          <button class="dropdown-toggle" type="button">
+            <i class="fas fa-building"></i>
+            <span>Công Ty</span>
+            <i class="fas fa-chevron-down dropdown-indicator"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="/business/list" class="dropdown-item">
+              <span class="item-icon">📋</span>
+              <span class="item-title">Danh sách công ty</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/business/register-page" class="dropdown-item featured">
+              <span class="item-icon">⭐</span>
+              <span class="item-title">Đăng ký nhà tuyển dụng</span>
+              <span class="item-badge">For Business</span>
+            </a>
+            <a href="/business/login-page" class="dropdown-item">
+              <span class="item-icon">🚀</span>
+              <span class="item-title">Đăng nhập tuyển dụng</span>
+              <span class="item-arrow">→</span>
+            </a>
+          </div>
+        </li>
+
+        <!-- Career Tools Dropdown -->
+        <li class="nav-item dropdown">
+          <button class="dropdown-toggle" type="button">
+            <i class="fas fa-tools"></i>
+            <span>Công cụ nghề nghiệp</span>
+            <i class="fas fa-chevron-down dropdown-indicator"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="/cv/uploadCV-page" class="dropdown-item">
+              <span class="item-icon">📄</span>
+              <span class="item-title">Tải CV & Gợi ý việc làm</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/auth/profile-page" class="dropdown-item">
+              <span class="item-icon">🎨</span>
+              <span class="item-title">Quản lý hồ sơ cá nhân</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/users/upload-avatar-page" class="dropdown-item featured">
+              <span class="item-icon">📸</span>
+              <span class="item-title">Cập nhật ảnh đại diện</span>
+              <span class="item-badge">Profile</span>
+            </a>
+            <a href="/personality-assessments" class="dropdown-item featured">
+              <span class="item-icon">🧠</span>
+              <span class="item-title">Bài kiểm tra tính cách</span>
+              <span class="item-badge">MBTI, Big Five, DISC</span>
+            </a>
+            <a href="/jobs/search-results" class="dropdown-item">
+              <span class="item-icon">💰</span>
+              <span class="item-title">Tìm việc lương cao</span>
+              <span class="item-arrow">→</span>
+            </a>
+          </div>
+        </li>
+
+        <!-- Resources Dropdown -->
+        <li class="nav-item dropdown">
+          <button class="dropdown-toggle" type="button">
+            <i class="fas fa-graduation-cap"></i>
+            <span>Tài nguyên</span>
+            <i class="fas fa-chevron-down dropdown-indicator"></i>
+          </button>
+          <div class="dropdown-menu">
+            <a href="/" class="dropdown-item">
+              <span class="item-icon">📖</span>
+              <span class="item-title">Trang chủ & Blog</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/auth/register-page" class="dropdown-item">
+              <span class="item-icon">💡</span>
+              <span class="item-title">Hướng dẫn đăng ký</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/cv-assistant" class="dropdown-item">
+              <span class="item-icon">🤖</span>
+              <span class="item-title">CV AI Assistant</span>
+              <span class="item-arrow">→</span>
+            </a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Enhanced Auth Actions -->
+    <div class="auth-actions">
+      {{#if user}}
+        <!-- Enhanced User Dropdown -->
+        <div class="dropdown user-dropdown">
+          <button class="dropdown-toggle user-toggle" type="button">
+            {{#if user.avatar}}
+              <img src="{{user.avatar}}" alt="Avatar" class="user-avatar">
+            {{else}}
+              <div class="user-avatar-placeholder">
+                <i class="fas fa-user"></i>
+              </div>
+            {{/if}}
+            <div class="user-info">
+              <span class="user-name">{{user.name}}</span>
+              <span class="user-role">{{user.role}}</span>
+            </div>
+            <span class="dropdown-indicator"></span>
+          </button>
+          <div class="dropdown-menu user-menu">
+            <div class="user-menu-header">
+              {{#if user.avatar}}
+                <img src="{{user.avatar}}" alt="Avatar" class="user-menu-avatar">
+              {{else}}
+                <div class="user-menu-avatar-placeholder">
+                  <i class="fas fa-user"></i>
+                </div>
+              {{/if}}
+              <div class="user-menu-info">
+                <h4>{{user.name}}</h4>
+                <p>{{user.email}}</p>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a href="/auth/profile-page" class="dropdown-item">
+              <span class="item-icon">👤</span>
+              <span class="item-title">Hồ sơ cá nhân</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/users/applied-jobs" class="dropdown-item">
+              <span class="item-icon">📋</span>
+              <span class="item-title">Việc làm đã ứng tuyển</span>
+              <span class="item-count">{{user.applicationsCount}}</span>
+            </a>
+            <a href="/users/saved-jobs" class="dropdown-item">
+              <span class="item-icon">❤️</span>
+              <span class="item-title">Việc làm đã lưu</span>
+              <span class="item-count">{{user.savedJobsCount}}</span>
+            </a>
+            <a href="/users/recommendations" class="dropdown-item featured">
+              <span class="item-icon">🎯</span>
+              <span class="item-title">Gợi ý cho bạn</span>
+              <span class="item-badge">AI</span>
+            </a>
+            <div class="dropdown-divider"></div>
+            <a href="/users/settings" class="dropdown-item">
+              <span class="item-icon">⚙️</span>
+              <span class="item-title">Cài đặt</span>
+              <span class="item-arrow">→</span>
+            </a>
+            <a href="/auth/logout" class="dropdown-item logout">
+              <span class="item-icon">🚪</span>
+              <span class="item-title">Đăng xuất</span>
+              <span class="item-arrow">→</span>
+            </a>
+          </div>
+        </div>
+      {{else}}
+        <!-- Enhanced Auth Buttons -->
+        <div class="auth-buttons">
+          <a href="/auth/login-page" class="btn btn-login">
+            <i class="fas fa-sign-in-alt"></i>
+            Đăng nhập
+          </a>
+          <a href="/auth/register-page" class="btn btn-signup">
+            <i class="fas fa-user-plus"></i>
+            Đăng ký miễn phí
+          </a>
+        </div>
+      {{/if}}
+    </div>
+
+    <!-- Enhanced Mobile Menu Toggle -->
+    <button class="mobile-menu-toggle">
+      <div class="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+  </div>
+</header>
+
+<!-- Header Spacer -->
+<div class="header-spacer"></div>
+
+<!-- <script>
+  // Smooth Dropdown Interactions
+  document.addEventListener('DOMContentLoaded', function() {
+    // Handle dropdown hover with delay for smooth UX
+    const navItems = document.querySelectorAll('.nav-item');
+    let dropdownTimeout;
+    let currentActiveItem = null;
+
+    navItems.forEach(item => {
+      item.addEventListener('mouseenter', function() {
+        clearTimeout(dropdownTimeout);
+        
+        // Close previous dropdown immediately
+        if (currentActiveItem && currentActiveItem !== this) {
+          currentActiveItem.classList.remove('active');
+        }
+        
+        // Add active class for styling
+        this.classList.add('active');
+        currentActiveItem = this;
+      });
+
+      item.addEventListener('mouseleave', function() {
+        // Delay removal for smooth transition
+        dropdownTimeout = setTimeout(() => {
+          if (currentActiveItem === this) {
+            this.classList.remove('active');
+            currentActiveItem = null;
+          }
+        }, 200);
+      });
+    });
+
+    // Handle user dropdown click for mobile
+    const userDropdown = document.querySelector('.user-dropdown');
+    if (userDropdown) {
+      const userToggle = userDropdown.querySelector('.user-toggle');
+      if (userToggle) {
+        userToggle.addEventListener('click', function(e) {
+          e.preventDefault();
+          userDropdown.classList.toggle('active');
+          
+          // Close other dropdowns
+          navItems.forEach(item => {
+            if (item !== userDropdown) {
+              item.classList.remove('active');
+            }
+          });
+        });
+      }
+    }
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.nav-item') && !e.target.closest('.user-dropdown')) {
+        navItems.forEach(item => item.classList.remove('active'));
+        currentActiveItem = null;
+        if (userDropdown) {
+          userDropdown.classList.remove('active');
+        }
+      }
+    });
+
+    // Smooth scroll for dropdown links
+    const dropdownLinks = document.querySelectorAll('.dropdown-item, .mega-menu-link, .category-item');
+    dropdownLinks.forEach(link => {
+      link.addEventListener('click', function(e) {
+        // Add ripple effect
+        const ripple = document.createElement('span');
+        ripple.style.position = 'absolute';
+        ripple.style.borderRadius = '50%';
+        ripple.style.background = 'rgba(255, 255, 255, 0.6)';
+        ripple.style.width = '20px';
+        ripple.style.height = '20px';
+        ripple.style.pointerEvents = 'none';
+        ripple.style.animation = 'ripple 0.6s ease-out';
+        
+        const rect = this.getBoundingClientRect();
+        ripple.style.left = (e.clientX - rect.left) + 'px';
+        ripple.style.top = (e.clientY - rect.top) + 'px';
+        
+        this.style.position = 'relative';
+        this.style.overflow = 'hidden';
+        this.appendChild(ripple);
+        
+        setTimeout(() => ripple.remove(), 600);
+      });
+    });
+
+    // Add ripple animation
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes ripple {
+        to {
+          transform: scale(4);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Keyboard navigation for accessibility
+    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
+    dropdownToggles.forEach((toggle, index) => {
+      toggle.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          this.closest('.nav-item, .user-dropdown').classList.toggle('active');
+        }
+        if (e.key === 'Escape') {
+          this.closest('.nav-item, .user-dropdown').classList.remove('active');
+        }
+      });
+    });
+  });
+</script> -->

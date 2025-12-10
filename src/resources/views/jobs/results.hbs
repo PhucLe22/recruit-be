@@ -1,0 +1,1285 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{pageTitle}}</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary-color: #667eea;
+      --secondary-color: #764ba2;
+      --success-color: #51cf66;
+      --warning-color: #ff922b;
+      --danger-color: #ff6b6b;
+      --info-color: #339af0;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+      --border-radius: 12px;
+      --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+      margin-top: 55px; /* Header height */
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header Section */
+    .search-header {
+      background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+      color: white;
+      padding: 40px 0;
+      margin-bottom: 30px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+    }
+
+    .search-header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .results-count {
+      font-size: 1.1rem;
+      opacity: 0.95;
+      margin-bottom: 20px;
+    }
+
+    .search-keyword-highlight {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.2);
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 25px;
+      padding: 8px 20px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-label {
+      color: rgba(255, 255, 255, 0.8);
+      margin-right: 8px;
+      font-size: 0.9rem;
+    }
+
+    .search-term {
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    .results-meta {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* Search Section */
+    .search-section {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid #e9ecef;
+    }
+
+    .search-form {
+      margin-bottom: 20px;
+    }
+
+    .search-input-group {
+      position: relative;
+      margin-bottom: 15px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 15px 50px 15px 20px;
+      border: 2px solid #e9ecef;
+      border-radius: var(--border-radius);
+      font-size: 1rem;
+      transition: var(--transition);
+      background: #fff;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+      font-size: 1.1rem;
+    }
+
+    /* Filter Section */
+    .filter-section {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      margin-bottom: 30px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid #e9ecef;
+      display: none;
+    }
+
+    .filter-section.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .filter-row {
+      margin-bottom: 20px;
+    }
+
+    .filter-group {
+      margin-bottom: 20px;
+    }
+
+    .filter-label {
+      font-weight: 600;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .filter-label i {
+      color: var(--primary-color);
+      width: 16px;
+    }
+
+    .filter-options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-chip {
+      background: var(--light-color);
+      border: 2px solid transparent;
+      border-radius: 20px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+    }
+
+    .filter-chip:hover {
+      background: #e9ecef;
+      border-color: var(--primary-color);
+    }
+
+    .filter-chip.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .salary-inputs {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .salary-input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 0.9rem;
+    }
+
+    .salary-input:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    .sort-section {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 30px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid #e9ecef;
+      display: flex;
+      justify-content: between;
+      align-items: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .sort-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sort-select {
+      padding: 8px 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: white;
+      cursor: pointer;
+    }
+
+    .sort-select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+    }
+
+    /* Job Cards */
+    .job-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 25px;
+      margin-bottom: 30px;
+    }
+
+    .job-card {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 25px;
+      box-shadow: var(--box-shadow);
+      transition: var(--transition);
+      border-left: 4px solid var(--primary-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .job-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .job-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent 90%, var(--primary-color) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
+    }
+
+    .job-card:hover::before {
+      opacity: 0.05;
+    }
+
+    .job-header {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .company-logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 8px;
+      object-fit: cover;
+      margin-right: 15px;
+      border: 2px solid #e9ecef;
+    }
+
+    .job-title {
+      flex: 1;
+    }
+
+    .job-title h3 {
+      font-size: 1.2rem;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      line-height: 1.3;
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .company-name {
+      color: var(--primary-color);
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .job-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+
+    .detail-item {
+      display: flex;
+      align-items: center;
+      font-size: 0.9rem;
+      color: #6c757d;
+    }
+
+    .detail-item i {
+      margin-right: 8px;
+      width: 16px;
+      color: var(--primary-color);
+    }
+
+    .salary {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 10px 15px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .job-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 15px;
+      border-top: 1px solid #e9ecef;
+    }
+
+    .posted-date {
+      color: #6c757d;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .posted-date i {
+      margin-right: 5px;
+    }
+
+    .view-details {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .view-details:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+      text-decoration: none;
+      color: white;
+    }
+
+    /* Status Badge */
+    .status-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      z-index: 10;
+    }
+
+    .status-urgent {
+      background: var(--danger-color);
+      color: white;
+    }
+
+    .status-active {
+      background: var(--success-color);
+      color: white;
+    }
+
+    .status-closed {
+      background: #868e96;
+      color: white;
+    }
+
+    /* Active Filters Display */
+    .active-filters {
+      background: white;
+      border-radius: var(--border-radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--box-shadow);
+      border: 1px solid #e9ecef;
+    }
+
+    .active-filter-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--primary-color);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 15px;
+      font-size: 0.85rem;
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+
+    .active-filter-tag .remove-filter {
+      cursor: pointer;
+      font-weight: bold;
+      margin-left: 5px;
+    }
+
+    .clear-all-filters {
+      background: var(--danger-color);
+      color: white;
+      border: none;
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+
+    /* Pagination */
+    .pagination-container {
+      display: flex;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 5px;
+    }
+
+    .page-link {
+      padding: 8px 12px;
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      background: white;
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+
+    .page-link:hover {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+      text-decoration: none;
+    }
+
+    .page-link.active {
+      background: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .page-link.disabled {
+      background: #f8f9fa;
+      color: #6c757d;
+      border-color: #e9ecef;
+      cursor: not-allowed;
+    }
+
+    /* No Results */
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6c757d;
+    }
+
+    .no-results i {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: #dee2e6;
+    }
+
+    /* Buttons */
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 2px 4px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-primary-custom:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary-custom {
+      background: #f8f9fa;
+      color: #495057;
+      border: 2px solid #e9ecef;
+      padding: 12px 20px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-secondary-custom:hover {
+      background: #e9ecef;
+      border-color: var(--primary-color);
+      color: var(--primary-color);
+    }
+
+    /* Loading Spinner */
+    .loading-spinner {
+      display: none;
+      text-align: center;
+      padding: 40px;
+    }
+
+    .loading-spinner.show {
+      display: block;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .search-header h1 {
+        font-size: 2rem;
+      }
+
+      .job-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .job-details {
+        grid-template-columns: 1fr;
+      }
+
+      .sort-section {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .results-meta {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .salary-inputs {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .search-form .row {
+        gtr: 1;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .search-header {
+        padding: 30px 0;
+      }
+
+      .search-header h1 {
+        font-size: 1.8rem;
+      }
+
+      .job-card {
+        padding: 20px;
+      }
+
+      .filter-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  {{> header}}
+
+  <div class="container">
+    <!-- Search Header -->
+    <div class="search-header">
+      <div class="text-center">
+        {{#if keyword}}
+        <h1>Kết quả tìm kiếm</h1>
+        <div class="search-keyword-highlight">
+          <span class="search-label">Từ khóa:</span>
+          <span class="search-term">"{{keyword}}"</span>
+        </div>
+        <div class="results-count">
+          Tìm thấy <strong>{{totalCount}}</strong> công việc phù hợp
+        </div>
+        {{else}}
+        <h1>Tất cả việc làm</h1>
+        <div class="results-count">
+          Hiển thị tất cả <strong>{{totalCount}}</strong> công việc
+        </div>
+        {{/if}}
+        </div>
+        <div class="results-meta justify-content-center">
+          <div class="meta-item">
+            <i class="fas fa-file-alt"></i>
+            <span>Trang {{currentPage}}/{{totalPages}}</span>
+          </div>
+          <div class="meta-item">
+            <i class="fas fa-filter"></i>
+            <span id="activeFilterCount">0 bộ lọc</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-section">
+      <form id="searchForm" method="GET" action="/jobs/search-results">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <div class="search-input-group">
+              <input type="text" name="q" id="searchInput" class="search-input"
+                placeholder="Nhập từ khóa tìm kiếm (vị trí, công ty, kỹ năng...)" value="{{keyword}}">
+              <i class="fas fa-search search-icon"></i>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn-primary-custom w-100">
+              <i class="fas fa-search"></i>
+              Tìm kiếm
+            </button>
+          </div>
+          <div class="col-md-2">
+            <button type="button" class="btn-secondary-custom w-100" id="toggleFilters">
+              <i class="fas fa-filter"></i>
+              Bộ lọc
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-section" id="filterSection">
+      <form id="filterForm">
+        <input type="hidden" name="q" value="{{keyword}}">
+
+        <!-- Location Filter -->
+        <div class="filter-row">
+          <div class="filter-group col-md-6">
+            <div class="filter-label">
+              <i class="fas fa-map-marker-alt"></i>
+              Địa điểm
+            </div>
+            <div class="filter-options" id="cityFilters">
+              {{#each (array "TP.HCM" "Hà Nội" "Đà Nẵng" "Hải Phòng" "Cần Thơ" "Biên Hòa" "Remote")}}
+              <div class="filter-chip" data-filter-type="cities" data-value="{{this}}">
+                {{this}}
+              </div>
+              {{/each}}
+            </div>
+          </div>
+
+          <!-- Job Type Filter -->
+          <div class="filter-group col-md-6">
+            <div class="filter-label">
+              <i class="fas fa-briefcase"></i>
+              Loại công việc
+            </div>
+            <div class="filter-options" id="typeFilters">
+              {{#each (array "Full-time" "Part-time" "Internship" "Remote" "Contract" "Freelance")}}
+              <div class="filter-chip" data-filter-type="types" data-value="{{this}}">
+                {{this}}
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+
+        <div class="filter-row">
+          <!-- Field Filter -->
+          <div class="filter-group col-md-6">
+            <div class="filter-label">
+              <i class="fas fa-tags"></i>
+              Ngành nghề
+            </div>
+            <div class="filter-options" id="fieldFilters">
+              {{#each (array "IT - Phần mềm" "IT - Phần cứng" "Marketing" "Sales - Kinh doanh" "Kế toán" "Nhân sự" "Thiết kế - Đồ họa")}}
+              <div class="filter-chip" data-filter-type="fields" data-value="{{this}}">
+                {{this}}
+              </div>
+              {{/each}}
+            </div>
+          </div>
+
+          <!-- Experience Filter -->
+          <div class="filter-group col-md-6">
+            <div class="filter-label">
+              <i class="fas fa-chart-line"></i>
+              Kinh nghiệm
+            </div>
+            <div class="filter-options" id="experienceFilters">
+              {{#each (array "Không yêu cầu" "Dưới 1 năm" "1-2 năm" "2-4 năm" "3-5 năm" "5-10 năm" "Trên 10 năm")}}
+              <div class="filter-chip" data-filter-type="experienceLevel" data-value="{{this}}">
+                {{this}}
+              </div>
+              {{/each}}
+            </div>
+          </div>
+        </div>
+
+        <!-- Salary Filter -->
+        <div class="filter-row">
+          <div class="filter-group col-md-12">
+            <div class="filter-label">
+              <i class="fas fa-dollar-sign"></i>
+              Mức lương
+            </div>
+            <div class="salary-inputs">
+              <input type="number" name="salaryMin" id="salaryMin" class="salary-input" placeholder="Tối thiểu" value="{{filters.salaryMin}}">
+              <span>-</span>
+              <input type="number" name="salaryMax" id="salaryMax" class="salary-input" placeholder="Tối đa" value="{{filters.salaryMax}}">
+              <button type="button" class="btn-primary-custom" id="applySalaryFilter">Áp dụng</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="filter-row">
+          <div class="col-md-12">
+            <button type="button" class="btn-primary-custom" id="applyFilters">
+              <i class="fas fa-check"></i>
+              Áp dụng bộ lọc
+            </button>
+            <button type="button" class="btn-secondary-custom ms-2" id="clearFilters">
+              <i class="fas fa-times"></i>
+              Xóa bộ lọc
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Active Filters Display -->
+    <div class="active-filters" id="activeFiltersSection" style="display: none;">
+      <h6>Bộ lọc đang áp dụng:</h6>
+      <div id="activeFiltersList"></div>
+      <button type="button" class="clear-all-filters" id="clearAllFilters">Xóa tất cả</button>
+    </div>
+
+    <!-- Sort Section -->
+    <div class="sort-section">
+      <div class="sort-group">
+        <label for="sortBy" class="form-label">Sắp xếp theo:</label>
+        <select name="sortBy" id="sortBy" class="sort-select">
+          <option value="relevance" {{#ifEquals sortBy 'relevance'}}selected{{/ifEquals}}>Phù hợp nhất</option>
+          <option value="date" {{#ifEquals sortBy 'date'}}selected{{/ifEquals}}>Mới nhất</option>
+          <option value="salary" {{#ifEquals sortBy 'salary'}}selected{{/ifEquals}}>Lương cao nhất</option>
+        </select>
+      </div>
+      <div class="sort-group">
+        <label for="sortOrder" class="form-label">Thứ tự:</label>
+        <select name="sortOrder" id="sortOrder" class="sort-select">
+          <option value="desc" {{#ifEquals sortOrder 'desc'}}selected{{/ifEquals}}>Giảm dần</option>
+          <option value="asc" {{#ifEquals sortOrder 'asc'}}selected{{/ifEquals}}>Tăng dần</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="loadingSpinner">
+      <div class="spinner"></div>
+      <p>Đang tìm kiếm công việc phù hợp...</p>
+    </div>
+
+    <!-- Job Results -->
+    <div id="jobResults">
+      {{#if sorted.length}}
+      <div class="job-grid">
+        {{#each sorted}}
+        <div class="job-card">
+          <div class="status-badge status-{{this.status}}">
+            {{#ifEquals this.status 'urgent'}}Gấp{{/ifEquals}}
+            {{#ifEquals this.status 'active'}}Đang tuyển{{/ifEquals}}
+            {{#ifEquals this.status 'closed'}}Đã đóng{{/ifEquals}}
+          </div>
+
+          <div class="job-header">
+            <img src="{{this.logoPath}}" alt="{{this.companyName}}" class="company-logo"
+              onerror="this.src='/images/default-company.png'">
+            <div class="job-title">
+              <h3>{{this.title}}</h3>
+              <div class="company-name">{{this.companyName}}</div>
+            </div>
+          </div>
+
+          <div class="job-details">
+            <div class="detail-item">
+              <i class="fas fa-briefcase"></i>
+              <span>{{this.type}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-clock"></i>
+              <span>{{this.workTime}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-map-marker-alt"></i>
+              <span>{{this.city}}</span>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-tags"></i>
+              <span>{{this.field}}</span>
+            </div>
+          </div>
+
+          <div class="salary">
+            <i class="fas fa-dollar-sign"></i>
+            {{this.salary}}
+          </div>
+
+          <div class="job-footer">
+            <div class="posted-date">
+              <i class="fas fa-calendar-alt"></i>
+              {{this.formattedDate}}
+            </div>
+            <a href="/jobs/{{this.slug}}" class="view-details">
+              <i class="fas fa-eye"></i>
+              Xem chi tiết
+            </a>
+          </div>
+        </div>
+        {{/each}}
+      </div>
+
+      <!-- Pagination -->
+      {{#if totalPages}}
+      <div class="pagination-container">
+        <div class="pagination">
+          {{#if currentPage}}
+          {{#if (gt currentPage 1)}}
+          <a href="?page={{sub currentPage 1}}&q={{keyword}}&sortBy={{sortBy}}&sortOrder={{sortOrder}}" class="page-link">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+          {{/if}}
+          {{/if}}
+
+          {{#each (paginationRange currentPage totalPages)}}
+          {{#if (eq this ../currentPage)}}
+          <span class="page-link active">{{this}}</span>
+          {{else}}
+          <a href="?page={{this}}&q={{../keyword}}&sortBy={{../sortBy}}&sortOrder={{../sortOrder}}" class="page-link">{{this}}</a>
+          {{/if}}
+          {{/each}}
+
+          {{#if (lt currentPage totalPages)}}
+          <a href="?page={{add currentPage 1}}&q={{keyword}}&sortBy={{sortBy}}&sortOrder={{sortOrder}}" class="page-link">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+          {{/if}}
+        </div>
+      </div>
+      {{/if}}
+
+      {{else}}
+      <div class="no-results">
+        <i class="fas fa-search"></i>
+        <h2>Không tìm thấy công việc nào</h2>
+        <p>{{#if keyword}}Thử thay đổi từ khóa tìm kiếm "{{keyword}}" hoặc bộ lọc của bạn{{else}}Tìm kiếm công việc phù hợp ngay!{{/if}}</p>
+        <button type="button" class="btn-primary-custom mt-3" onclick="clearAllFiltersAndSearch()">
+          <i class="fas fa-redo"></i>
+          Tìm lại từ đầu
+        </button>
+      </div>
+      {{/if}}
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Global state
+    let currentFilters = {
+      q: '{{keyword}}' || '',
+      cities: [],
+      types: [],
+      fields: [],
+      experienceLevel: '',
+      salaryMin: null,
+      salaryMax: null,
+      sortBy: '{{sortBy}}' || 'relevance',
+      sortOrder: '{{sortOrder}}' || 'desc'
+    };
+
+    // Initialize filters from URL parameters
+    {{#if filters}}
+    {{#if filters.cities}}
+    currentFilters.cities = {{{json filters.cities}}};
+    {{/if}}
+    {{#if filters.types}}
+    currentFilters.types = {{{json filters.types}}};
+    {{/if}}
+    {{#if filters.fields}}
+    currentFilters.fields = {{{json filters.fields}}};
+    {{/if}}
+    {{#if filters.experienceLevel}}
+    currentFilters.experienceLevel = '{{filters.experienceLevel}}';
+    {{/if}}
+    {{/if}}
+
+    // DOM Elements
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
+    const filterSection = document.getElementById('filterSection');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    const clearFiltersBtn = document.getElementById('clearFilters');
+    const clearAllFiltersBtn = document.getElementById('clearAllFilters');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+    const jobResults = document.getElementById('jobResults');
+    const activeFiltersSection = document.getElementById('activeFiltersSection');
+    const activeFiltersList = document.getElementById('activeFiltersList');
+
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeFilters();
+      updateActiveFiltersDisplay();
+      focusSearchInput();
+    });
+
+    toggleFiltersBtn.addEventListener('click', function() {
+      filterSection.classList.toggle('show');
+      const icon = this.querySelector('i');
+      if (filterSection.classList.contains('show')) {
+        icon.className = 'fas fa-times';
+      } else {
+        icon.className = 'fas fa-filter';
+      }
+    });
+
+    // Filter chip clicks
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        const filterType = this.dataset.filterType;
+        const value = this.dataset.value;
+
+        this.classList.toggle('active');
+
+        if (filterType === 'experienceLevel') {
+          // Single selection for experience
+          document.querySelectorAll(`[data-filter-type="${filterType}"]`).forEach(c => {
+            if (c !== this) c.classList.remove('active');
+          });
+          currentFilters[filterType] = this.classList.contains('active') ? value : '';
+        } else {
+          // Multiple selection for others
+          const index = currentFilters[filterType].indexOf(value);
+          if (index > -1) {
+            currentFilters[filterType].splice(index, 1);
+          } else {
+            currentFilters[filterType].push(value);
+          }
+        }
+      });
+    });
+
+    // Apply filters
+    applyFiltersBtn.addEventListener('click', applyFilters);
+    clearFiltersBtn.addEventListener('click', clearAllFilters);
+    clearAllFiltersBtn.addEventListener('click', clearAllFilters);
+
+    // Sort change
+    document.getElementById('sortBy').addEventListener('change', applyFilters);
+    document.getElementById('sortOrder').addEventListener('change', applyFilters);
+
+    // Salary filter
+    document.getElementById('applySalaryFilter').addEventListener('click', function() {
+      const minVal = document.getElementById('salaryMin').value;
+      const maxVal = document.getElementById('salaryMax').value;
+      currentFilters.salaryMin = minVal ? parseInt(minVal) : null;
+      currentFilters.salaryMax = maxVal ? parseInt(maxVal) : null;
+      applyFilters();
+    });
+
+    function initializeFilters() {
+      // Set initial filter states
+      Object.keys(currentFilters).forEach(filterType => {
+        if (Array.isArray(currentFilters[filterType])) {
+          currentFilters[filterType].forEach(value => {
+            const chip = document.querySelector(`[data-filter-type="${filterType}"][data-value="${value}"]`);
+            if (chip) chip.classList.add('active');
+          });
+        } else if (currentFilters[filterType]) {
+          const chip = document.querySelector(`[data-filter-type="${filterType}"][data-value="${currentFilters[filterType]}"]`);
+          if (chip) chip.classList.add('active');
+        }
+      });
+
+      // Set initial form values
+      document.getElementById('sortBy').value = currentFilters.sortBy;
+      document.getElementById('sortOrder').value = currentFilters.sortOrder;
+    }
+
+    function applyFilters() {
+      updateCurrentFilters();
+      performSearch();
+    }
+
+    function updateCurrentFilters() {
+      currentFilters.q = document.getElementById('searchInput').value;
+      currentFilters.sortBy = document.getElementById('sortBy').value;
+      currentFilters.sortOrder = document.getElementById('sortOrder').value;
+    }
+
+    function performSearch() {
+      showLoading();
+
+      const params = new URLSearchParams();
+
+      // Add search query
+      if (currentFilters.q) params.append('q', currentFilters.q);
+
+      // Add array filters
+      currentFilters.cities.forEach(city => params.append('cities', city));
+      currentFilters.types.forEach(type => params.append('types', type));
+      currentFilters.fields.forEach(field => params.append('fields', field));
+
+      // Add other filters
+      if (currentFilters.experienceLevel) params.append('experienceLevel', currentFilters.experienceLevel);
+      if (currentFilters.salaryMin) params.append('salaryMin', currentFilters.salaryMin);
+      if (currentFilters.salaryMax) params.append('salaryMax', currentFilters.salaryMax);
+
+      // Add sorting
+      params.append('sortBy', currentFilters.sortBy);
+      params.append('sortOrder', currentFilters.sortOrder);
+
+      // Navigate to new URL
+      window.location.href = '/jobs/search-results?' + params.toString();
+    }
+
+    function clearAllFilters() {
+      // Reset filter state
+      currentFilters = {
+        q: document.getElementById('searchInput').value,
+        cities: [],
+        types: [],
+        fields: [],
+        experienceLevel: '',
+        salaryMin: null,
+        salaryMax: null,
+        sortBy: 'relevance',
+        sortOrder: 'desc'
+      };
+
+      // Clear UI
+      document.querySelectorAll('.filter-chip').forEach(chip => {
+        chip.classList.remove('active');
+      });
+
+      document.getElementById('salaryMin').value = '';
+      document.getElementById('salaryMax').value = '';
+      document.getElementById('sortBy').value = 'relevance';
+      document.getElementById('sortOrder').value = 'desc';
+
+      updateActiveFiltersDisplay();
+
+      // Perform search with cleared filters
+      performSearch();
+    }
+
+    function clearAllFiltersAndSearch() {
+      document.getElementById('searchInput').value = '';
+      clearAllFilters();
+    }
+
+    function updateActiveFiltersDisplay() {
+      const activeFilters = [];
+
+      // Count active filters
+      let filterCount = 0;
+
+      if (currentFilters.cities.length > 0) {
+        filterCount += currentFilters.cities.length;
+        currentFilters.cities.forEach(city => activeFilters.push({type: 'cities', value: city, label: city}));
+      }
+
+      if (currentFilters.types.length > 0) {
+        filterCount += currentFilters.types.length;
+        currentFilters.types.forEach(type => activeFilters.push({type: 'types', value: type, label: type}));
+      }
+
+      if (currentFilters.fields.length > 0) {
+        filterCount += currentFilters.fields.length;
+        currentFilters.fields.forEach(field => activeFilters.push({type: 'fields', value: field, label: field}));
+      }
+
+      if (currentFilters.experienceLevel) {
+        filterCount++;
+        activeFilters.push({type: 'experienceLevel', value: currentFilters.experienceLevel, label: currentFilters.experienceLevel});
+      }
+
+      if (currentFilters.salaryMin || currentFilters.salaryMax) {
+        filterCount++;
+        const salaryLabel = `${currentFilters.salaryMin || ''}-${currentFilters.salaryMax || ''} $`;
+        activeFilters.push({type: 'salary', value: 'salary', label: `Lương: ${salaryLabel}`});
+      }
+
+      // Update filter count in header
+      document.getElementById('activeFilterCount').textContent = `${filterCount} bộ lọc`;
+
+      // Show/hide active filters section
+      if (activeFilters.length > 0) {
+        activeFiltersSection.style.display = 'block';
+        activeFiltersList.innerHTML = activeFilters.map(filter =>
+          `<span class="active-filter-tag">
+            ${filter.label}
+            <span class="remove-filter" onclick="removeFilter('${filter.type}', '${filter.value}')">&times;</span>
+          </span>`
+        ).join('');
+      } else {
+        activeFiltersSection.style.display = 'none';
+      }
+    }
+
+    function removeFilter(filterType, value) {
+      if (filterType === 'experienceLevel') {
+        currentFilters.experienceLevel = '';
+        const chip = document.querySelector(`[data-filter-type="${filterType}"][data-value="${value}"]`);
+        if (chip) chip.classList.remove('active');
+      } else if (filterType === 'salary') {
+        currentFilters.salaryMin = null;
+        currentFilters.salaryMax = null;
+        document.getElementById('salaryMin').value = '';
+        document.getElementById('salaryMax').value = '';
+      } else if (Array.isArray(currentFilters[filterType])) {
+        const index = currentFilters[filterType].indexOf(value);
+        if (index > -1) {
+          currentFilters[filterType].splice(index, 1);
+        }
+        const chip = document.querySelector(`[data-filter-type="${filterType}"][data-value="${value}"]`);
+        if (chip) chip.classList.remove('active');
+      }
+
+      updateActiveFiltersDisplay();
+      performSearch();
+    }
+
+    function showLoading() {
+      loadingSpinner.classList.add('show');
+      jobResults.style.display = 'none';
+    }
+
+    function focusSearchInput() {
+      if (!document.getElementById('searchInput').value) {
+        document.getElementById('searchInput').focus();
+      }
+    }
+
+    // Handle back/forward browser navigation
+    window.addEventListener('popstate', function(event) {
+      if (event.state) {
+        location.reload();
+      }
+    });
+
+    // Enhanced search keyword preservation
+    function preserveSearchKeyword() {
+      const searchInput = document.getElementById('searchInput');
+      const urlParams = new URLSearchParams(window.location.search);
+      const keywordFromUrl = urlParams.get('q');
+
+      // Ensure the search input always has the current keyword value
+      if (keywordFromUrl && searchInput.value !== keywordFromUrl) {
+        searchInput.value = keywordFromUrl;
+      }
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      preserveSearchKeyword();
+      focusSearchInput();
+      restoreFiltersFromURL();
+      updateActiveFiltersDisplay();
+    });
+
+    // Utility functions (these would normally be handlebars helpers)
+    function sub(a, b) { return a - b; }
+    function add(a, b) { return a + b; }
+    function gt(a, b) { return a > b; }
+    function lt(a, b) { return a < b; }
+    function eq(a, b) { return a === b; }
+  </script>
+</body>
+
+</html>

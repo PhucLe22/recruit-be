@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Ứng Viên</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d1b69 100%);
+      min-height: 100vh;
+      color: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .back-btn {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 100;
+    }
+
+    .back-btn:hover {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+      border-color: transparent;
+      color: white;
+    }
+
+    .back-btn i {
+      font-size: 16px;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: 700;
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      transition: all 0.3s ease;
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+
+    .stat-card:nth-child(1) { animation-delay: 0.1s; }
+    .stat-card:nth-child(2) { animation-delay: 0.2s; }
+    .stat-card:nth-child(3) { animation-delay: 0.3s; }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .stat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #8b5cf6;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .table-container {
+      padding: 30px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    th {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      padding: 20px 15px;
+      text-align: left;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.9rem;
+      position: relative;
+    }
+
+    th::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    }
+
+    td {
+      padding: 18px 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+      color: #ffffff;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    tr:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      transform: scale(1.01);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+    }
+
+    .user-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid rgba(99, 102, 241, 0.3);
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .user-avatar:hover {
+      transform: scale(1.05);
+      border-color: #6366f1;
+    }
+
+    .avatar-placeholder {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .email-text {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.95rem;
+    }
+
+    .status-select {
+      background: rgba(255, 255, 255, 0.05);
+      color: #ffffff;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      min-width: 140px;
+    }
+
+    .status-select:focus {
+      outline: none;
+      border-color: #6366f1;
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    .status-select option {
+      background: #1a1a3a;
+      color: #ffffff;
+      padding: 8px;
+    }
+
+    .status-select.loading {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .job-tag {
+      background: rgba(99, 102, 241, 0.2);
+      color: #c4b5fd;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .btn-primary, .btn-danger {
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border: none;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+    }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 40px;
+      color: #a1a1aa;
+    }
+
+    .no-data i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .no-data p {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    /* Loading indicator */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .status-select.loading::after {
+      content: '';
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    /* Modal Styles */
+    .modal-content {
+      background: rgba(26, 26, 58, 0.95);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      color: white;
+    }
+
+    .modal-header {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px 20px 0 0;
+    }
+
+    .modal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn-close {
+      filter: invert(1);
+    }
+
+    .modal-body {
+      padding: 30px;
+      text-align: center;
+    }
+
+    .modal-body i {
+      font-size: 3rem;
+      color: #ef4444;
+      margin-bottom: 15px;
+    }
+
+    .modal-footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 10px 25px;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Success Toast */
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideOutRight {
+      from {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      to {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+    }
+
+    .success-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 15px 25px;
+      border-radius: 15px;
+      font-weight: 600;
+      z-index: 9999;
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+      animation: slideInRight 0.5s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Back Button -->
+  {{> back-to-dashboard}}
+
+  <div class="container">
+    <div class="header">
+      <h1>Quản Lý Ứng Viên</h1>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <i class="fas fa-users stat-icon"></i>
+        <div class="stat-number" id="totalCandidates">0</div>
+        <div class="stat-label">Tổng Ứng Viên</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-check-circle stat-icon"></i>
+        <div class="stat-number" id="approvedCandidates">0</div>
+        <div class="stat-label">Đã Tuyển</div>
+      </div>
+      <div class="stat-card">
+        <i class="fas fa-clock stat-icon"></i>
+        <div class="stat-number" id="pendingCandidates">0</div>
+        <div class="stat-label">Chờ Xử Lý</div>
+      </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+      <table id="candidateTable">
+        <thead>
+          <tr>
+            <th><i class="fas fa-user me-2"></i>Ứng Viên</th>
+            <th><i class="fas fa-toggle-on me-2"></i>Trạng Thái</th>
+            <th><i class="fas fa-briefcase me-2"></i>Vị Trí</th>
+            <th><i class="fas fa-calendar me-2"></i>Ngày Tạo</th>
+            <th><i class="fas fa-cogs me-2"></i>Thao Tác</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#if jobApplieds.length}}
+            {{#each jobApplieds}}
+            <tr>
+              <td>
+                <div class="user-info">
+                  {{#if this.userAvatar}}
+                    <img src="{{this.userAvatar}}" alt="{{this.userName}}" class="user-avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'avatar-placeholder\'>{{substring this.userName 0 2}}</div>'">
+                  {{else}}
+                    <div class="avatar-placeholder">{{substring this.userName 0 2}}</div>
+                  {{/if}}
+                  <div>
+                    <div class="email-text">{{this.userName}}</div>
+                    <small style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem;">{{this.userEmail}}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <select class="status-select" data-id="{{this._id}}">
+                  <option value="pending" {{#if (eq this.status 'pending')}}selected{{/if}}>⏳ Chờ xử lý</option>
+                  <option value="reviewing" {{#if (eq this.status 'reviewing')}}selected{{/if}}>👁️ Đang xem xét</option>
+                  <option value="interviewing" {{#if (eq this.status 'interviewing')}}selected{{/if}}>💬 Phỏng vấn</option>
+                  <option value="hired" {{#if (eq this.status 'hired')}}selected{{/if}}>✅ Đã tuyển</option>
+                  <option value="rejected" {{#if (eq this.status 'rejected')}}selected{{/if}}>❌ Từ chối</option>
+                </select>
+              </td>
+              <td>
+                <span class="job-tag">{{this.jobTitle}}</span>
+              </td>
+              <td>
+                <i class="far fa-calendar-alt me-2"></i>
+                {{formatDate this.createdAt}}
+              </td>
+              <td>
+                <div class="d-flex gap-2">
+                  <a href="/business/cv/{{this.cvId}}" class="btn btn-primary" target="_blank">
+                    <i class="far fa-eye"></i> Xem CV
+                  </a>
+                  <button class="btn btn-danger delete-candidate" data-id="{{this._id}}">
+                    <i class="far fa-trash-alt"></i> Xóa
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {{/each}}
+          {{else}}
+            <tr>
+              <td colspan="5" class="no-data">
+                <i class="fas fa-inbox"></i>
+                <p>Chưa có ứng viên nào</p>
+              </td>
+            </tr>
+          {{/if}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">
+            <i class="fas fa-exclamation-triangle"></i>
+            Xác Nhận Xóa
+          </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <i class="fas fa-user-times"></i>
+          <h6>Bạn có chắc chắn muốn xóa ứng viên này?</h6>
+          <p class="text-muted">Hành động này không thể hoàn tác.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Hủy
+          </button>
+          <button type="button" class="btn btn-danger" id="confirmDelete">
+            <i class="fas fa-trash me-2"></i>Xóa
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script>
+    // Register Handlebars helpers
+    if (typeof Handlebars !== 'undefined') {
+      Handlebars.registerHelper('substring', function(str, start, end) {
+        if (!str) return '';
+        str = String(str);
+        return str.substring(start, end);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      let selectedId = null;
+      const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+
+      // Update stats counters
+      function updateStats() {
+        const rows = document.querySelectorAll('#candidateTable tbody tr:not(:has(.no-data))');
+        const hired = document.querySelectorAll('select.status-select option:checked[value="hired"]').length;
+        const pending = document.querySelectorAll('select.status-select option:checked[value="pending"]').length;
+        
+        document.getElementById('totalCandidates').textContent = rows.length;
+        document.getElementById('approvedCandidates').textContent = hired;
+        document.getElementById('pendingCandidates').textContent = pending;
+      }
+
+      updateStats();
+
+      // Animate counter function
+      function animateCounter(elementId, target) {
+        const element = document.getElementById(elementId);
+        const start = parseInt(element.textContent) || 0;
+        if (start === target) return;
+        
+        const increment = target > start ? 1 : -1;
+        const duration = 1000;
+        const stepTime = Math.abs(duration / (target - start));
+
+        const timer = setInterval(() => {
+          const current = parseInt(element.textContent);
+          if (current === target) {
+            clearInterval(timer);
+          } else {
+            element.textContent = current + increment;
+          }
+        }, stepTime);
+      }
+
+      // Show success toast
+      function showSuccessToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'success-toast';
+        toast.innerHTML = `<i class="fas fa-check-circle"></i>${message}`;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+          toast.style.animation = 'slideOutRight 0.5s ease';
+          setTimeout(() => toast.remove(), 500);
+        }, 3000);
+      }
+
+      // Handle delete button clicks
+      document.querySelectorAll('.delete-candidate').forEach(btn => {
+        btn.addEventListener('click', function() {
+          selectedId = this.dataset.id;
+          deleteModal.show();
+        });
+      });
+
+      // Confirm delete
+      document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (selectedId) {
+          // Submit delete form
+          const deleteForm = document.createElement('form');
+          deleteForm.method = 'POST';
+          deleteForm.action = `/business/jobApplied/${selectedId}?_method=DELETE`;
+          deleteForm.style.display = 'none';
+          document.body.appendChild(deleteForm);
+          deleteForm.submit();
+        }
+      });
+
+      // Handle status change
+      document.querySelectorAll('.status-select').forEach(select => {
+        select.setAttribute('data-old-value', select.value);
+        
+        select.addEventListener('change', async function() {
+          const applicationId = this.dataset.id;
+          const newStatus = this.value;
+          const oldStatus = this.getAttribute('data-old-value');
+          
+          this.disabled = true;
+          this.classList.add('loading');
+
+          try {
+            const response = await fetch(`/business/${applicationId}/update`, {
+              method: 'PUT',
+              headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({ status: newStatus })
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok || !data.success) {
+              throw new Error('Cập nhật thất bại');
+            }
+            
+            this.setAttribute('data-old-value', newStatus);
+            showSuccessToast('Cập nhật trạng thái thành công!');
+            updateStats();
+            
+          } catch (error) {
+            console.error('Error updating status:', error);
+            this.value = oldStatus;
+            
+            const errorToast = document.createElement('div');
+            errorToast.className = 'success-toast';
+            errorToast.style.background = 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)';
+            errorToast.innerHTML = `<i class="fas fa-exclamation-circle"></i>Có lỗi xảy ra khi cập nhật trạng thái`;
+            document.body.appendChild(errorToast);
+            
+            setTimeout(() => {
+              errorToast.style.animation = 'slideOutRight 0.5s ease';
+              setTimeout(() => errorToast.remove(), 500);
+            }, 3000);
+          } finally {
+            this.disabled = false;
+            this.classList.remove('loading');
+          }
+        });
+      });
+
+      // Add fadeOut animation
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeOut {
+          from { opacity: 1; transform: translateX(0); }
+          to { opacity: 0; transform: translateX(-20px); }
+        }
+      `;
+      document.head.appendChild(style);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{job.title}} - Chi Tiết Công Việc | Job Portal</title>
+    <meta name="description" content="{{job.title}} tại {{job.companyName}}. {{job.field}} với mức lương {{job.salary}} tại {{job.city}}.">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            --secondary: #10b981;
+            --secondary-light: #34d399;
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --gray: #6b7280;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* Hero Header */
+        .job-detail-header {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            color: white;
+            padding: 60px 0 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .job-detail-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="0.1" d="M0,96L48,112C96,128,192,160,288,160C384,160,480,128,576,122.7C672,117,768,139,864,154.7C960,171,1056,181,1152,186.7C1248,192,1344,192,1392,192L1440,192L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>') no-repeat bottom center;
+            background-size: cover;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb a:hover {
+            color: white;
+        }
+
+        .breadcrumb .separator {
+            color: rgba(255, 255, 255, 0.6);
+            margin: 0 10px;
+        }
+
+        .job-title-header {
+            margin-bottom: 30px;
+        }
+
+        .job-title-main {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .company-info-top {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .company-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .company-badge i {
+            font-size: 1rem;
+        }
+
+        .location-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #d1fae5;
+        }
+
+        .deadline-badge {
+            background: rgba(239, 68, 68, 0.2);
+            color: #fecaca;
+        }
+
+        .main-content {
+            background: var(--light);
+            border-radius: 20px;
+            padding: 40px;
+            margin-top: -20px;
+            position: relative;
+            box-shadow: var(--shadow-xl);
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 40px;
+        }
+
+        /* Main Job Content */
+        .job-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        /* Job Info Cards */
+        .job-info-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .job-info-section:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light);
+        }
+
+        .section-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .job-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border-radius: 12px;
+            border-left: 4px solid var(--primary-light);
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            transform: translateX(5px);
+        }
+
+        .info-item.salary {
+            border-left-color: var(--secondary);
+        }
+
+        .info-item.salary:hover {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+        }
+
+        .info-item.technology {
+            border-left-color: var(--accent);
+        }
+
+        .info-item.technology:hover {
+            background: linear-gradient(135deg, #f3e8ff, #e9d5ff);
+        }
+
+        .info-icon {
+            width: 24px;
+            height: 24px;
+            color: var(--primary-light);
+            font-size: 1.1rem;
+            margin-top: 2px;
+            flex-shrink: 0;
+        }
+
+        .info-item.salary .info-icon {
+            color: var(--secondary);
+        }
+
+        .info-item.technology .info-icon {
+            color: var(--accent);
+        }
+
+        .info-content {
+            flex: 1;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            line-height: 1.4;
+        }
+
+        .info-value a {
+            color: var(--primary-light);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .info-value a:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+
+        /* Job Description */
+        .job-description-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .description-content {
+            color: #4b5563;
+            line-height: 1.8;
+            font-size: 1rem;
+        }
+
+        .description-content {
+            white-space: pre-line;
+        }
+
+        .description-content h3 {
+            color: var(--dark);
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 30px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .description-content h3:first-child {
+            margin-top: 0;
+        }
+
+        .description-content h3::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            border-radius: 2px;
+        }
+
+        .description-content p {
+            margin-bottom: 15px;
+        }
+
+        .description-content ul, .description-content ol {
+            margin: 15px 0 20px 25px;
+        }
+
+        .description-content li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .description-content strong {
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        /* Apply Section */
+        .apply-section {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .apply-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.7; }
+        }
+
+        .apply-title {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .apply-subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .apply-btn {
+            background: white;
+            color: var(--primary);
+            border: none;
+            padding: 18px 50px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .apply-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .apply-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .apply-btn:hover::before {
+            left: 100%;
+        }
+
+        .apply-btn.applied {
+            background: var(--secondary);
+            color: white;
+            cursor: not-allowed;
+        }
+
+        .apply-btn.applied:hover {
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .company-card {
+            text-align: center;
+        }
+
+        .company-logo {
+            width: 100px;
+            height: 100px;
+            object-fit: contain;
+            border-radius: 16px;
+            margin: 0 auto 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+            border: 2px solid var(--light);
+            transition: transform 0.3s ease;
+        }
+
+        .company-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .company-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .company-meta {
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .save-job-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--accent-light), var(--accent));
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .save-job-btn:hover {
+            background: linear-gradient(135deg, var(--accent), #7c3aed);
+            transform: translateY(-1px);
+        }
+
+        .save-job-btn.saved {
+            background: var(--secondary);
+        }
+
+        .other-jobs {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .other-jobs-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .other-jobs-item {
+            padding: 15px;
+            margin-bottom: 12px;
+            background: var(--light);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .other-jobs-item:hover {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            transform: translateX(5px);
+        }
+
+        .other-jobs-link {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .other-jobs-link:hover {
+            color: var(--primary);
+        }
+
+        .other-jobs-salary {
+            color: var(--gray);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .other-jobs-salary i {
+            color: var(--secondary);
+            font-size: 0.8rem;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 16px 24px;
+            margin-bottom: 30px;
+            border-radius: 12px;
+            font-weight: 500;
+            backdrop-filter: blur(10px);
+            border: 1px solid transparent;
+            box-shadow: var(--shadow-md);
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
+            color: var(--secondary);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
+            color: var(--danger);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                order: -1;
+            }
+
+            .job-title-main {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                background: var(--light);
+            }
+
+            .job-detail-header {
+                padding: 40px 0 20px;
+                background: var(--primary);
+            }
+
+            .main-content {
+                margin-top: 0;
+                border-radius: 0;
+                padding: 20px;
+            }
+
+            .job-title-main {
+                font-size: 1.75rem;
+            }
+
+            .company-info-top {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .content-wrapper {
+                gap: 30px;
+            }
+
+            .job-info-section,
+            .job-description-section,
+            .sidebar-card,
+            .apply-section {
+                padding: 20px;
+            }
+
+            .apply-title {
+                font-size: 1.5rem;
+            }
+
+            .apply-btn {
+                width: 100%;
+                padding: 16px 30px;
+            }
+
+            .section-title {
+                font-size: 1.2rem;
+            }
+
+            .info-label {
+                font-size: 0.8rem;
+            }
+
+            .info-value {
+                font-size: 0.95rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .job-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .breadcrumb {
+                padding: 10px 15px;
+            }
+
+            .company-badge {
+                font-size: 0.85rem;
+                padding: 6px 12px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: white;
+            }
+
+            .job-detail-header {
+                background: white;
+                color: var(--dark);
+                padding: 20px 0;
+            }
+
+            .main-content {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                margin-top: 0;
+                border-radius: 0;
+            }
+
+            .apply-section,
+            .sidebar-card {
+                display: none;
+            }
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--light);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Focus states for accessibility */
+        .apply-btn:focus,
+        .save-job-btn:focus,
+        .other-jobs-item:focus {
+            outline: 2px solid var(--primary);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+
+<body>
+    {{#if messages.success}}
+    <div class="alert alert-success">
+        <i class="fas fa-check-circle"></i> {{messages.success}}
+    </div>
+    {{/if}}
+
+    {{#if messages.error}}
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle"></i> {{messages.error}}
+        <form action="/auth/login-page" style="margin-top: 12px; display: inline-block;">
+            <button type="submit" class="apply-btn" style="padding: 8px 20px; font-size: 0.9rem;">
+                <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
+            </button>
+        </form>
+    </div>
+    {{/if}}
+
+    <!-- Job Detail Header -->
+    <div class="job-detail-header">
+        <div class="container">
+            <nav class="breadcrumb">
+                <a href="/">Trang chủ</a>
+                <span class="separator">/</span>
+                <a href="/jobs/all">Việc làm</a>
+                <span class="separator">/</span>
+                <span>{{job.title}}</span>
+            </nav>
+
+            <div class="job-title-header">
+                <h1 class="job-title-main">{{job.title}}</h1>
+                <div class="company-info-top">
+                    <div class="company-badge">
+                        <i class="fas fa-building"></i>
+                        {{job.companyName}}
+                    </div>
+                    <div class="company-badge location-badge">
+                        <i class="fas fa-map-marker-alt"></i>
+                        {{job.city}}
+                    </div>
+                    <div class="company-badge deadline-badge">
+                        <i class="fas fa-calendar-times"></i>
+                        Hạn: {{formatDate job.expiryTime}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <div class="content-wrapper">
+                <!-- Left Column - Job Details -->
+                <div class="job-content">
+                    <!-- Job Information Section -->
+                    <div class="job-info-section">
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-briefcase"></i>
+                            </div>
+                            <h2 class="section-title">Thông tin công việc</h2>
+                        </div>
+
+                        <div class="job-info-grid">
+                            <div class="info-item salary">
+                                <div class="info-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Mức lương</div>
+                                    <div class="info-value">{{job.salary}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-industry"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Ngành nghề</div>
+                                    <div class="info-value">{{job.field}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Loại hình</div>
+                                    <div class="info-value">{{job.type}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Thời gian làm việc</div>
+                                    <div class="info-value">{{job.workTime}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item technology">
+                                <div class="info-icon">
+                                    <i class="fas fa-code"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Công nghệ yêu cầu</div>
+                                    <div class="info-value">{{job.technique}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Kinh nghiệm</div>
+                                    <div class="info-value">{{job.experience}}</div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-envelope"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Email liên hệ</div>
+                                    <div class="info-value">
+                                        <a href="mailto:{{job.email}}">{{job.email}}</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="fas fa-phone"></i>
+                                </div>
+                                <div class="info-content">
+                                    <div class="info-label">Số điện thoại</div>
+                                    <div class="info-value">
+                                        <a href="tel:{{job.contact}}">{{job.contact}}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Job Description Section -->
+                    <div class="job-description-section">
+                        <div class="section-header">
+                            <div class="section-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <h2 class="section-title">Mô tả công việc</h2>
+                        </div>
+
+                        <div class="description-content">
+                            {{#if job.description}}
+                                {{job.description}}
+                            {{else}}
+                                <p>Chúng tôi đang tìm kiếm một ứng viên tài năng và nhiệt huyết với vị trí <strong>{{job.title}}</strong> tại công ty <strong>{{job.companyName}}</strong>.</p>
+
+                                <h3>Vị trí này phù hợp với bạn nếu bạn có:</h3>
+                                <ul>
+                                    <li>Kinh nghiệm phù hợp: {{job.experience}}</li>
+                                    <li>Kỹ năng công nghệ: {{job.technique}}</li>
+                                    <li>Sẵn sàng làm việc với loại hình: {{job.type}}</li>
+                                </ul>
+
+                                <p>Hãy ứng tuyển ngay để trở thành một phần của đội ngũ của chúng tôi!</p>
+                            {{/if}}
+                        </div>
+                    </div>
+
+                    <!-- Apply Section -->
+                    <div class="apply-section">
+                        <h2 class="apply-title">
+                            <i class="fas fa-rocket"></i> Sẵn sàng ứng tuyển?
+                        </h2>
+                        <p class="apply-subtitle">
+                            {{#if job.salary}}
+                                Mức lương hấp dẫn: {{job.salary}}
+                            {{else}}
+                                Cơ hội phát triển sự nghiệp tuyệt vời
+                            {{/if}}
+                        </p>
+
+                        {{#if isStatus}}
+                        <button class="apply-btn applied" disabled>
+                            <i class="fas fa-check-circle"></i>
+                            Đã ứng tuyển
+                        </button>
+                        {{else if (eq isStatus 'closed')}}
+                        <button class="apply-btn applied" disabled>
+                            <i class="fas fa-times-circle"></i>
+                            Vị trí đã đóng
+                        </button>
+                        {{else}}
+                        <form action="/jobs/apply/{{job.slug}}" method="post">
+                            <button type="submit" class="apply-btn">
+                                <i class="fas fa-paper-plane"></i>
+                                Ứng tuyển ngay
+                            </button>
+                        </form>
+                        {{/if}}
+                    </div>
+                </div>
+
+                <!-- Right Column - Sidebar -->
+                <div class="sidebar">
+                    <!-- Company Card -->
+                    <div class="sidebar-card company-card">
+                        <h3 class="section-title" style="margin-bottom: 20px;">
+                            <i class="fas fa-building"></i> Công ty tuyển dụng
+                        </h3>
+
+                        {{#if business.logoPath}}
+                        <img src="{{business.logoPath}}" alt="{{job.companyName}}" class="company-logo">
+                        {{else}}
+                        <div class="company-logo" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                            {{job.companyName.charAt 0}}
+                        </div>
+                        {{/if}}
+
+                        <h4 class="company-name">{{job.companyName}}</h4>
+                        <div class="company-meta">
+                            <div><i class="fas fa-briefcase"></i> {{job.field}}</div>
+                            <div><i class="fas fa-map-marker-alt"></i> {{job.city}}</div>
+                        </div>
+
+                        {{#if isLogin}}
+                        {{#if isSaved}}
+                        <button type="button" class="save-job-btn saved" id="saveJobBtn" data-job-id="{{job._id}}">
+                            <i class="fas fa-check-circle"></i>
+                            Đã lưu
+                        </button>
+                        {{else}}
+                        <button type="button" class="save-job-btn" id="saveJobBtn" data-job-id="{{job._id}}">
+                            <i class="fas fa-bookmark"></i>
+                            Lưu tin tuyển dụng
+                        </button>
+                        {{/if}}
+                        {{else}}
+                        <form action="/auth/login-page" method="get">
+                            <button type="submit" class="save-job-btn">
+                                <i class="fas fa-bookmark"></i>
+                                Đăng nhập để lưu
+                            </button>
+                        </form>
+                        {{/if}}
+                    </div>
+
+                    <!-- Other Jobs -->
+                    {{#if jobs}}
+                    <div class="sidebar-card">
+                        <h3 class="section-title" style="margin-bottom: 20px;">
+                            <i class="fas fa-list"></i> Việc làm khác
+                        </h3>
+
+                        <div class="other-jobs">
+                            <ul class="other-jobs-list">
+                                {{#each jobs}}
+                                <li class="other-jobs-item">
+                                    <a href="/jobs/{{this.slug}}" class="other-jobs-link">
+                                        {{this.title}}
+                                    </a>
+                                    <div class="other-jobs-salary">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        {{this.salary}}
+                                    </div>
+                                </li>
+                                {{/each}}
+                            </ul>
+                        </div>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // JavaScript functionality
+        document.addEventListener('DOMContentLoaded', function () {
+            // Save job functionality
+            const saveJobBtn = document.getElementById('saveJobBtn');
+            if (saveJobBtn) {
+                saveJobBtn.addEventListener('click', async function(e) {
+                    e.preventDefault();
+
+                    const jobId = this.dataset.jobId;
+                    const isSaved = this.classList.contains('saved');
+                    const originalContent = this.innerHTML;
+
+                    // Show loading state
+                    this.disabled = true;
+                    this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                    try {
+                        const url = isSaved ? `/jobs/save/${jobId}` : `/jobs/save/${jobId}`;
+                        const method = isSaved ? 'DELETE' : 'POST';
+
+                        const response = await fetch(url, {
+                            method: method,
+                            headers: {
+                                'Content-Type': 'application/json',
+                            }
+                        });
+
+                        const result = await response.json();
+
+                        if (response.ok) {
+                            // Toggle button state
+                            if (isSaved) {
+                                // Job was saved, now unsaving
+                                this.classList.remove('saved');
+                                this.innerHTML = '<i class="fas fa-bookmark"></i> Lưu tin tuyển dụng';
+                            } else {
+                                // Job was not saved, now saving
+                                this.classList.add('saved');
+                                this.innerHTML = '<i class="fas fa-check-circle"></i> Đã lưu';
+                            }
+
+                            // Show success message
+                            showMessage(result.message || result.message, 'success');
+                        } else {
+                            // Show error message
+                            showMessage(result.message || 'Đã có lỗi xảy ra', 'error');
+                            // Restore original button state
+                            this.innerHTML = originalContent;
+                        }
+                    } catch (error) {
+                        console.error('Error saving/unsaving job:', error);
+                        showMessage('Đã có lỗi xảy ra. Vui lòng thử lại.', 'error');
+                        // Restore original button state
+                        this.innerHTML = originalContent;
+                    } finally {
+                        this.disabled = false;
+                    }
+                });
+            }
+
+            // Function to show messages
+            function showMessage(message, type = 'success') {
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `alert alert-${type}`;
+                alertDiv.style.position = 'fixed';
+                alertDiv.style.top = '20px';
+                alertDiv.style.right = '20px';
+                alertDiv.style.zIndex = '9999';
+                alertDiv.style.minWidth = '300px';
+                alertDiv.innerHTML = `
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    ${message}
+                `;
+
+                document.body.appendChild(alertDiv);
+
+                // Auto remove after 3 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.parentNode.removeChild(alertDiv);
+                    }
+                }, 3000);
+            }
+
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add animation on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe elements for animation
+            document.querySelectorAll('.job-info-section, .job-description-section, .sidebar-card').forEach(el => {
+                observer.observe(el);
+            });
+
+            // Print functionality
+            const printBtn = document.querySelector('.print-btn');
+            if (printBtn) {
+                printBtn.addEventListener('click', () => {
+                    window.print();
+                });
+            }
+
+            // Share functionality
+            const shareBtn = document.querySelector('.share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', () => {
+                    if (navigator.share) {
+                        navigator.share({
+                            title: '{{job.title}}',
+                            text: '{{job.companyName}} - {{job.field}} - {{job.salary}}',
+                            url: window.location.href
+                        });
+                    } else {
+                        // Fallback: copy to clipboard
+                        navigator.clipboard.writeText(window.location.href);
+
+                        // Show feedback
+                        const originalText = shareBtn.innerHTML;
+                        shareBtn.innerHTML = '<i class="fas fa-check"></i> Đã sao chép!';
+                        setTimeout(() => {
+                            shareBtn.innerHTML = originalText;
+                        }, 2000);
+                    }
+                });
+            }
+        });
+
+        // Handle form submission with loading state
+        const applyForm = document.querySelector('form[action*="/jobs/apply/"]');
+        if (applyForm) {
+            applyForm.addEventListener('submit', function (e) {
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalContent = submitBtn.innerHTML;
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+
+                // Re-enable after 5 seconds (fallback)
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalContent;
+                }, 5000);
+            });
+        }
+
+        // Enhance accessibility
+        document.addEventListener('keydown', function(e) {
+            // Press '/' to focus on job search
+            if (e.key === '/' && !e.target.matches('input, textarea, button')) {
+                e.preventDefault();
+                const searchInput = document.querySelector('input[type="search"]');
+                if (searchInput) {
+                    searchInput.focus();
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

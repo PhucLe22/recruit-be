@@ -1,0 +1,610 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #1e40af;
+            --secondary-color: #3b82f6;
+            --accent-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --gray-color: #64748b;
+            --border-radius: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2d3748 100%);
+            min-height: 100vh;
+            color: var(--dark-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #e0e7ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 400;
+            line-height: 1.8;
+        }
+
+        .assessment-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .assessment-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .assessment-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .assessment-card::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .assessment-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
+        }
+
+        .assessment-icon {
+            width: 90px;
+            height: 90px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+            font-size: 2.2rem;
+            color: white;
+            box-shadow: 0 15px 30px rgba(30, 64, 175, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+
+        .assessment-icon::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(135deg, var(--accent-color), var(--primary-color));
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0.8;
+            filter: blur(8px);
+        }
+
+        .assessment-title {
+            font-size: 2rem;
+            color: #1a202c;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .assessment-subtitle {
+            color: var(--gray-color);
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            opacity: 0.8;
+        }
+
+        .assessment-description {
+            color: #4a5568;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+        }
+
+        .assessment-features {
+            list-style: none;
+            margin-bottom: 2.5rem;
+            flex-grow: 1;
+        }
+
+        .assessment-features li {
+            padding: 0.8rem 0;
+            color: #4a5568;
+            position: relative;
+            padding-left: 2rem;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            border-radius: 8px;
+            min-height: 2rem;
+        }
+
+        .assessment-features li:hover {
+            background: rgba(59, 130, 246, 0.05);
+            padding-left: 2.5rem;
+            color: var(--primary-color);
+        }
+
+        .assessment-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--accent-color);
+            font-weight: 700;
+            font-size: 1.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .assessment-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.2rem 2.5rem;
+            border-radius: 60px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            font-size: 1.05rem;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+            position: relative;
+            overflow: hidden;
+            margin-top: auto;
+        }
+
+        .assessment-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+
+        .assessment-button:hover::before {
+            left: 100%;
+        }
+
+        .assessment-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.3);
+        }
+
+        .info-section {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .info-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .info-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.12);
+        }
+
+        .info-section h2 {
+            color: #1a202c;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .info-section h2 i {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+        }
+
+        .info-section p {
+            color: #4a5568;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        .user-info {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-info::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.05), transparent);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .user-info strong {
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .user-info a {
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                max-width: 1200px;
+            }
+
+            .assessment-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+
+            .assessment-card {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 992px) {
+            .container {
+                max-width: 100%;
+                padding: 1.5rem;
+            }
+
+            .assessment-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.2rem;
+            }
+
+            .assessment-card {
+                padding: 1.8rem;
+            }
+
+            .assessment-icon {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+
+            .assessment-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header h1 {
+                font-size: 2.5rem;
+            }
+
+            .header p {
+                font-size: 1.1rem;
+            }
+
+            .assessment-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .assessment-card {
+                padding: 2rem;
+            }
+
+            .assessment-icon {
+                width: 70px;
+                height: 70px;
+                font-size: 1.8rem;
+            }
+
+            .assessment-title {
+                font-size: 1.6rem;
+            }
+
+            .info-section {
+                padding: 1.5rem;
+            }
+
+            .user-info {
+                padding: 1rem 1.5rem;
+            }
+        }
+
+        /* Enhanced card-specific color schemes */
+        .mbti-card {
+            position: relative;
+        }
+
+        .mbti-card::before {
+            background: linear-gradient(90deg, #e74c3c, #3498db);
+        }
+
+        .mbti-card .assessment-icon {
+            background: linear-gradient(135deg, #e74c3c, #3498db);
+            box-shadow: 0 15px 30px rgba(231, 76, 60, 0.2);
+        }
+
+        .mbti-card .assessment-icon::before {
+            background: linear-gradient(135deg, #c0392b, #2980b9);
+        }
+
+        .bigfive-card {
+            position: relative;
+        }
+
+        .bigfive-card::before {
+            background: linear-gradient(90deg, #27ae60, #16a085);
+        }
+
+        .bigfive-card .assessment-icon {
+            background: linear-gradient(135deg, #27ae60, #16a085);
+            box-shadow: 0 15px 30px rgba(39, 174, 96, 0.2);
+        }
+
+        .bigfive-card .assessment-icon::before {
+            background: linear-gradient(135deg, #229954, #138d75);
+        }
+
+        .disc-card {
+            position: relative;
+        }
+
+        .disc-card::before {
+            background: linear-gradient(90deg, #f39c12, #d35400);
+        }
+
+        .disc-card .assessment-icon {
+            background: linear-gradient(135deg, #f39c12, #d35400);
+            box-shadow: 0 15px 30px rgba(243, 156, 18, 0.2);
+        }
+
+        .disc-card .assessment-icon::before {
+            background: linear-gradient(135deg, #e67e22, #ba4a00);
+        }
+
+        /* Enhanced button hover effects for different cards */
+        .mbti-card .assessment-button:hover {
+            box-shadow: 0 20px 40px rgba(231, 76, 60, 0.3);
+        }
+
+        .bigfive-card .assessment-button:hover {
+            box-shadow: 0 20px 40px rgba(39, 174, 96, 0.3);
+        }
+
+        .disc-card .assessment-button:hover {
+            box-shadow: 0 20px 40px rgba(243, 156, 18, 0.3);
+        }
+    </style>
+
+    <div class="container">
+        {{#if user}}
+        <div class="user-info">
+            <i class="fas fa-user"></i> Xin chào, <strong>{{user.name}}</strong>! Chào mừng bạn đến với trang bài kiểm tra tính cách chuyên nghiệp.
+        </div>
+        {{/if}}
+
+        <div class="header">
+            <h1><i class="fas fa-brain"></i> Bài kiểm tra tính cách</h1>
+            <p>Khám phá bản thân và tìm kiếm công việc phù hợp nhất với tính cách của bạn</p>
+        </div>
+
+        <div class="assessment-grid">
+            <!-- MBTI Assessment Card -->
+            <div class="assessment-card mbti-card">
+                <div class="assessment-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h2 class="assessment-title">MBTI</h2>
+                <p class="assessment-subtitle">Myers-Briggs Type Indicator</p>
+                <p class="assessment-description">
+                    Phân loại 16 nhóm tính cách dựa trên hướng nội/hướng ngoại, cảm tính/lý trí,
+                    trực giác/cảm giác và có kế hoạch/linh hoạt.
+                </p>
+                <ul class="assessment-features">
+                    <li>16 loại tính cách khác nhau</li>
+                    <li>Tập trung vào sở thích và năng khiếu</li>
+                    <li>Phù hợp với lựa chọn nghề nghiệp</li>
+                    <li>Thời gian: 10-15 phút</li>
+                </ul>
+                <a href="/personality-assessments/mbti" class="assessment-button">
+                    <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
+                </a>
+            </div>
+
+            <!-- Big Five Assessment Card -->
+            <div class="assessment-card bigfive-card">
+                <div class="assessment-icon">
+                    <i class="fas fa-water"></i>
+                </div>
+                <h2 class="assessment-title">Big Five</h2>
+                <p class="assessment-subtitle">Mô hình 5 yếu tố tính cách (OCEAN)</p>
+                <p class="assessment-description">
+                    Đo lường 5 khía cạnh chính của tính cách: Hướng ngoại, Cởi mở,
+                    Tận tâm, Thân thiện và Ổn định cảm xúc.
+                </p>
+                <ul class="assessment-features">
+                    <li>5 yếu tố tính cách chính</li>
+                    <li>Đo lường theo thang điểm khoa học</li>
+                    <li>Dự đoán hiệu suất công việc</li>
+                    <li>Thời gian: 15-20 phút</li>
+                </ul>
+                <a href="/api/personality-assessments/big-five" class="assessment-button">
+                    <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
+                </a>
+            </div>
+
+            <!-- DISC Assessment Card -->
+            <div class="assessment-card disc-card">
+                <div class="assessment-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h2 class="assessment-title">DISC</h2>
+                <p class="assessment-subtitle">Đánh giá hành vi trong công việc</p>
+                <p class="assessment-description">
+                    Phân tích 4 phong cách hành vi: Thống trị (Dominance), Ảnh hưởng (Influence),
+                    Ổn định (Steadiness) và Tận tâm (Conscientiousness).
+                </p>
+                <ul class="assessment-features">
+                    <li>4 phong cách hành vi chính</li>
+                    <li>Tập trung vào môi trường làm việc</li>
+                    <li>Dự báo phong cách lãnh đạo</li>
+                    <li>Thời gian: 10-15 phút</li>
+                </ul>
+                <a href="/api/personality-assessments/disc" class="assessment-button">
+                    <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
+                </a>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-info-circle"></i> Tại sao nên làm bài kiểm tra tính cách?</h2>
+            <p>
+                Bài kiểm tra tính cách giúp bạn hiểu rõ hơn về bản thân, xác định điểm mạnh và điểm yếu,
+                từ đó đưa ra quyết định nghề nghiệp chính xác hơn. Các công ty ngày càng sử dụng
+                bài kiểm tra tính cách trong quy trình tuyển dụng để tìm kiếm ứng viên phù hợp nhất với văn hóa công ty.
+            </p>
+        </div>
+
+        <div class="info-section">
+            <h2><i class="fas fa-shield-alt"></i> Chính sách bảo mật</h2>
+            <p>
+                Chúng tôi cam kết bảo mật tuyệt đối thông tin cá nhân và kết quả bài kiểm tra của bạn.
+                Kết quả chỉ được sử dụng để đưa ra gợi ý nghề nghiệp phù hợp và không chia sẻ cho bên thứ ba.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some interactive animations
+            const cards = document.querySelectorAll('.assessment-card');
+
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-10px) scale(1.02)';
+                });
+
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+    </script>

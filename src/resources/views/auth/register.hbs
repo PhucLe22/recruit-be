@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Registration</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 30px 20px;
+            background: linear-gradient(135deg, #0077b5, #00a0dc);
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00a0dc;
+            width: 33.33%;
+            transition: width 0.3s ease;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .step-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #fafbfc;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #0077b5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+        }
+
+        .form-input.error {
+            border-color: #dc3545;
+            background: #fff5f5;
+        }
+
+        .form-input.success {
+            border-color: #28a745;
+            background: #f8fff8;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .success-message {
+            color: #28a745;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .form-input.error+.error-message {
+            display: block;
+        }
+
+        .form-input.success+.error-message+.success-message {
+            display: block;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .file-input-display {
+            display: flex;
+            align-items: center;
+            padding: 16px;
+            border: 2px dashed #e1e5e9;
+            border-radius: 8px;
+            background: #fafbfc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-input-display:hover {
+            border-color: #0077b5;
+            background: #f0f8ff;
+        }
+
+        .file-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            color: #666;
+        }
+
+        .select-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fafbfc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: #0077b5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+        }
+
+        .textarea-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fafbfc;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .textarea-input:focus {
+            outline: none;
+            border-color: #0077b5;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0, 119, 181, 0.1);
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: none;
+        }
+
+        .btn-primary {
+            background: #0077b5;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #005885;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 119, 181, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-secondary {
+            background: #f3f2ef;
+            color: #666;
+            border: 2px solid #e1e5e9;
+        }
+
+        .btn-secondary:hover {
+            background: #e9e5df;
+            border-color: #d0ccc7;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .password-requirements {
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            margin-bottom: 4px;
+            color: #666;
+        }
+
+        .requirement.met {
+            color: #28a745;
+        }
+
+        .requirement-icon {
+            margin-right: 6px;
+            font-size: 10px;
+        }
+
+        .info-note {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #1565c0;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+
+            .form-container {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 30px 20px 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Business Registration</h1>
+            <p>Join our platform to connect with talented professionals</p>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+
+        <div class="form-container">
+            <form id="businessForm" enctype="multipart/form-data">
+                <!-- Step 1: Basic Information -->
+                <div id="step1" class="step active">
+                    <h3 class="step-title">Basic Information</h3>
+
+                    <div class="info-note">
+                        Please provide accurate business information. All fields marked with * are required.
+                    </div>
+
+                    <div class="form-group">
+                        <label for="name">Business Name *</label>
+                        <input type="text" id="name" class="form-input" placeholder="Enter your business name" required>
+                        <div class="error-message" id="nameError"></div>
+                        <div class="success-message" id="nameSuccess">Business name is valid!</div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taxId">Tax ID *</label>
+                            <input type="text" id="taxId" class="form-input" placeholder="Enter tax ID" required>
+                            <div class="error-message" id="taxIdError"></div>
+                            <div class="success-message" id="taxIdSuccess">Tax ID is valid!</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Business Email *</label>
+                            <input type="email" id="email" class="form-input" placeholder="business@company.com"
+                                required>
+                            <div class="error-message" id="emailError"></div>
+                            <div class="success-message" id="emailSuccess">Email is valid!</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" class="form-input" placeholder="Enter phone number">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="website">Website</label>
+                            <input type="url" id="website" class="form-input" placeholder="https://yourwebsite.com">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address">Business Address</label>
+                        <input type="text" id="address" class="form-input"
+                            placeholder="Enter complete business address">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password *</label>
+                        <input type="password" id="password" class="form-input" placeholder="Create a secure password"
+                            required>
+                        <div class="error-message" id="passwordError"></div>
+                        <div class="password-requirements" id="passwordRequirements">
+                            <div class="requirement" id="lengthReq">
+                                <span class="requirement-icon">○</span>
+                                At least 6 characters
+                            </div>
+                            <div class="requirement" id="uppercaseReq">
+                                <span class="requirement-icon">○</span>
+                                Contains uppercase letter
+                            </div>
+                            <div class="requirement" id="numberReq">
+                                <span class="requirement-icon">○</span>
+                                Contains number
+                            </div>
+                            <div class="requirement" id="specialReq">
+                                <span class="requirement-icon">○</span>
+                                Contains special character
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="button" id="next1" class="btn btn-primary" disabled>Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Business Details -->
+                <div id="step2" class="step">
+                    <h3 class="step-title">Business Details</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="scale">Business Scale</label>
+                            <select id="scale" class="select-input">
+                                <option value="">-- Select Scale --</option>
+                                <option value="1-10">1-10 employees</option>
+                                <option value="11-50">11-50 employees</option>
+                                <option value="51-100">51-100 employees</option>
+                                <option value="101-500">101-500 employees</option>
+                                <option value="501+">500+ employees</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="capital">Registered Capital</label>
+                            <select id="capital" class="select-input">
+                                <option value="">-- Select Capital Range --</option>
+                                <option value="Under 1B">Under 1 Billion VND</option>
+                                <option value="1B-5B">1-5 Billion VND</option>
+                                <option value="5B-10B">5-10 Billion VND</option>
+                                <option value="10B-50B">10-50 Billion VND</option>
+                                <option value="50B+">Over 50 Billion VND</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="logo">Business Logo</label>
+                        <div class="file-input-wrapper">
+                            <input type="file" id="logo" class="file-input" accept="image/*">
+                            <div class="file-input-display">
+                                <svg class="file-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                    </path>
+                                </svg>
+                                <span id="logoText">Choose business logo</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="description">Business Description</label>
+                        <textarea id="description" class="textarea-input"
+                            placeholder="Describe your business, services, and what makes you unique..."></textarea>
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="button" id="prev2" class="btn btn-secondary">Previous</button>
+                        <button type="button" id="next2" class="btn btn-primary">Next</button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Review & Submit -->
+                <div id="step3" class="step">
+                    <h3 class="step-title">Review & Submit</h3>
+
+                    <div class="info-note">
+                        Please review your information before submitting. Your account will be pending approval after
+                        registration.
+                    </div>
+
+                    <div id="reviewContent" class="review-content">
+                        <!-- Review content will be populated by JavaScript -->
+                    </div>
+
+                    <div class="btn-container">
+                        <button type="button" id="prev3" class="btn btn-secondary">Previous</button>
+                        <button type="button" id="submitBtn" class="btn btn-primary">Submit Registration</button>
+                    </div>
+                </div>
+            </form>
+
+            <div id="status" class="status"></div>
+        </div>
+        <a href="/business/login-page">You registered for Company account?</a>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+        }
+
+        // Show specific step
+        function showStep(stepNum) {
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(`step${stepNum}`).classList.add('active');
+            currentStep = stepNum;
+            updateProgress();
+        }
+
+        // Validation functions
+        function validateBusinessName(name) {
+            if (name.length < 2) {
+                return { valid: false, message: 'Business name must be at least 2 characters long' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        function validateTaxId(taxId) {
+            if (taxId.length < 8) {
+                return { valid: false, message: 'Tax ID must be at least 8 characters long' };
+            }
+            if (!/^[0-9A-Za-z-]+$/.test(taxId)) {
+                return { valid: false, message: 'Tax ID can only contain letters, numbers, and hyphens' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        function validateEmail(email) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                return { valid: false, message: 'Please enter a valid email address' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        function validatePassword(password) {
+            const requirements = {
+                length: password.length >= 6,
+                uppercase: /[A-Z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+
+            // Update requirement indicators
+            document.getElementById('lengthReq').classList.toggle('met', requirements.length);
+            document.getElementById('uppercaseReq').classList.toggle('met', requirements.uppercase);
+            document.getElementById('numberReq').classList.toggle('met', requirements.number);
+            document.getElementById('specialReq').classList.toggle('met', requirements.special);
+
+            // Update icons
+            ['lengthReq', 'uppercaseReq', 'numberReq', 'specialReq'].forEach((id, index) => {
+                const req = Object.values(requirements)[index];
+                const icon = document.querySelector(`#${id} .requirement-icon`);
+                icon.textContent = req ? '●' : '○';
+            });
+
+            const allMet = Object.values(requirements).every(req => req);
+
+            if (!allMet) {
+                return { valid: false, message: 'Password does not meet all requirements' };
+            }
+            return { valid: true, message: '' };
+        }
+
+        function setFieldState(fieldId, isValid, message) {
+            const field = document.getElementById(fieldId);
+            const errorElement = document.getElementById(fieldId + 'Error');
+
+            field.classList.remove('error', 'success');
+            if (message) {
+                if (isValid) {
+                    field.classList.add('success');
+                } else {
+                    field.classList.add('error');
+                    errorElement.textContent = message;
+                }
+            }
+        }
+
+        function checkStep1Validity() {
+            const name = document.getElementById('name').value;
+            const taxId = document.getElementById('taxId').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const nameValid = name && validateBusinessName(name).valid;
+            const taxIdValid = taxId && validateTaxId(taxId).valid;
+            const emailValid = email && validateEmail(email).valid;
+            const passwordValid = password && validatePassword(password).valid;
+
+            const allValid = nameValid && taxIdValid && emailValid && passwordValid;
+            document.getElementById('next1').disabled = !allValid;
+        }
+
+        function populateReview() {
+            const formData = {
+                name: document.getElementById('name').value,
+                taxId: document.getElementById('taxId').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                website: document.getElementById('website').value,
+                address: document.getElementById('address').value,
+                scale: document.getElementById('scale').value,
+                capital: document.getElementById('capital').value,
+                description: document.getElementById('description').value,
+                logo: document.getElementById('logo').files[0]?.name
+            };
+
+            const reviewContent = document.getElementById('reviewContent');
+            reviewContent.innerHTML = `
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h4 style="margin-bottom: 16px; color: #333;">Business Information</h4>
+                    <div style="display: grid; gap: 12px;">
+                        <div><strong>Business Name:</strong> ${formData.name}</div>
+                        <div><strong>Tax ID:</strong> ${formData.taxId}</div>
+                        <div><strong>Email:</strong> ${formData.email}</div>
+                        ${formData.phone ? `<div><strong>Phone:</strong> ${formData.phone}</div>` : ''}
+                        ${formData.website ? `<div><strong>Website:</strong> ${formData.website}</div>` : ''}
+                        ${formData.address ? `<div><strong>Address:</strong> ${formData.address}</div>` : ''}
+                        ${formData.scale ? `<div><strong>Scale:</strong> ${formData.scale}</div>` : ''}
+                        ${formData.capital ? `<div><strong>Capital:</strong> ${formData.capital}</div>` : ''}
+                        ${formData.logo ? `<div><strong>Logo:</strong> ${formData.logo}</div>` : ''}
+                        ${formData.description ? `<div><strong>Description:</strong> ${formData.description.substring(0, 100)}${formData.description.length > 100 ? '...' : ''}</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Real-time validation for Step 1
+        document.getElementById('name').addEventListener('input', function () {
+            const validation = validateBusinessName(this.value);
+            setFieldState('name', validation.valid, validation.message);
+            checkStep1Validity();
+        });
+
+        document.getElementById('taxId').addEventListener('input', function () {
+            const validation = validateTaxId(this.value);
+            setFieldState('taxId', validation.valid, validation.message);
+            checkStep1Validity();
+        });
+
+        document.getElementById('email').addEventListener('input', function () {
+            const validation = validateEmail(this.value);
+            setFieldState('email', validation.valid, validation.message);
+            checkStep1Validity();
+        });
+
+        document.getElementById('password').addEventListener('input', function () {
+            const validation = validatePassword(this.value);
+            setFieldState('password', validation.valid, validation.message);
+            checkStep1Validity();
+        });
+
+        // File input handler
+        document.getElementById('logo').addEventListener('change', function () {
+            const fileName = this.files[0] ? this.files[0].name : 'Choose business logo';
+            document.getElementById('logoText').textContent = fileName;
+        });
+
+        // Step navigation
+        document.getElementById('next1').addEventListener('click', async () => {
+            const data = {
+                name: document.getElementById('name').value,
+                taxId: document.getElementById('taxId').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value,
+                website: document.getElementById('website').value,
+                address: document.getElementById('address').value,
+                password: document.getElementById('password').value,
+            };
+
+            // Simulate API call for step 1
+            try {
+                const res = await fetch('/business/register/step1', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                if (res.ok) {
+                    showStep(2);
+                } else {
+                    const text = await res.text();
+                    showStatus(text, 'error');
+                }
+            } catch (error) {
+                showStatus('An error occurred, please try again', 'error');
+            }
+        });
+
+        document.getElementById('next2').addEventListener('click', async () => {
+            const file = document.getElementById('logo').files[0];
+            const scale = document.getElementById('scale').value;
+            const capital = document.getElementById('capital').value;
+            const description = document.getElementById('description').value;
+
+            const formData = new FormData();
+            if (file) formData.append('logo', file);
+            formData.append('scale', scale);
+            formData.append('capital', capital);
+            formData.append('description', description);
+
+            try {
+                const res = await fetch('/business/register/step2', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (res.ok) {
+                    populateReview();
+                    showStep(3);
+                } else {
+                    const text = await res.text();
+                    showStatus(text, 'error');
+                }
+            } catch (error) {
+                showStatus('An error occurred, please try again', 'error');
+            }
+        });
+
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            try {
+                const res = await fetch('/business/register/submit', {
+                    method: 'POST'
+                });
+
+                showStatus('Business registration submitted successfully! Your account is pending approval.', 'success');
+                //otp/business
+                if (res.ok) {
+                    showStatus('Business registration submitted successfully! Your account is pending approval.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/business/upload-logo-page';
+                    }, 3000);
+                } else {
+                    const text = await res.text();
+                    showStatus(text, 'error');
+                }
+            } catch (error) {
+                showStatus('An error occurred, please try again', 'error');
+            }
+        });
+
+        // Previous buttons
+        document.getElementById('prev2').addEventListener('click', () => showStep(1));
+        document.getElementById('prev3').addEventListener('click', () => showStep(2));
+
+        function showStatus(message, type) {
+            const statusEl = document.getElementById('status');
+            statusEl.textContent = message;
+            statusEl.className = `status ${type}`;
+            statusEl.style.display = 'block';
+
+            setTimeout(() => {
+                statusEl.style.display = 'none';
+            }, 5000);
+        }
+
+        // Initialize
+        updateProgress();
+        checkStep1Validity();
+    </script>
+</body>
+
+</html>

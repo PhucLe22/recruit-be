@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hồ Sơ Cá Nhân</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .profile-container {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .profile-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 40px;
+      color: white;
+      position: relative;
+    }
+
+    .profile-header::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background:
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .header-content {
+      display: grid;
+      grid-template-columns: 200px 1fr auto;
+      gap: 40px;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .avatar-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .avatar-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .avatar-container:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-upload-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: white;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .avatar-container:hover .avatar-upload-overlay {
+      opacity: 1;
+    }
+
+    .file-input {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .profile-info {
+      flex: 1;
+    }
+
+    .profile-name {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-subtitle {
+      font-size: 18px;
+      opacity: 0.9;
+      margin-bottom: 20px;
+    }
+
+    .profile-stats {
+      display: flex;
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      backdrop-filter: blur(10px);
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .profile-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .upload-btn, .edit-profile-btn {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+
+    .upload-btn:hover, .edit-profile-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .main-content {
+      padding: 40px;
+      background: #f8f9fa;
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .content-section {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .section-badge {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* Personal Information Section */
+    .personal-info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .info-item {
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      border-left: 4px solid #667eea;
+    }
+
+    .info-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 5px;
+    }
+
+    .info-value {
+      font-size: 16px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    /* Personality Assessments Section */
+    .assessment-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6c757d;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .assessment-card {
+      background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 4px solid #667eea;
+    }
+
+    .assessment-result {
+      margin-bottom: 15px;
+    }
+
+    .result-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6c757d;
+      text-transform: uppercase;
+      margin-bottom: 5px;
+    }
+
+    .result-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .assessment-traits {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .trait-tag {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* Job Recommendations Section */
+    .job-recommendations {
+      grid-column: 1 / -1;
+    }
+
+    .recommendation-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .job-card {
+      background: white;
+      border: 1px solid #e1e5e9;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .job-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+      border-color: #667eea;
+    }
+
+    .job-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .job-match {
+      display: inline-block;
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .job-skills {
+      font-size: 13px;
+      color: #6c757d;
+      line-height: 1.5;
+    }
+
+    /* Assessment History - Enhanced */
+    .history-list {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 5px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+      border-radius: 12px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      border-left: 4px solid #667eea;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .history-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      transition: width 0.3s ease;
+    }
+
+    .history-item:hover::before {
+      width: 100%;
+    }
+
+    .history-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.15);
+      background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
+    }
+
+    .history-info {
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .history-type {
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .history-type-icon {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .history-type-mbti { background: linear-gradient(135deg, #667eea, #764ba2); }
+    .history-type-bigfive { background: linear-gradient(135deg, #4CAF50, #45a049); }
+    .history-type-disc { background: linear-gradient(135deg, #FF6B6B, #ee5a24); }
+
+    .history-date {
+      font-size: 12px;
+      color: #6c757d;
+      margin-bottom: 3px;
+    }
+
+    .history-details {
+      font-size: 11px;
+      color: #868e96;
+      display: flex;
+      gap: 15px;
+      margin-top: 5px;
+    }
+
+    .history-detail-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .history-score {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+      min-width: 80px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .history-actions {
+      display: flex;
+      gap: 8px;
+      margin-left: 15px;
+    }
+
+    .history-action-btn {
+      background: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      padding: 6px 10px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .history-action-btn:hover {
+      background: #667eea;
+      color: white;
+      transform: translateY(-1px);
+    }
+
+    /* Enhanced Assessment Results */
+    .assessment-card {
+      background: linear-gradient(135deg, #f8f9ff 0%, #f0f2ff 100%);
+      border-radius: 15px;
+      padding: 25px;
+      margin-bottom: 20px;
+      border-left: 5px solid #667eea;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .assessment-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100px;
+      background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+      border-radius: 50%;
+      transform: translate(30px, -30px);
+    }
+
+    .assessment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .assessment-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .assessment-badge {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 4px 12px;
+      border-radius: 15px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .assessment-score-display {
+      background: white;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .score-main {
+      font-size: 32px;
+      font-weight: 800;
+      color: #667eea;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .score-description {
+      text-align: center;
+      color: #6c757d;
+      font-size: 14px;
+      font-style: italic;
+    }
+
+    .assessment-details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .detail-item {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      border-left: 3px solid #667eea;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .detail-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6c757d;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .detail-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 4px;
+      transition: width 0.3s ease;
+    }
+
+    /* Profile Actions */
+    .profile-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .edit-profile-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+    }
+
+    .edit-profile-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Assessment Tabs */
+    .assessment-tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #e9ecef;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #6c757d;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+
+    .tab-btn:hover {
+      color: #667eea;
+    }
+
+    .tab-btn.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+
+    /* Tab Content */
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+    }
+
+    .action-btn.secondary {
+      background: white;
+      color: #667eea;
+      border: 2px solid #667eea;
+    }
+
+    .action-btn.secondary:hover {
+      background: #667eea;
+      color: white;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 24px;
+      cursor: pointer;
+      color: #6c757d;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      color: #2c3e50;
+      font-weight: 500;
+    }
+
+    .form-input, .form-select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e5e9;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    /* Loading State */
+    .loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .loading.active {
+      display: block;
+    }
+
+    .spinner {
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #667eea;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 10px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1200px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .job-recommendations {
+        grid-column: 1;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header-content {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 20px;
+      }
+
+      .profile-stats {
+        justify-content: center;
+      }
+
+      .personal-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .recommendation-list {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: #6c757d;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 15px;
+      opacity: 0.5;
+    }
+
+    .empty-state-text {
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="profile-container">
+    <!-- Profile Header -->
+    <div class="profile-header">
+      <div class="header-content">
+        <!-- Avatar Section -->
+        <div class="avatar-section">
+          <form action="/users/upload-avatar" method="POST" enctype="multipart/form-data" id="avatarForm">
+            <div class="avatar-container">
+              <img src="{{#if user.avatar}}{{user.avatar}}{{else}}/avatars/default-avatar-red.png{{/if}}" alt="Avatar" class="avatar-img" id="avatarPreview" onerror="this.src='/avatars/default-avatar-red.png'" />
+              <div class="avatar-upload-overlay">
+                <span>Thay đổi ảnh</span>
+              </div>
+              <input type="file" name="avatar" class="file-input" accept="image/*" id="avatarInput">
+            </div>
+            <button type="submit" class="upload-btn">Cập nhật Avatar</button>
+          </form>
+        </div>
+
+        <!-- Profile Info -->
+        <div class="profile-info">
+          <h1 class="profile-name">{{user.username}}</h1>
+          <p class="profile-subtitle">@{{user.username}} • {{user.major}}</p>
+          <div class="profile-stats">
+            <div class="stat-item">
+              <div class="stat-value" id="assessmentCount">0</div>
+              <div class="stat-label">Bài kiểm tra</div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-value" id="profileCompleteness">0%</div>
+              <div class="stat-label">Hoàn thiện</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Actions -->
+        <div class="profile-actions">
+          <button class="edit-profile-btn" onclick="openEditModal()">
+            ✏️ Chỉnh sửa thông tin
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="content-grid">
+        <!-- Personal Information Section -->
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">📋 Thông tin cá nhân</h2>
+            <span class="section-badge">Profile</span>
+          </div>
+          <div class="personal-info-grid">
+            <div class="info-item">
+              <div class="info-label">Email</div>
+              <div class="info-value">{{user.email}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Số điện thoại</div>
+              <div class="info-value">{{user.phone}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Ngày sinh</div>
+              <div class="info-value">{{birthdate}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Giới tính</div>
+              <div class="info-value">{{user.gender}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Bằng cấp</div>
+              <div class="info-value">{{user.degree}}</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">Kinh nghiệm</div>
+              <div class="info-value">{{user.experience}}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Personality Assessments Section -->
+        <div class="content-section">
+          <div class="section-header">
+            <h2 class="section-title">🧠 Kết quả đánh giá tính cách</h2>
+            <span class="section-badge">Assessments</span>
+          </div>
+
+          <div class="assessment-tabs">
+            <button class="tab-btn active" onclick="switchTab('mbti')">MBTI</button>
+            <button class="tab-btn" onclick="switchTab('bigfive')">Big Five</button>
+            <button class="tab-btn" onclick="switchTab('disc')">DISC</button>
+          </div>
+
+          <div id="mbti" class="tab-content active">
+            <div class="loading" id="mbti-loading">
+              <div class="spinner"></div>
+              <p>Đang tải kết quả MBTI...</p>
+            </div>
+            <div id="mbti-results"></div>
+          </div>
+
+          <div id="bigfive" class="tab-content">
+            <div class="loading" id="bigfive-loading">
+              <div class="spinner"></div>
+              <p>Đang tải kết quả Big Five...</p>
+            </div>
+            <div id="bigfive-results"></div>
+          </div>
+
+          <div id="disc" class="tab-content">
+            <div class="loading" id="disc-loading">
+              <div class="spinner"></div>
+              <p>Đang tải kết quả DISC...</p>
+            </div>
+            <div id="disc-results"></div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="action-btn" onclick="takeAssessment('mbti')">Làm bài MBTI</button>
+            <button class="action-btn secondary" onclick="takeAssessment('big-five')">Làm bài Big Five</button>
+            <button class="action-btn secondary" onclick="takeAssessment('disc')">Làm bài DISC</button>
+          </div>
+        </div>
+
+        <!-- Applied Jobs Section -->
+        <div class="content-section job-recommendations">
+          <div class="section-header">
+            <h2 class="section-title">💼 Việc làm đã ứng tuyển</h2>
+            <span class="section-badge">Applications</span>
+          </div>
+
+          <div class="action-buttons">
+            <a href="/users/applied-jobs" class="action-btn">
+              📋 Xem chi tiết ứng tuyển
+            </a>
+            <a href="/jobs/search-results" class="action-btn secondary">
+              🔍 Tìm việc làm mới
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Chỉnh sửa thông tin cá nhân</h3>
+        <button class="modal-close" onclick="closeEditModal()">&times;</button>
+      </div>
+      <form action="/auth/profile/edit" method="POST">
+        <div class="form-group">
+          <label class="form-label">Tên người dùng</label>
+          <input type="text" name="username" class="form-input" value="{{user.username}}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" name="email" class="form-input" value="{{user.email}}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại</label>
+          <input type="tel" name="phone" class="form-input" value="{{user.phone}}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Giới tính</label>
+          <select name="gender" class="form-select">
+            <option value="Nam" {{#if (eq user.gender "Nam")}}selected{{/if}}>Nam</option>
+            <option value="Nữ" {{#if (eq user.gender "Nữ")}}selected{{/if}}>Nữ</option>
+            <option value="Khác" {{#if (eq user.gender "Khác")}}selected{{/if}}>Khác</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bằng cấp</label>
+          <input type="text" name="degree" class="form-input" value="{{user.degree}}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Kinh nghiệm</label>
+          <input type="text" name="experience" class="form-input" value="{{user.experience}}">
+        </div>
+        <div class="action-buttons">
+          <button type="submit" class="action-btn">Lưu thay đổi</button>
+          <button type="button" class="action-btn secondary" onclick="closeEditModal()">Hủy</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Global variables
+    let currentAssessmentData = {};
+    let jobRecommendations = [];
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadProfileData();
+      setupEventListeners();
+    });
+
+    // Setup event listeners
+    function setupEventListeners() {
+      // Avatar upload preview
+      document.getElementById('avatarInput').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            document.getElementById('avatarPreview').src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Close modal when clicking outside
+      document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+          closeEditModal();
+        }
+      });
+    }
+
+    // Load profile data
+    async function loadProfileData() {
+      try {
+        // Load assessment results
+        await loadAssessmentResults();
+
+        // Update stats
+        updateProfileStats();
+      } catch (error) {
+        console.error('Error loading profile data:', error);
+      }
+    }
+
+    // Load assessment results
+    async function loadAssessmentResults() {
+      try {
+        console.log('🔄 Loading assessment results...');
+        showLoading('mbti-loading');
+        showLoading('bigfive-loading');
+        showLoading('disc-loading');
+
+        // Get user_id from the page - using Handlebars template variable
+        const userId = '{{user._id}}';
+        console.log('👤 User ID:', userId);
+
+        if (!userId || userId === '' || userId.length === 0) {
+          console.warn('⚠️ User ID not found or template not rendered');
+          // Use a fallback user ID for testing
+          const fallbackUserId = '692f840f28a9b73f73b61550';
+          console.log('🔄 Using fallback user ID:', fallbackUserId);
+          loadWithUserId(fallbackUserId);
+          return;
+        }
+
+        loadWithUserId(userId);
+      } catch (error) {
+        console.error('Error loading assessment results:', error);
+      }
+    }
+
+    // Helper function to load assessment data with specific user ID
+    async function loadWithUserId(userId) {
+        console.log('📡 Fetching assessment data for user:', userId);
+
+        // Load latest results for each assessment type from Express server
+        const [mbtiResponse, bigFiveResponse, discResponse] = await Promise.all([
+          fetch(`/personality-assessments/api/mbti/latest/${userId}`),
+          fetch(`/personality-assessments/api/big-five/latest/${userId}`),
+          fetch(`/personality-assessments/api/disc/latest/${userId}`)
+        ]);
+
+        console.log('📡 API Response statuses:', {
+          mbti: mbtiResponse.status,
+          bigFive: bigFiveResponse.status,
+          disc: discResponse.status
+        });
+
+        const [mbtiData, bigFiveData, discData] = await Promise.all([
+          mbtiResponse.json(),
+          bigFiveResponse.json(),
+          discResponse.json()
+        ]);
+
+        console.log('📊 API Response data:', {
+          mbti: mbtiData,
+          bigFive: bigFiveData,
+          disc: discData
+        });
+
+        // Display MBTI results
+        if (mbtiResponse.ok && mbtiData.success) {
+          console.log('✅ MBTI data loaded successfully:', mbtiData.result);
+          displayAssessmentResult('mbti', mbtiData.result);
+          currentAssessmentData.mbti = mbtiData.result;
+        } else {
+          console.warn('❌ MBTI data failed:', mbtiData);
+          showEmptyState('mbti');
+        }
+
+        // Display Big Five results
+        if (bigFiveResponse.ok && bigFiveData.success) {
+          console.log('✅ Big Five data loaded successfully:', bigFiveData.result);
+          displayAssessmentResult('bigfive', bigFiveData.result);
+          currentAssessmentData.bigfive = bigFiveData.result;
+        } else {
+          console.warn('❌ Big Five data failed:', bigFiveData);
+          showEmptyState('bigfive');
+        }
+
+        // Display DISC results
+        if (discResponse.ok && discData.success) {
+          console.log('✅ DISC data loaded successfully:', discData.result);
+          displayAssessmentResult('disc', discData.result);
+          currentAssessmentData.disc = discData.result;
+        } else {
+          console.warn('❌ DISC data failed:', discData);
+          showEmptyState('disc');
+        }
+
+      } catch (error) {
+        console.error('💥 Error loading assessment results:', error);
+        showEmptyState('mbti');
+        showEmptyState('bigfive');
+        showEmptyState('disc');
+      } finally {
+        hideLoading('mbti-loading');
+        hideLoading('bigfive-loading');
+        hideLoading('disc-loading');
+        console.log('✨ Assessment results loading completed');
+      }
+    }
+
+    // Display assessment result - Enhanced
+    function displayAssessmentResult(type, result) {
+      console.log(`🎨 Displaying ${type} assessment result:`, result);
+      const resultsContainer = document.getElementById(`${type}-results`);
+
+      if (type === 'mbti') {
+        const mbtiDescriptions = {
+          'INTJ': 'Kiến trúc sư - Tư duy chiến lược, lập kế hoạch dài hạn',
+          'INTP': 'Logic học - Thích phân tích, giải quyết vấn đề phức tạp',
+          'ENTJ': 'Chỉ huy - Lãnh đạo tự nhiên, quyết đoán',
+          'ENTP': 'Tranh luận - Sáng tạo, thích thử thách',
+          'INFJ': 'Nhà ủng hộ - Lí tưởng, có tâm hồn sâu sắc',
+          'INFP': 'Người hòa giải - Giá trị cá nhân cao, sáng tạo',
+          'ENFJ': 'Người thầy - Truyền cảm hứng, quan tâm người khác',
+          'ENFP': 'Nhà vô địch - Đam mê, sáng tạo, người hướng ngoại',
+          'ISTJ': 'Người kiểm toán - Thực tế, có trách nhiệm',
+          'ISFJ': 'Người bảo vệ - Ấm áp, có责任心',
+          'ESTJ': 'Giám đốc - Tổ chức hiệu quả, quy tắc rõ ràng',
+          'ESFJ': 'Người cung ứng - Thân thiện, hòa đồng',
+          'ISTP': 'Nghệ nhân - Linh hoạt, thích thực hành',
+          'ISFP': 'Nhà thám hiểm - Nhạy cảm, giá trị thẩm mỹ',
+          'ESTP': 'Doanh nhân - Năng động, mạo hiểm',
+          'ESFP': 'Người giải trí - Tự phát, vui vẻ'
+        };
+
+        resultsContainer.innerHTML = `
+          <div class="assessment-card">
+            <div class="assessment-header">
+              <div class="assessment-title">
+                🧠 Kết quả MBTI
+                <span class="assessment-badge">Năng lực</span>
+              </div>
+            </div>
+
+            <div class="assessment-score-display">
+              <div class="score-main">${result.type}</div>
+              <div class="score-description">${mbtiDescriptions[result.type] || 'Loại hình tính cách độc đáo'}</div>
+            </div>
+
+            <div class="assessment-details-grid">
+              <div class="detail-item">
+                <div class="detail-label">Năng lượng</div>
+                <div class="detail-value">${result.type[0] === 'E' ? 'Hướng ngoại (Extroversion)' : 'Hướng nội (Introversion)'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Thông tin</div>
+                <div class="detail-value">${result.type[1] === 'S' ? 'Cảm nhận (Sensing)' : 'Trực giác (Intuition)'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Quyết định</div>
+                <div class="detail-value">${result.type[2] === 'T' ? 'Lý trí (Thinking)' : 'Tình cảm (Feeling)'}</div>
+              </div>
+              <div class="detail-item">
+                <div class="detail-label">Lối sống</div>
+                <div class="detail-value">${result.type[3] === 'J' ? 'Kế hoạch (Judging)' : 'Linh hoạt (Perceiving)'}</div>
+              </div>
+            </div>
+
+            ${result.traits ? `
+              <div style="margin-top: 20px;">
+                <div class="detail-label">Đặc điểm nổi bật</div>
+                <div class="assessment-traits" style="margin-top: 10px;">
+                  ${result.traits.map(trait => `<span class="trait-tag">${trait}</span>`).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            ${result.analysis ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">🤖 Phân tích AI</div>
+                <div style="font-size: 14px; color: #6c757d; line-height: 1.5;">
+                  ${result.analysis}
+                </div>
+              </div>
+            ` : ''}
+
+            ${result.recommendations ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(76, 175, 80, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">💼 Gợi ý công việc phù hợp</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                  ${result.recommendations.map(job => `
+                    <span style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500;">
+                      ${job}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else if (type === 'bigfive') {
+        const scores = result.scores || {};
+        const descriptions = {
+          'openness': 'Sự cởi mở với trải nghiệm',
+          'conscientiousness': 'Tận tâm và có tổ chức',
+          'extraversion': 'Năng lượng hướng ngoại',
+          'agreeableness': 'Hòa đồng và hợp tác',
+          'neuroticism': 'Ổn định cảm xúc'
+        };
+
+        resultsContainer.innerHTML = `
+          <div class="assessment-card">
+            <div class="assessment-header">
+              <div class="assessment-title">
+                🌊 Kết quả Big Five
+                <span class="assessment-badge">Tính cách</span>
+              </div>
+            </div>
+
+            <div class="assessment-details-grid">
+              ${Object.entries(scores).map(([dimension, score]) => `
+                <div class="detail-item">
+                  <div class="detail-label">${descriptions[dimension] || dimension}</div>
+                  <div class="detail-value">${score}%</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${score}%"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            ${result.analysis ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">🤖 Phân tích AI</div>
+                <div style="font-size: 14px; color: #6c757d; line-height: 1.5;">
+                  ${result.analysis}
+                </div>
+              </div>
+            ` : ''}
+
+            ${result.recommendations ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(76, 175, 80, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">💼 Gợi ý công việc phù hợp</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                  ${result.recommendations.map(job => `
+                    <span style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500;">
+                      ${job}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+              <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">📊 Phân tích nhanh</div>
+              <div style="font-size: 14px; color: #6c757d; line-height: 1.5;">
+                ${getBigFiveAnalysis(scores)}
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'disc') {
+        const scores = result.scores || {};
+        const descriptions = {
+          'D': 'Thống trị (Dominance) - Quyết đoán, trực tiếp',
+          'I': 'Ảnh hưởng (Influence) - Truyền cảm hứng, lạc quan',
+          'S': 'Kiên định (Steadiness) - Ổn định, kiên nhẫn',
+          'C': 'Tuân thủ (Conscientiousness) - Cẩn thận, chính xác'
+        };
+
+        resultsContainer.innerHTML = `
+          <div class="assessment-card">
+            <div class="assessment-header">
+              <div class="assessment-title">
+                💼 Kết quả DISC
+                <span class="assessment-badge">Hành vi</span>
+              </div>
+            </div>
+
+            <div class="assessment-score-display">
+              <div class="score-main">${result.primaryTrait || 'N/A'}</div>
+              <div class="score-description">Phong cách hành vi chủ đạo của bạn</div>
+            </div>
+
+            <div class="assessment-details-grid">
+              ${Object.entries(scores).map(([trait, percentage]) => `
+                <div class="detail-item">
+                  <div class="detail-label">${descriptions[trait] || trait}</div>
+                  <div class="detail-value">${percentage}%</div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${percentage}%"></div>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+
+            ${result.analysis ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(102, 126, 234, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">🤖 Phân tích AI</div>
+                <div style="font-size: 14px; color: #6c757d; line-height: 1.5;">
+                  ${result.analysis}
+                </div>
+              </div>
+            ` : ''}
+
+            ${result.recommendations ? `
+              <div style="margin-top: 20px; padding: 15px; background: rgba(76, 175, 80, 0.05); border-radius: 10px;">
+                <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">💼 Gợi ý công việc phù hợp</div>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px;">
+                  ${result.recommendations.map(job => `
+                    <span style="background: linear-gradient(135deg, #4CAF50, #45a049); color: white; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 500;">
+                      ${job}
+                    </span>
+                  `).join('')}
+                </div>
+              </div>
+            ` : ''}
+
+            <div style="margin-top: 20px; padding: 15px; background: rgba(255, 107, 107, 0.05); border-radius: 10px;">
+              <div style="font-weight: 600; color: #2c3e50; margin-bottom: 8px;">🎯 Phong cách làm việc</div>
+              <div style="font-size: 14px; color: #6c757d; line-height: 1.5;">
+                ${getDISCAnalysis(result.primaryTrait, scores)}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Show empty state for assessment
+    function showEmptyState(type) {
+      const resultsContainer = document.getElementById(`${type}-results`);
+      resultsContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📝</div>
+          <div class="empty-state-text">Chưa có kết quả đánh giá ${type.toUpperCase()}</div>
+          <button class="action-btn" onclick="takeAssessment('${type}')">Làm bài ${type.toUpperCase()}</button>
+        </div>
+      `;
+    }
+
+
+    // Update profile statistics
+    function updateProfileStats() {
+      const assessmentCount = Object.keys(currentAssessmentData).length;
+
+      // Calculate profile completeness
+      const fields = ['email', 'phone', 'degree', 'experience'];
+      const filledFields = fields.filter(field =>
+        document.querySelector(`[value="${field}"]`) &&
+        document.querySelector(`[value="${field}"]`).value.trim() !== ''
+      ).length;
+      const completeness = Math.round((filledFields / fields.length) * 100);
+
+      document.getElementById('assessmentCount').textContent = assessmentCount;
+      document.getElementById('profileCompleteness').textContent = `${completeness}%`;
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      // Hide all tabs
+      document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+      });
+
+      // Remove active class from all buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+
+      // Show selected tab
+      document.getElementById(tabName).classList.add('active');
+
+      // Add active class to clicked button
+      event.target.classList.add('active');
+    }
+
+    // Take assessment
+    function takeAssessment(type) {
+      window.location.href = `/personality-assessments/${type}`;
+    }
+
+
+    // Modal functions
+    function openEditModal() {
+      document.getElementById('editModal').classList.add('active');
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').classList.remove('active');
+    }
+
+    // Helper function to save assessment result
+    async function saveAssessmentResult(assessmentType, result) {
+      try {
+        const userId = '{{user._id}}';
+        if (!userId) {
+          console.error('User ID not found');
+          return false;
+        }
+
+        const saveData = {
+          user_id: userId,
+          assessment_type: assessmentType,
+          result: result,
+          completed_at: new Date().toISOString()
+        };
+
+        const response = await fetch('http://localhost:8000/api/personality-assessment/save', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(saveData)
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.status === 'success') {
+          console.log(`Assessment ${assessmentType} saved successfully:`, data.assessment_id);
+          return true;
+        } else {
+          console.error(`Failed to save assessment ${assessmentType}:`, data.message || 'Unknown error');
+          return false;
+        }
+      } catch (error) {
+        console.error(`Error saving assessment ${assessmentType}:`, error);
+        return false;
+      }
+    }
+
+    // Helper functions for assessment analysis
+    function getBigFiveAnalysis(scores) {
+      const traits = [];
+      if (scores.openness >= 70) traits.push('Sáng tạo và cởi mở');
+      if (scores.conscientiousness >= 70) traits.push('Tận tâm và có tổ chức');
+      if (scores.extraversion >= 70) traits.push('Năng động và hướng ngoại');
+      if (scores.agreeableness >= 70) traits.push('Hòa đồng và hợp tác');
+      if (scores.neuroticism <= 30) traits.push('Ổn định cảm xúc');
+
+      if (traits.length > 0) {
+        return `Bạn thể hiện mạnh mẽ các đặc điểm: ${traits.join(', ')}.`;
+      } else {
+        return 'Bạn có sự cân bằng hợp lý giữa các đặc điểm tính cách.';
+      }
+    }
+
+    function getDISCAnalysis(primaryTrait, scores) {
+      const analyses = {
+        'D': 'Bạn là người quyết đoán, trực tiếp và tập trung vào kết quả. Thích hợp với các vai trò lãnh đạo và quản lý.',
+        'I': 'Bạn là người truyền cảm hứng, lạc quan và có khả năng giao tiếp tốt. Thích hợp với các công việc trong lĩnh vực truyền thông, bán hàng.',
+        'S': 'Bạn là người kiên định, đáng tin cậy và ủng hộ đội nhóm. Thích hợp với các vai trò hỗ trợ, huấn luyện.',
+        'C': 'Bạn là người cẩn thận, chính xác và tuân thủ quy trình. Thích hợp với các công việc đòi hỏi sự chính xác và phân tích.'
+      };
+
+      return analyses[primaryTrait] || 'Bạn có phong cách hành vi độc đáo và cân bằng.';
+    }
+
+
+    // Loading functions
+    function showLoading(elementId) {
+      document.getElementById(elementId).classList.add('active');
+    }
+
+    function hideLoading(elementId) {
+      document.getElementById(elementId).classList.remove('active');
+    }
+  </script>
+</body>
+
+</html>

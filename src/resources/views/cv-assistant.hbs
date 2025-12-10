@@ -1,0 +1,536 @@
+{{! File: /src/resources/views/cv-assistant.hbs }}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Service APIs - CV Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --info: #4895ef;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .api-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 2rem;
+            background: white;
+            overflow: hidden;
+        }
+        
+        .api-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .api-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .api-method {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            margin-right: 0.5rem;
+        }
+        
+        .method-get { background-color: #28a745; }
+        .method-post { background-color: #007bff; }
+        .method-put { background-color: #ffc107; color: #212529; }
+        .method-delete { background-color: #dc3545; }
+        
+        .api-endpoint {
+            font-family: 'Courier New', Courier, monospace;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            word-break: break-all;
+            font-size: 0.9rem;
+        }
+        
+        .api-body {
+            padding: 1.5rem;
+        }
+        
+        .api-description {
+            color: var(--gray);
+            margin-bottom: 1.5rem;
+        }
+        
+        .api-params {
+            margin-top: 1.5rem;
+        }
+        
+        .param {
+            display: flex;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .param-name {
+            font-weight: 600;
+            width: 150px;
+            color: var(--dark);
+        }
+        
+        .param-type {
+            color: var(--info);
+            font-size: 0.8rem;
+            margin-left: 1rem;
+            background: #e9f7ff;
+            padding: 0.1rem 0.5rem;
+            border-radius: 3px;
+        }
+        
+        .param-required {
+            color: #dc3545;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
+        }
+        
+        .param-desc {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .try-it-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .try-it-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            color: white;
+        }
+        
+        .response-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            max-height: 300px;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .tab-content {
+            padding: 2rem 0;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: var(--gray);
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px 8px 0 0;
+            margin-right: 0.5rem;
+        }
+        
+        .nav-tabs .nav-link.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--primary);">
+                <i class="fas fa-robot me-2"></i>AI Service APIs
+            </h1>
+            <p class="lead text-muted">Explore and test the available AI service endpoints</p>
+        </div>
+
+        <ul class="nav nav-tabs" id="apiTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
+                    <i class="fas fa-users me-2"></i>Users
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="resumes-tab" data-bs-toggle="tab" data-bs-target="#resumes" type="button" role="tab">
+                    <i class="fas fa-file-alt me-2"></i>Resumes
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="jobs-tab" data-bs-toggle="tab" data-bs-target="#jobs" type="button" role="tab">
+                    <i class="fas fa-briefcase me-2"></i>Jobs
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="meetings-tab" data-bs-toggle="tab" data-bs-target="#meetings" type="button" role="tab">
+                    <i class="fas fa-video me-2"></i>Meetings
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="apiTabsContent">
+            <!-- Users Tab -->
+            <div class="tab-pane fade show active" id="users" role="tabpanel">
+                <!-- Create User -->
+                <div class="api-card mb-4">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Create User</h4>
+                            <span class="api-method method-post">POST</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/users</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Create a new user in the AI service.</p>
+                        
+                        <h6>Request Body</h6>
+                        <div class="api-params">
+                            <div class="param">
+                                <div class="param-name">username</div>
+                                <div class="param-type">string</div>
+                                <div class="param-required">required</div>
+                            </div>
+                            <div class="param-desc">Unique username for the new user</div>
+                            
+                            <div class="param mt-3">
+                                <div class="param-name">email</div>
+                                <div class="param-type">string</div>
+                                <div class="param-required">required</div>
+                            </div>
+                            <div class="param-desc">User's email address</div>
+                            
+                            <div class="param mt-3">
+                                <div class="param-name">full_name</div>
+                                <div class="param-type">string</div>
+                            </div>
+                            <div class="param-desc">User's full name</div>
+                        </div>
+                        
+                        <button class="btn try-it-btn mt-3" onclick="testEndpoint('createUser')">
+                            <i class="fas fa-play me-1"></i> Try it out
+                        </button>
+                        
+                        <div id="createUserResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Get All Users -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Get All Users</h4>
+                            <span class="api-method method-get">GET</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/users</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Retrieve a list of all users in the AI service.</p>
+                        
+                        <button class="btn try-it-btn" onclick="testEndpoint('getUsers')">
+                            <i class="fas fa-play me-1"></i> Try it out
+                        </button>
+                        
+                        <div id="getUsersResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumes Tab -->
+            <div class="tab-pane fade" id="resumes" role="tabpanel">
+                <!-- Upload Resume -->
+                <div class="api-card mb-4">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Upload Resume</h4>
+                            <span class="api-method method-post">POST</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/resumes</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Upload a resume file for a user.</p>
+                        
+                        <h6>Request Body (multipart/form-data)</h6>
+                        <div class="api-params">
+                            <div class="param">
+                                <div class="param-name">resume</div>
+                                <div class="param-type">file</div>
+                                <div class="param-required">required</div>
+                            </div>
+                            <div class="param-desc">Resume file (PDF, DOC, DOCX, TXT)</div>
+                            
+                            <div class="param mt-3">
+                                <div class="param-name">username</div>
+                                <div class="param-type">string</div>
+                                <div class="param-required">required</div>
+                            </div>
+                            <div class="param-desc">Username of the resume owner</div>
+                        </div>
+                        
+                        <div class="mt-3">
+                            <input type="file" id="resumeFile" class="form-control">
+                            <input type="text" id="resumeUsername" class="form-control mt-2" placeholder="Username">
+                            <button class="btn try-it-btn mt-3" onclick="testFileUpload('uploadResume')">
+                                <i class="fas fa-upload me-1"></i> Upload Resume
+                            </button>
+                        </div>
+                        
+                        <div id="uploadResumeResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+
+                <!-- Get Resume -->
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Get Resume</h4>
+                            <span class="api-method method-get">GET</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/resumes/:username</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Retrieve a user's resume information.</p>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" id="getResumeUsername" class="form-control" placeholder="Enter username">
+                            <button class="btn try-it-btn" onclick="testEndpointWithParam('getResume', 'getResumeUsername')">
+                                <i class="fas fa-play me-1"></i> Get Resume
+                            </button>
+                        </div>
+                        
+                        <div id="getResumeResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add more tabs for other API categories (Jobs, Meetings, etc.) -->
+            <!-- Jobs Tab -->
+            <div class="tab-pane fade" id="jobs" role="tabpanel">
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Get Job Recommendations</h4>
+                            <span class="api-method method-get">GET</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/jobs/recommendations/:username</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Get job recommendations for a user based on their resume.</p>
+                        
+                        <div class="input-group mb-3">
+                            <input type="text" id="jobRecUsername" class="form-control" placeholder="Enter username">
+                            <button class="btn try-it-btn" onclick="testEndpointWithParam('getJobRecommendations', 'jobRecUsername')">
+                                <i class="fas fa-briefcase me-1"></i> Get Recommendations
+                            </button>
+                        </div>
+                        
+                        <div id="getJobRecommendationsResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Meetings Tab -->
+            <div class="tab-pane fade" id="meetings" role="tabpanel">
+                <div class="api-card">
+                    <div class="api-header">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h4 class="mb-0">Schedule Google Meet</h4>
+                            <span class="api-method method-post">POST</span>
+                        </div>
+                        <div class="api-endpoint">/ai-service/meetings/schedule</div>
+                    </div>
+                    <div class="api-body">
+                        <p class="api-description">Schedule a new Google Meet meeting.</p>
+                        
+                        <div class="api-params">
+                            <div class="mb-3">
+                                <label class="form-label">Username</label>
+                                <input type="text" id="meetUsername" class="form-control" placeholder="Username">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Meeting Title</label>
+                                <input type="text" id="meetTitle" class="form-control" placeholder="Meeting Title">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Start Time</label>
+                                <input type="datetime-local" id="meetStartTime" class="form-control">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label">Duration (minutes)</label>
+                                <input type="number" id="meetDuration" class="form-control" value="30" min="15" step="15">
+                            </div>
+                            
+                            <button class="btn try-it-btn" onclick="testScheduleMeeting()">
+                                <i class="fas fa-calendar-plus me-1"></i> Schedule Meeting
+                            </button>
+                        </div>
+                        
+                        <div id="scheduleMeetingResponse" class="response-container mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Helper function to format JSON responses
+        function formatJson(json) {
+            return JSON.stringify(json, null, 2);
+        }
+
+        // Show response in the specified container
+        function showResponse(containerId, data) {
+            const container = document.getElementById(containerId);
+            container.textContent = formatJson(data);
+            container.style.display = 'block';
+        }
+
+        // Test a simple GET endpoint
+        async function testEndpoint(endpoint) {
+            const url = `/ai-service/${endpoint.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                showResponse(`${endpoint}Response`, data);
+            } catch (error) {
+                showResponse(`${endpoint}Response`, { error: error.message });
+            }
+        }
+
+        // Test an endpoint with a parameter
+        async function testEndpointWithParam(endpoint, inputId) {
+            const param = document.getElementById(inputId).value;
+            if (!param) {
+                alert('Please enter a value');
+                return;
+            }
+
+            const url = `/ai-service/${endpoint.replace(/([A-Z])/g, '-$1').toLowerCase()}/${param}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const data = await response.json();
+                showResponse(`${endpoint}Response`, data);
+            } catch (error) {
+                showResponse(`${endpoint}Response`, { error: error.message });
+            }
+        }
+
+        // Test file upload
+        async function testFileUpload(endpoint) {
+            const fileInput = document.getElementById('resumeFile');
+            const username = document.getElementById('resumeUsername').value;
+            
+            if (!fileInput.files.length || !username) {
+                alert('Please select a file and enter a username');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('resume', fileInput.files[0]);
+            formData.append('username', username);
+
+            try {
+                const response = await fetch(`/ai-service/${endpoint === 'uploadResume' ? 'resumes' : ''}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                showResponse(`${endpoint}Response`, data);
+            } catch (error) {
+                showResponse(`${endpoint}Response`, { error: error.message });
+            }
+        }
+
+        // Test scheduling a meeting
+        async function testScheduleMeeting() {
+            const username = document.getElementById('meetUsername').value;
+            const title = document.getElementById('meetTitle').value;
+            const startTime = document.getElementById('meetStartTime').value;
+            const duration = document.getElementById('meetDuration').value;
+
+            if (!username || !title || !startTime || !duration) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const meetingData = {
+                username,
+                title,
+                start_time: new Date(startTime).toISOString(),
+                duration_minutes: parseInt(duration)
+            };
+
+            try {
+                const response = await fetch('/ai-service/meetings/schedule', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(meetingData)
+                });
+                
+                const data = await response.json();
+                showResponse('scheduleMeetingResponse', data);
+            } catch (error) {
+                showResponse('scheduleMeetingResponse', { error: error.message });
+            }
+        }
+
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>

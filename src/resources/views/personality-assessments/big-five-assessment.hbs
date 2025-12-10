@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài kiểm tra tính cách Big Five (OCEAN) - JobLife</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 2rem;
+            color: white;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h2 {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-circle {
+            width: 150px;
+            height: 150px;
+            margin: 2rem auto;
+            position: relative;
+        }
+
+        .progress-ring {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-bg {
+            stroke: rgba(255, 255, 255, 0.2);
+            stroke-width: 8;
+            fill: none;
+        }
+
+        .progress-ring-fill {
+            stroke: white;
+            stroke-width: 8;
+            fill: none;
+            stroke-linecap: round;
+            transition: stroke-dasharray 0.5s ease;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .question-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+            gap: 0.5rem;
+            margin-top: 2rem;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .grid-item {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid transparent;
+        }
+
+        .grid-item.current {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+            transform: scale(1.1);
+        }
+
+        .grid-item.answered {
+            background: rgba(40, 167, 69, 0.3);
+            border-color: #28a745;
+        }
+
+        .grid-item.flagged::after {
+            content: '🚩';
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            font-size: 0.8rem;
+        }
+
+        .content-area {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .assessment-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .assessment-header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .view-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            backdrop-filter: blur(10px);
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .intro-section {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            animation: fadeIn 1s ease;
+            text-align: center;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .intro-section h2 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+        }
+
+        .intro-section p {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+
+        .traits-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .trait-item {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 4px solid #667eea;
+        }
+
+        .trait-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .trait-desc {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .question-container {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+
+        .question-container.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .question-card {
+            background: white;
+            border-radius: 25px;
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            margin-bottom: 2rem;
+            position: relative;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+
+        .question-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .flag-btn {
+            background: none;
+            border: 2px solid #ffc107;
+            color: #ffc107;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .flag-btn.flagged {
+            background: #ffc107;
+            color: white;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            color: #333;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .scale-container {
+            margin-bottom: 2rem;
+        }
+
+        .scale-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .scale-options {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .scale-option {
+            flex: 1;
+            position: relative;
+        }
+
+        .scale-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .scale-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem 0.5rem;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .scale-option input[type="radio"]:checked + label {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .scale-option label:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .scale-option input[type="radio"]:checked + label:hover {
+            background: linear-gradient(135deg, #5a6fd8, #6a4190);
+        }
+
+        .scale-number {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .scale-text {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .questions-grid-container {
+            display: none;
+        }
+
+        .questions-grid-container.active {
+            display: block;
+        }
+
+        .questions-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-question-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .grid-question-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .grid-question-card.answered {
+            border-left-color: #28a745;
+        }
+
+        .grid-question-card.flagged {
+            border-left-color: #ffc107;
+        }
+
+        .grid-question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .grid-question-number {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .grid-question-text {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            line-height: 1.5;
+        }
+
+        .grid-scale-options {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .grid-scale-option {
+            flex: 1;
+            min-width: 80px;
+        }
+
+        .grid-scale-option label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0.8rem 0.5rem;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(40, 167, 69, 0.3);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 3rem;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        @media (max-width: 1024px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 999;
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .content-area {
+                margin-left: 0;
+                padding: 4rem 1rem 1rem;
+            }
+
+            .question-grid {
+                max-height: 200px;
+            }
+
+            .scale-options {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .assessment-header h1 {
+                font-size: 2rem;
+            }
+
+            .question-card {
+                padding: 2rem;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+            }
+
+            .navigation {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .traits-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-bar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="main-container">
+        <aside class="sidebar" id="sidebar">
+            <h2><i class="fas fa-brain"></i> Big Five</h2>
+
+            <div class="progress-circle">
+                <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="54"></circle>
+                    <circle class="progress-ring-fill" cx="60" cy="60" r="54"
+                            stroke-dasharray="0 339.292" id="progressRing"></circle>
+                </svg>
+                <div class="progress-text">
+                    <div id="progressPercent">0%</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Hoàn thành</div>
+                </div>
+            </div>
+
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="answeredCount">0</div>
+                    <div class="stat-label">Đã trả lời</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="flaggedCount">0</div>
+                    <div class="stat-label">Đã đánh dấu</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem; opacity: 0.9;">Danh sách câu hỏi</h3>
+            <div class="question-grid" id="questionGrid">
+                <!-- Question items will be generated here -->
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;" onclick="showFlaggedQuestions()">
+                    <i class="fas fa-flag"></i> Xem câu đã đánh dấu
+                </button>
+                <button class="btn btn-success" style="width: 100%;" onclick="submitAssessment()" id="submitBtn" disabled>
+                    <i class="fas fa-check"></i> Hoàn thành bài kiểm tra
+                </button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="assessment-header">
+                <h1><i class="fas fa-brain"></i> Bài kiểm tra tính cách Big Five</h1>
+                <p>Khám phá 5 yếu tố tính cách chính: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism</p>
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setViewMode('single')">
+                    <i class="fas fa-list"></i> Từng câu
+                </button>
+                <button class="view-btn" onclick="setViewMode('grid')">
+                    <i class="fas fa-th"></i> Lưới
+                </button>
+            </div>
+
+            <div id="introSection" class="intro-section">
+                <h2><i class="fas fa-info-circle"></i> Giới thiệu bài kiểm tra</h2>
+                <p>
+                    Mô hình Big Five (OCEAN) là một trong những lý thuyết tính cách được khoa học công nhận rộng rãi nhất.
+                    Bài kiểm tra này giúp bạn hiểu rõ hơn về 5 yếu tố chính tạo nên tính cách của bạn thông qua 25 câu hỏi
+                    được thiết kế khoa học.
+                </p>
+
+                <div class="traits-grid">
+                    <div class="trait-item">
+                        <div class="trait-name">O - Openness</div>
+                        <div class="trait-desc">Sự cởi mở với trải nghiệm mới</div>
+                    </div>
+                    <div class="trait-item">
+                        <div class="trait-name">C - Conscientiousness</div>
+                        <div class="trait-desc">Sự tận tâm và có tổ chức</div>
+                    </div>
+                    <div class="trait-item">
+                        <div class="trait-name">E - Extraversion</div>
+                        <div class="trait-desc">Sự hướng ngoại và năng lượng</div>
+                    </div>
+                    <div class="trait-item">
+                        <div class="trait-name">A - Agreeableness</div>
+                        <div class="trait-desc">Sự hòa đồng và hợp tác</div>
+                    </div>
+                    <div class="trait-item">
+                        <div class="trait-name">N - Neuroticism</div>
+                        <div class="trait-desc">Sự ổn định cảm xúc</div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" onclick="startAssessment()">
+                    <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
+                </button>
+            </div>
+
+            <div id="questionContainer" class="question-container">
+                <div class="question-card">
+                    <div class="question-header">
+                        <div class="question-number" id="questionNumber">1</div>
+                        <div class="question-actions">
+                            <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">
+                                <i class="fas fa-flag"></i> Đánh dấu
+                            </button>
+                        </div>
+                    </div>
+                    <div class="question-text" id="questionText">
+                        Question text will appear here
+                    </div>
+                    <div class="scale-container">
+                        <div class="scale-labels">
+                            <span>Hoàn toàn không đồng ý</span>
+                            <span>Hoàn toàn đồng ý</span>
+                        </div>
+                        <div class="scale-options" id="scaleOptions">
+                            <!-- Scale options will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                        <i class="fas fa-arrow-left"></i> Câu trước
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                        Câu tiếp theo <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="gridContainer" class="questions-grid-container">
+                <div class="questions-grid" id="questionsGrid">
+                    <!-- Grid questions will be generated here -->
+                </div>
+            </div>
+
+            <div id="loadingSection" class="loading">
+                <div class="spinner"></div>
+                <h3>Đang phân tích kết quả...</h3>
+                <p>Hệ thống AI đang phân tích câu trả lời của bạn. Vui lòng chờ trong giây lát.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const questions = [
+            { id: 1, text: "Tôi có trí tưởng tượng phong phú" },
+            { id: 2, text: "Tôi luôn chuẩn bị mọi thứ một cách cẩn thận" },
+            { id: 3, text: "Tôi nói chuyện với nhiều người khác nhau tại các buổi tiệc" },
+            { id: 4, text: "Tôi cảm thấy đồng cảm với cảm xúc của người khác" },
+            { id: 5, text: "Tôi thường xuyên cảm thấy lo lắng" },
+            { id: 6, text: "Tôi thích có nhiều sở thích khác nhau" },
+            { id: 7, text: "Tôi luôn hoàn thành công việc đúng hạn" },
+            { id: 8, text: "Tôi là trung tâm của sự chú ý tại các buổi tiệc" },
+            { id: 9, text: "Tôi không quan tâm đến cảm xúc của người khác" },
+            { id: 10, text: "Tôi thư giãn một cách dễ dàng" },
+            { id: 11, text: "Tôi tò mò về nhiều điều khác nhau" },
+            { id: 12, text: "Tôi để mọi thứ lộn xộn" },
+            { id: 13, text: "Tôi không thích nói chuyện" },
+            { id: 14, text: "Tôi làm người khác cảm thấy thoải mái" },
+            { id: 15, text: "Tôi dễ dàng bị căng thẳng" },
+            { id: 16, text: "Tôi có trí tưởng tượng sống động" },
+            { id: 17, text: "Tôi luôn đáng tin cậy" },
+            { id: 18, text: "Tôi tràn đầy năng lượng" },
+            { id: 19, text: "Tôi ít quan tâm đến người khác" },
+            { id: 20, text: "Tôi thường xuyên lo lắng" },
+            { id: 21, text: "Tôi thích thử những trải nghiệm mới" },
+            { id: 22, text: "Tôi làm việc một cách có phương pháp" },
+            { id: 23, text: "Tôi bắt đầu các cuộc trò chuyện" },
+            { id: 24, text: "Tôi cảm thấy quan tâm đến người khác" },
+            { id: 25, text: "Tôi dễ bị cáu kỉnh" }
+        ];
+
+        let currentQuestion = 0;
+        let answers = new Array(questions.length).fill(null);
+        let flaggedQuestions = new Set();
+        let viewMode = 'single';
+        let assessmentStarted = false;
+
+        function initializeScale() {
+            const scaleOptions = document.getElementById('scaleOptions');
+            const scaleLabels = ['Hoàn toàn không đồng ý', 'Không đồng ý', 'Bình thường', 'Đồng ý', 'Hoàn toàn đồng ý'];
+
+            scaleOptions.innerHTML = '';
+
+            for (let i = 1; i <= 5; i++) {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'scale-option';
+
+                optionDiv.innerHTML = `
+                    <input type="radio" id="scale_${i}" name="scale" value="${i}">
+                    <label for="scale_${i}">
+                        <span class="scale-number">${i}</span>
+                        <span class="scale-text">${scaleLabels[i-1]}</span>
+                    </label>
+                `;
+
+                scaleOptions.appendChild(optionDiv);
+            }
+
+            scaleOptions.querySelectorAll('input[type="radio"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateAnswer(currentQuestion, parseInt(this.value));
+                });
+            });
+        }
+
+        function startAssessment() {
+            document.getElementById('introSection').style.display = 'none';
+            document.getElementById('questionContainer').classList.add('active');
+            assessmentStarted = true;
+            currentQuestion = 0;
+            initializeScale();
+            initializeGrid();
+            updateGrid();
+            showQuestion(0);
+            updateProgress();
+        }
+
+        function setViewMode(mode) {
+            viewMode = mode;
+            document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.view-btn').classList.add('active');
+
+            if (mode === 'single') {
+                document.getElementById('questionContainer').classList.add('active');
+                document.getElementById('gridContainer').classList.remove('active');
+            } else {
+                document.getElementById('questionContainer').classList.remove('active');
+                document.getElementById('gridContainer').classList.add('active');
+            }
+        }
+
+        function initializeGrid() {
+            const gridContainer = document.getElementById('questionsGrid');
+            gridContainer.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-question-card';
+                gridItem.id = `grid_question_${index}`;
+
+                gridItem.innerHTML = `
+                    <div class="grid-question-header">
+                        <div class="grid-question-number">${index + 1}</div>
+                        <button class="flag-btn ${flaggedQuestions.has(index) ? 'flagged' : ''}"
+                                onclick="toggleGridFlag(${index})" id="grid_flag_${index}">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
+                    <div class="grid-question-text">${question.text}</div>
+                    <div class="grid-scale-options">
+                        ${[1, 2, 3, 4, 5].map(value => `
+                            <div class="grid-scale-option">
+                                <input type="radio" id="grid_scale_${index}_${value}"
+                                       name="grid_scale_${index}" value="${value}"
+                                       ${answers[index] === value ? 'checked' : ''}>
+                                <label for="grid_scale_${index}_${value}">
+                                    <span>${value}</span>
+                                </label>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+
+                gridContainer.appendChild(gridItem);
+
+                // Add event listeners for grid scale options
+                gridItem.querySelectorAll('input[type="radio"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        updateAnswer(index, parseInt(this.value));
+                        updateGridItemStatus(index);
+                    });
+                });
+
+                updateGridItemStatus(index);
+            });
+        }
+
+        function updateGridItemStatus(index) {
+            const gridItem = document.getElementById(`grid_question_${index}`);
+            if (answers[index] !== null) {
+                gridItem.classList.add('answered');
+            } else {
+                gridItem.classList.remove('answered');
+            }
+
+            if (flaggedQuestions.has(index)) {
+                gridItem.classList.add('flagged');
+            } else {
+                gridItem.classList.remove('flagged');
+            }
+        }
+
+        function showQuestion(index) {
+            const question = questions[index];
+            document.getElementById('questionNumber').textContent = index + 1;
+            document.getElementById('questionText').textContent = question.text;
+
+            // Clear previous selection
+            document.querySelectorAll('input[name="scale"]').forEach(radio => {
+                radio.checked = false;
+            });
+
+            // Set previous answer if exists
+            if (answers[index] !== null) {
+                const radio = document.querySelector(`input[name="scale"][value="${answers[index]}"]`);
+                if (radio) radio.checked = true;
+            }
+
+            // Update flag button
+            const flagBtn = document.getElementById('flagBtn');
+            if (flaggedQuestions.has(index)) {
+                flagBtn.classList.add('flagged');
+                flagBtn.innerHTML = '<i class="fas fa-flag"></i> Bỏ đánh dấu';
+            } else {
+                flagBtn.classList.remove('flagged');
+                flagBtn.innerHTML = '<i class="fas fa-flag"></i> Đánh dấu';
+            }
+
+            updateGrid();
+            updateNavigationButtons();
+        }
+
+        function updateGrid() {
+            const gridContainer = document.getElementById('questionGrid');
+            if (!gridContainer) return;
+
+            gridContainer.innerHTML = '';
+
+            questions.forEach((question, index) => {
+                const gridItem = document.createElement('div');
+                gridItem.className = 'grid-item';
+                if (index === currentQuestion) gridItem.classList.add('current');
+                if (answers[index] !== null) gridItem.classList.add('answered');
+                if (flaggedQuestions.has(index)) gridItem.classList.add('flagged');
+
+                gridItem.textContent = index + 1;
+                gridItem.onclick = () => {
+                    currentQuestion = index;
+                    showQuestion(index);
+                    setViewMode('single');
+                };
+
+                gridContainer.appendChild(gridItem);
+            });
+        }
+
+        function updateAnswer(questionIndex, value) {
+            answers[questionIndex] = value;
+            updateProgress();
+            updateSubmitButton();
+        }
+
+        function toggleFlag() {
+            const index = currentQuestion;
+            if (flaggedQuestions.has(index)) {
+                flaggedQuestions.delete(index);
+            } else {
+                flaggedQuestions.add(index);
+            }
+            showQuestion(index);
+        }
+
+        function toggleGridFlag(index) {
+            if (flaggedQuestions.has(index)) {
+                flaggedQuestions.delete(index);
+            } else {
+                flaggedQuestions.add(index);
+            }
+            updateGridItemStatus(index);
+            updateGrid();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answered = answers.filter(answer => answer !== null).length;
+            const progress = Math.round((answered / questions.length) * 100);
+
+            const circumference = 2 * Math.PI * 54;
+            const offset = circumference - (progress / 100) * circumference;
+
+            const progressRing = document.getElementById('progressRing');
+            if (progressRing) {
+                progressRing.style.strokeDasharray = `${circumference - offset} ${circumference}`;
+            }
+
+            const progressPercent = document.getElementById('progressPercent');
+            if (progressPercent) {
+                progressPercent.textContent = `${progress}%`;
+            }
+
+            const answeredCount = document.getElementById('answeredCount');
+            if (answeredCount) {
+                answeredCount.textContent = answered;
+            }
+
+            const flaggedCount = document.getElementById('flaggedCount');
+            if (flaggedCount) {
+                flaggedCount.textContent = flaggedQuestions.size;
+            }
+        }
+
+        function updateSubmitButton() {
+            const submitBtn = document.getElementById('submitBtn');
+            const allAnswered = answers.every(answer => answer !== null);
+            submitBtn.disabled = !allAnswered || !assessmentStarted;
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentQuestion === 0;
+
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.innerHTML = 'Hoàn thành <i class="fas fa-check"></i>';
+                nextBtn.onclick = submitAssessment;
+            } else {
+                nextBtn.innerHTML = 'Câu tiếp theo <i class="fas fa-arrow-right"></i>';
+                nextBtn.onclick = nextQuestion;
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion(currentQuestion);
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                currentQuestion--;
+                showQuestion(currentQuestion);
+            }
+        }
+
+        function showFlaggedQuestions() {
+            if (flaggedQuestions.size === 0) {
+                alert('Bạn chưa đánh dấu câu hỏi nào.');
+                return;
+            }
+
+            let flaggedMessage = 'Các câu hỏi đã đánh dấu:\n\n';
+            flaggedQuestions.forEach(index => {
+                flaggedMessage += `Câu ${index + 1}: ${questions[index].text}\n`;
+            });
+
+            alert(flaggedMessage);
+        }
+
+        function submitAssessment() {
+            const allAnswered = answers.every(answer => answer !== null);
+
+            if (!allAnswered) {
+                const unanswered = answers.map((answer, index) => answer === null ? index + 1 : null)
+                                          .filter(index => index !== null);
+                alert(`Vui lòng trả lời tất cả các câu hỏi. Còn ${unanswered.length} câu chưa trả lời: ${unanswered.join(', ')}`);
+                return;
+            }
+
+            if (flaggedQuestions.size > 0) {
+                const confirmSubmit = confirm(`Bạn có ${flaggedQuestions.size} câu hỏi đã đánh dấu. Bạn có chắc muốn hoàn thành bài kiểm tra không?`);
+                if (!confirmSubmit) return;
+            }
+
+            document.getElementById('questionContainer').style.display = 'none';
+            document.getElementById('gridContainer').classList.remove('active');
+            document.getElementById('loadingSection').classList.add('active');
+
+            fetch('/personality-assessments/big-five/submit', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ answers: answers })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.redirectTo;
+                } else {
+                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                    document.getElementById('loadingSection').classList.remove('active');
+                    document.getElementById('questionContainer').style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+                document.getElementById('loadingSection').classList.remove('active');
+                document.getElementById('questionContainer').style.display = 'block';
+            });
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('open');
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (!assessmentStarted || document.getElementById('questionContainer').style.display === 'none') return;
+
+            if (e.key >= '1' && e.key <= '5') {
+                const radio = document.querySelector(`input[name="scale"][value="${e.key}"]`);
+                if (radio) {
+                    radio.checked = true;
+                    updateAnswer(currentQuestion, parseInt(e.key));
+                }
+            } else if (e.key === 'ArrowRight' && currentQuestion < questions.length - 1) {
+                nextQuestion();
+            } else if (e.key === 'ArrowLeft' && currentQuestion > 0) {
+                previousQuestion();
+            } else if (e.key === 'Enter' && answers.every(answer => answer !== null)) {
+                submitAssessment();
+            } else if (e.key === 'f' || e.key === 'F') {
+                toggleFlag();
+            }
+        });
+
+        // Close sidebar when clicking outside on mobile
+        document.addEventListener('click', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+
+            if (window.innerWidth <= 1024 &&
+                !sidebar.contains(e.target) &&
+                !menuBtn.contains(e.target) &&
+                sidebar.classList.contains('open')) {
+                sidebar.classList.remove('open');
+            }
+        });
+    </script>
+</body>
+</html>
