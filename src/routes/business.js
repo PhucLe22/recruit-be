@@ -169,20 +169,28 @@ router.get('/upload-logo-page', verifyToken, (req, res, next) => {
 // Public business list route (no authentication required)
 router.get('/list', async (req, res, next) => {
     try {
+        // const business = await Business.find({});
+        // console.log('Business found:', business);
+        // return res.json({ business });
         // Get all businesses with necessary fields
         const businesses = await Business.find({})
-            .select('companyName description location logo isVerified')
-            .lean();
+
+        const jobs = (await Job.find({})).filter(job => job.businessId);
+        // return res.json({ jobs });
 
         // Transform data for the view
         const transformedBusinesses = businesses.map(business => ({
             _id: business._id,
-            companyName: business.companyName || 'Chưa có tên công ty',
+            id: business._id, // Add id field for template compatibility
+            name: business.name || 'Chưa có tên công ty',
             description: business.description || 'Chưa có mô tả',
-            location: business.location || 'Chưa cập nhật địa chỉ',
+            location: (business.address?.city || business.address?.state) || 'Chưa cập nhật địa chỉ',
             logoUrl: business.logo || '/images/default-company.png',
-            verified: business.isVerified || false
+            verified: business.isVerified || false,
+            jobCount: jobs.filter(job => job.businessId && job.businessId.equals(business._id)).length,
+            employeeCount: business.employeeCount || Math.floor(Math.random() * 500) + 50 // Mock data for now
         }));
+        // return res.json({ businesses: transformedBusinesses });
 
         // Render the view with the transformed data
         res.render('business/list', {

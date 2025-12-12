@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
 const businessSchema = new mongoose.Schema({
-  companyName: {
+  name: {
     type: String,
     required: true,
     trim: true

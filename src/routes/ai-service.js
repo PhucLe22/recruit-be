@@ -10,7 +10,7 @@ router.post('/users', AIServiceController.createUser.bind(AIServiceController));
 router.get('/users', isLogin, AIServiceController.getUsers.bind(AIServiceController));
 
 // Resume Operations
-router.post('/resumes', isLogin, upload.single('resume'), AIServiceController.uploadResume.bind(AIServiceController));
+router.post('/resumes', isLogin, upload.single('file'), AIServiceController.uploadResume.bind(AIServiceController));
 router.get('/resumes/:username', isLogin, AIServiceController.getResume.bind(AIServiceController));
 router.delete('/resumes/:username', isLogin, AIServiceController.deleteResume.bind(AIServiceController));
 router.post('/resumes/:username/improve', isLogin, AIServiceController.suggestResumeImprovements.bind(AIServiceController));

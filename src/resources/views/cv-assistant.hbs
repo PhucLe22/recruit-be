@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Service APIs - CV Assistant</title>
+    <title>CV Assistant - AI Services</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -20,517 +20,781 @@
         }
         
         body {
-            background-color: #f5f7ff;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
-        .api-card {
+        .service-card {
             border: none;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
             margin-bottom: 2rem;
             background: white;
             overflow: hidden;
+            position: relative;
         }
         
-        .api-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
         
-        .api-header {
+        .service-header {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
-            padding: 1.5rem;
-            border-radius: 15px 15px 0 0;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
         }
         
-        .api-method {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            margin-right: 0.5rem;
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.9;
         }
         
-        .method-get { background-color: #28a745; }
-        .method-post { background-color: #007bff; }
-        .method-put { background-color: #ffc107; color: #212529; }
-        .method-delete { background-color: #dc3545; }
-        
-        .api-endpoint {
-            font-family: 'Courier New', Courier, monospace;
-            background: rgba(0, 0, 0, 0.1);
-            padding: 0.5rem 1rem;
-            border-radius: 5px;
-            word-break: break-all;
-            font-size: 0.9rem;
-        }
-        
-        .api-body {
-            padding: 1.5rem;
-        }
-        
-        .api-description {
-            color: var(--gray);
-            margin-bottom: 1.5rem;
-        }
-        
-        .api-params {
-            margin-top: 1.5rem;
-        }
-        
-        .param {
-            display: flex;
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid #eee;
         }
         
-        .param-name {
-            font-weight: 600;
-            width: 150px;
-            color: var(--dark);
-        }
-        
-        .param-type {
-            color: var(--info);
-            font-size: 0.8rem;
-            margin-left: 1rem;
-            background: #e9f7ff;
-            padding: 0.1rem 0.5rem;
-            border-radius: 3px;
-        }
-        
-        .param-required {
-            color: #dc3545;
-            font-size: 0.8rem;
-            margin-left: 0.5rem;
-        }
-        
-        .param-desc {
-            color: var(--gray);
+        .service-description {
+            opacity: 0.9;
             font-size: 0.9rem;
         }
         
-        .try-it-btn {
+        .service-body {
+            padding: 2rem;
+        }
+        
+        .action-btn {
             background: linear-gradient(135deg, var(--primary), var(--secondary));
             border: none;
-            border-radius: 8px;
+            border-radius: 12px;
             color: white;
-            padding: 0.5rem 1.5rem;
+            padding: 0.75rem 2rem;
             font-weight: 600;
             transition: all 0.3s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             gap: 0.5rem;
+            text-decoration: none;
         }
         
-        .try-it-btn:hover {
+        .action-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(67, 97, 238, 0.3);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
             color: white;
         }
         
-        .response-container {
-            background: #f8f9fa;
+        .secondary-btn {
+            background: linear-gradient(135deg, var(--info), var(--success));
+        }
+        
+        .warning-btn {
+            background: linear-gradient(135deg, var(--warning), #ff6b6b);
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--info);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            background: #f8f9ff;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: #f0f2ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: var(--success);
+            background: #e8f5e8;
+        }
+        
+        .form-control, .form-select {
             border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.85rem;
-            max-height: 300px;
-            overflow-y: auto;
+            border: 2px solid #e9ecef;
+            padding: 0.75rem 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(67, 97, 238, 0.25);
+        }
+        
+        .result-container {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--success);
             display: none;
         }
         
-        .tab-content {
-            padding: 2rem 0;
+        .result-container.show {
+            display: block;
+            animation: slideIn 0.3s ease;
         }
         
-        .nav-tabs .nav-link {
-            border: none;
-            color: var(--gray);
-            font-weight: 600;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px 8px 0 0;
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
             margin-right: 0.5rem;
         }
         
-        .nav-tabs .nav-link.active {
-            background: white;
-            color: var(--primary);
-            border-bottom: 3px solid var(--primary);
+        .status-success { background-color: var(--success); }
+        .status-error { background-color: var(--warning); }
+        .status-pending { background-color: var(--info); }
+        
+        .hero-section {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(63, 55, 201, 0.9));
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+            margin-bottom: 3rem;
+            border-radius: 0 0 30px 30px;
+        }
+        
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container py-5">
-        <div class="text-center mb-5">
-            <h1 class="display-4 fw-bold mb-3" style="color: var(--primary);">
-                <i class="fas fa-robot me-2"></i>AI Service APIs
+    <!-- Hero Section -->
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="hero-title">
+                <i class="fas fa-robot me-3"></i>CV Assistant
             </h1>
-            <p class="lead text-muted">Explore and test the available AI service endpoints</p>
-        </div>
-
-        <ul class="nav nav-tabs" id="apiTabs" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="users-tab" data-bs-toggle="tab" data-bs-target="#users" type="button" role="tab">
-                    <i class="fas fa-users me-2"></i>Users
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="resumes-tab" data-bs-toggle="tab" data-bs-target="#resumes" type="button" role="tab">
-                    <i class="fas fa-file-alt me-2"></i>Resumes
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="jobs-tab" data-bs-toggle="tab" data-bs-target="#jobs" type="button" role="tab">
-                    <i class="fas fa-briefcase me-2"></i>Jobs
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="meetings-tab" data-bs-toggle="tab" data-bs-target="#meetings" type="button" role="tab">
-                    <i class="fas fa-video me-2"></i>Meetings
-                </button>
-            </li>
-        </ul>
-
-        <div class="tab-content" id="apiTabsContent">
-            <!-- Users Tab -->
-            <div class="tab-pane fade show active" id="users" role="tabpanel">
-                <!-- Create User -->
-                <div class="api-card mb-4">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Create User</h4>
-                            <span class="api-method method-post">POST</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/users</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Create a new user in the AI service.</p>
-                        
-                        <h6>Request Body</h6>
-                        <div class="api-params">
-                            <div class="param">
-                                <div class="param-name">username</div>
-                                <div class="param-type">string</div>
-                                <div class="param-required">required</div>
-                            </div>
-                            <div class="param-desc">Unique username for the new user</div>
-                            
-                            <div class="param mt-3">
-                                <div class="param-name">email</div>
-                                <div class="param-type">string</div>
-                                <div class="param-required">required</div>
-                            </div>
-                            <div class="param-desc">User's email address</div>
-                            
-                            <div class="param mt-3">
-                                <div class="param-name">full_name</div>
-                                <div class="param-type">string</div>
-                            </div>
-                            <div class="param-desc">User's full name</div>
-                        </div>
-                        
-                        <button class="btn try-it-btn mt-3" onclick="testEndpoint('createUser')">
-                            <i class="fas fa-play me-1"></i> Try it out
-                        </button>
-                        
-                        <div id="createUserResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
-
-                <!-- Get All Users -->
-                <div class="api-card">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Get All Users</h4>
-                            <span class="api-method method-get">GET</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/users</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Retrieve a list of all users in the AI service.</p>
-                        
-                        <button class="btn try-it-btn" onclick="testEndpoint('getUsers')">
-                            <i class="fas fa-play me-1"></i> Try it out
-                        </button>
-                        
-                        <div id="getUsersResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Resumes Tab -->
-            <div class="tab-pane fade" id="resumes" role="tabpanel">
-                <!-- Upload Resume -->
-                <div class="api-card mb-4">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Upload Resume</h4>
-                            <span class="api-method method-post">POST</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/resumes</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Upload a resume file for a user.</p>
-                        
-                        <h6>Request Body (multipart/form-data)</h6>
-                        <div class="api-params">
-                            <div class="param">
-                                <div class="param-name">resume</div>
-                                <div class="param-type">file</div>
-                                <div class="param-required">required</div>
-                            </div>
-                            <div class="param-desc">Resume file (PDF, DOC, DOCX, TXT)</div>
-                            
-                            <div class="param mt-3">
-                                <div class="param-name">username</div>
-                                <div class="param-type">string</div>
-                                <div class="param-required">required</div>
-                            </div>
-                            <div class="param-desc">Username of the resume owner</div>
-                        </div>
-                        
-                        <div class="mt-3">
-                            <input type="file" id="resumeFile" class="form-control">
-                            <input type="text" id="resumeUsername" class="form-control mt-2" placeholder="Username">
-                            <button class="btn try-it-btn mt-3" onclick="testFileUpload('uploadResume')">
-                                <i class="fas fa-upload me-1"></i> Upload Resume
-                            </button>
-                        </div>
-                        
-                        <div id="uploadResumeResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
-
-                <!-- Get Resume -->
-                <div class="api-card">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Get Resume</h4>
-                            <span class="api-method method-get">GET</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/resumes/:username</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Retrieve a user's resume information.</p>
-                        
-                        <div class="input-group mb-3">
-                            <input type="text" id="getResumeUsername" class="form-control" placeholder="Enter username">
-                            <button class="btn try-it-btn" onclick="testEndpointWithParam('getResume', 'getResumeUsername')">
-                                <i class="fas fa-play me-1"></i> Get Resume
-                            </button>
-                        </div>
-                        
-                        <div id="getResumeResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Add more tabs for other API categories (Jobs, Meetings, etc.) -->
-            <!-- Jobs Tab -->
-            <div class="tab-pane fade" id="jobs" role="tabpanel">
-                <div class="api-card">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Get Job Recommendations</h4>
-                            <span class="api-method method-get">GET</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/jobs/recommendations/:username</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Get job recommendations for a user based on their resume.</p>
-                        
-                        <div class="input-group mb-3">
-                            <input type="text" id="jobRecUsername" class="form-control" placeholder="Enter username">
-                            <button class="btn try-it-btn" onclick="testEndpointWithParam('getJobRecommendations', 'jobRecUsername')">
-                                <i class="fas fa-briefcase me-1"></i> Get Recommendations
-                            </button>
-                        </div>
-                        
-                        <div id="getJobRecommendationsResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Meetings Tab -->
-            <div class="tab-pane fade" id="meetings" role="tabpanel">
-                <div class="api-card">
-                    <div class="api-header">
-                        <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h4 class="mb-0">Schedule Google Meet</h4>
-                            <span class="api-method method-post">POST</span>
-                        </div>
-                        <div class="api-endpoint">/ai-service/meetings/schedule</div>
-                    </div>
-                    <div class="api-body">
-                        <p class="api-description">Schedule a new Google Meet meeting.</p>
-                        
-                        <div class="api-params">
-                            <div class="mb-3">
-                                <label class="form-label">Username</label>
-                                <input type="text" id="meetUsername" class="form-control" placeholder="Username">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Meeting Title</label>
-                                <input type="text" id="meetTitle" class="form-control" placeholder="Meeting Title">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Start Time</label>
-                                <input type="datetime-local" id="meetStartTime" class="form-control">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label class="form-label">Duration (minutes)</label>
-                                <input type="number" id="meetDuration" class="form-control" value="30" min="15" step="15">
-                            </div>
-                            
-                            <button class="btn try-it-btn" onclick="testScheduleMeeting()">
-                                <i class="fas fa-calendar-plus me-1"></i> Schedule Meeting
-                            </button>
-                        </div>
-                        
-                        <div id="scheduleMeetingResponse" class="response-container mt-3"></div>
-                    </div>
-                </div>
+            <p class="hero-subtitle">AI-powered tools to enhance your job search and career development</p>
+            <div class="d-flex justify-content-center gap-3">
+                <span class="badge bg-white text-primary px-3 py-2">
+                    <i class="fas fa-check-circle me-1"></i> Smart Analysis
+                </span>
+                <span class="badge bg-white text-primary px-3 py-2">
+                    <i class="fas fa-briefcase me-1"></i> Job Matching
+                </span>
+                <span class="badge bg-white text-primary px-3 py-2">
+                    <i class="fas fa-video me-1"></i> Interview Scheduling
+                </span>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <div class="container">
+        <!-- User Session Info -->
+        {{#if isLogin}}
+            <div class="alert alert-info alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-user-check me-2"></i>
+                    <div>
+                        <strong>Welcome back, {{#if user.name}}{{user.name}}{{else}}{{user.username}}{{/if}}!</strong>
+                        {{#if userCVData}}
+                            <br><small class="text-muted">We found your CV file: {{#if userCVData.filename}}{{userCVData.filename}}{{else}}Uploaded CV{{/if}} ({{#if userCVData.file_size}}{{userCVData.file_size}}KB{{/if}})</small>
+                        {{else}}
+                            <br><small class="text-muted">No CV found. Upload your CV to get started with analysis.</small>
+                        {{/if}}
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {{else}}
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                <div class="d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <div>
+                        <strong>Please log in to use CV Assistant</strong>
+                        <br><small class="text-muted">Login to access personalized CV analysis and job recommendations.</small>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {{/if}}
+
+        <!-- Service Grid -->
+        <div class="feature-grid">
+            <!-- CV Analysis Service -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">
+                        <i class="fas fa-file-medical"></i>
+                    </div>
+                    <h3 class="service-title">CV Analysis</h3>
+                    <p class="service-description">Get detailed feedback and improvement suggestions for your CV</p>
+                </div>
+                <div class="service-body">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Your Username</label>
+                        {{#if user}}
+                            <div class="input-group">
+                                <input type="text" id="cvAnalysisUsername" class="form-control" placeholder="{{#if user.username}}{{user.username}}{{else}}{{user.name}}{{/if}} (auto-filled)" readonly>
+                                <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Username auto-filled from your profile</small>
+                        {{else}}
+                            <input type="text" id="cvAnalysisUsername" class="form-control" placeholder="Enter your username">
+                            <small class="text-muted">Please <a href="/auth/loginRIX">login</a> for auto-fill</small>
+                        {{/if}}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <div class="upload-area" id="cvUploadArea">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>Upload Your CV</h5>
+                            <p class="text-muted">Drag & drop or click to browse</p>
+                            <p class="text-muted small">Supported: PDF, DOC, DOCX, TXT</p>
+                            <input type="file" id="cvFileInput" accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn action-btn" onclick="analyzeCV()">
+                            <i class="fas fa-search me-2"></i>Analyze My CV
+                        </button>
+                        <button class="btn action-btn secondary-btn" onclick="getCVImprovements()">
+                            <i class="fas fa-lightbulb me-2"></i>Get Improvement Tips
+                        </button>
+                    </div>
+                    
+                    <div id="cvAnalysisResult" class="result-container mt-3"></div>
+                </div>
+            </div>
+
+            <!-- Job Recommendations Service -->
+            <div class="service-card">
+                <div class="service-header">
+                    <div class="service-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3 class="service-title">Job Recommendations</h3>
+                    <p class="service-description">Find personalized job matches based on your CV and skills</p>
+                </div>
+                <div class="service-body">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Your Username</label>
+                        {{#if user}}
+                            <div class="input-group">
+                                <input type="text" id="jobUsername" class="form-control" placeholder="{{#if user.username}}{{user.username}}{{else}}{{user.name}}{{/if}} (auto-filled)" readonly>
+                                <span class="input-group-text"><i class="fas fa-lock text-muted"></i></span>
+                            </div>
+                            <small class="text-muted">Username auto-filled from your profile</small>
+                        {{else}}
+                            <input type="text" id="jobUsername" class="form-control" placeholder="Enter your username">
+                            <small class="text-muted">Please <a href="/auth/loginRIX">login</a> for auto-fill</small>
+                        {{/if}}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Preferences</label>
+                        <select class="form-select mb-2" id="jobLocation">
+                            <option value="">All Locations</option>
+                            <option value="Ho Chi Minh">Ho Chi Minh City</option>
+                            <option value="Hanoi">Hanoi</option>
+                            <option value="Da Nang">Da Nang</option>
+                            <option value="Remote">Remote</option>
+                        </select>
+                        <select class="form-select" id="jobType">
+                            <option value="">All Types</option>
+                            <option value="full-time">Full-time</option>
+                            <option value="part-time">Part-time</option>
+                            <option value="contract">Contract</option>
+                            <option value="internship">Internship</option>
+                        </select>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button class="btn action-btn" onclick="getJobRecommendations()">
+                            <i class="fas fa-search me-2"></i>Find Jobs for Me
+                        </button>
+                        <button class="btn action-btn secondary-btn" onclick="scrapeNewJobs()">
+                            <i class="fas fa-sync me-2"></i>Refresh Job Listings
+                        </button>
+                    </div>
+                    
+                    <div id="jobRecommendationsResult" class="result-container mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Helper function to format JSON responses
-        function formatJson(json) {
-            return JSON.stringify(json, null, 2);
-        }
-
-        // Show response in the specified container
-        function showResponse(containerId, data) {
+        // Base URL for AI services
+        const AI_BASE_URL = '/ai-service';
+        
+        // Show result in container
+        function showResult(containerId, content, isSuccess = true) {
             const container = document.getElementById(containerId);
-            container.textContent = formatJson(data);
-            container.style.display = 'block';
+            container.innerHTML = content;
+            container.className = `result-container show ${isSuccess ? 'border-success' : 'border-danger'}`;
         }
-
-        // Test a simple GET endpoint
-        async function testEndpoint(endpoint) {
-            const url = `/ai-service/${endpoint.replace(/([A-Z])/g, '-$1').toLowerCase()}`;
+        
+        // Show loading state
+        function showLoading(containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '<div class="text-center"><div class="loading"></div> Processing...</div>';
+            container.className = 'result-container show';
+        }
+        
+        // CV Analysis Functions
+        function analyzeCV() {
+            const username = document.getElementById('cvAnalysisUsername').value;
+            if (!username) {
+                alert('Please enter your username');
+                return;
+            }
             
-            try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
+            showLoading('cvAnalysisResult');
+            
+            fetch(`${AI_BASE_URL}/resumes/${username}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
                     }
-                });
-                
-                const data = await response.json();
-                showResponse(`${endpoint}Response`, data);
-            } catch (error) {
-                showResponse(`${endpoint}Response`, { error: error.message });
-            }
-        }
-
-        // Test an endpoint with a parameter
-        async function testEndpointWithParam(endpoint, inputId) {
-            const param = document.getElementById(inputId).value;
-            if (!param) {
-                alert('Please enter a value');
-                return;
-            }
-
-            const url = `/ai-service/${endpoint.replace(/([A-Z])/g, '-$1').toLowerCase()}/${param}`;
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
                     }
+                    
+                    const resultHtml = `
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="status-indicator status-success"></span>
+                            <h5 class="mb-0">CV Found Successfully</h5>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Username:</strong> ${data.username || username}</p>
+                                <p><strong>Uploaded:</strong> ${data.uploaded_at ? new Date(data.uploaded_at).toLocaleDateString() : 'Unknown'}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>File Size:</strong> ${data.file_size ? (data.file_size / 1024).toFixed(1) + ' KB' : 'Unknown'}</p>
+                                <p><strong>Processed:</strong> ${data.processed_text ? 'Yes' : 'No'}</p>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button class="btn btn-sm btn-outline-primary" onclick="getCVImprovements()">
+                                <i class="fas fa-lightbulb me-1"></i>Get Detailed Analysis
+                            </button>
+                        </div>
+                    `;
+                    showResult('cvAnalysisResult', resultHtml, true);
+                })
+                .catch(error => {
+                    showResult('cvAnalysisResult', `
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-error"></span>
+                            <h5 class="mb-0">CV Not Found</h5>
+                        </div>
+                        <p class="text-muted">${error.message}</p>
+                        <p class="small">Please upload your CV first using the upload area above.</p>
+                    `, false);
                 });
-                
-                const data = await response.json();
-                showResponse(`${endpoint}Response`, data);
-            } catch (error) {
-                showResponse(`${endpoint}Response`, { error: error.message });
-            }
         }
-
-        // Test file upload
-        async function testFileUpload(endpoint) {
-            const fileInput = document.getElementById('resumeFile');
-            const username = document.getElementById('resumeUsername').value;
+        
+        function getCVImprovements() {
+            const username = document.getElementById('cvAnalysisUsername').value;
+            if (!username) {
+                alert('Please enter your username');
+                return;
+            }
             
-            if (!fileInput.files.length || !username) {
-                alert('Please select a file and enter a username');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('resume', fileInput.files[0]);
-            formData.append('username', username);
-
-            try {
-                const response = await fetch(`/ai-service/${endpoint === 'uploadResume' ? 'resumes' : ''}`, {
-                    method: 'POST',
-                    body: formData
-                });
+            showLoading('cvAnalysisResult');
+            
+            fetch(`${AI_BASE_URL}/resumes/${username}/improve`, {
+                method: 'POST'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
                 
-                const data = await response.json();
-                showResponse(`${endpoint}Response`, data);
-            } catch (error) {
-                showResponse(`${endpoint}Response`, { error: error.message });
-            }
-        }
-
-        // Test scheduling a meeting
-        async function testScheduleMeeting() {
-            const username = document.getElementById('meetUsername').value;
-            const title = document.getElementById('meetTitle').value;
-            const startTime = document.getElementById('meetStartTime').value;
-            const duration = document.getElementById('meetDuration').value;
-
-            if (!username || !title || !startTime || !duration) {
-                alert('Please fill in all fields');
-                return;
-            }
-
-            const meetingData = {
-                username,
-                title,
-                start_time: new Date(startTime).toISOString(),
-                duration_minutes: parseInt(duration)
-            };
-
-            try {
-                const response = await fetch('/ai-service/meetings/schedule', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(meetingData)
-                });
-                
-                const data = await response.json();
-                showResponse('scheduleMeetingResponse', data);
-            } catch (error) {
-                showResponse('scheduleMeetingResponse', { error: error.message });
-            }
-        }
-
-        // Initialize tooltips
-        document.addEventListener('DOMContentLoaded', function() {
-            const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+                const analysis = data.analysis || {};
+                const resultHtml = `
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="status-indicator status-success"></span>
+                        <h5 class="mb-0">CV Analysis Complete</h5>
+                    </div>
+                    
+                    ${analysis.overall_assessment ? `
+                    <div class="alert alert-${analysis.overall_assessment.status === 'excellent' ? 'success' : analysis.overall_assessment.status === 'good' ? 'info' : 'warning'}">
+                        <h6>Overall Assessment: ${analysis.overall_assessment.grade || 'N/A'}</h6>
+                        <p class="mb-0">${analysis.overall_assessment.message}</p>
+                        <div class="progress mt-2" style="height: 8px;">
+                            <div class="progress-bar bg-${analysis.overall_assessment.status === 'excellent' ? 'success' : 'info'}" 
+                                 style="width: ${analysis.overall_assessment.score || 0}%"></div>
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.strengths && analysis.strengths.length > 0 ? `
+                    <div class="mb-3">
+                        <h6><i class="fas fa-thumbs-up text-success me-2"></i>Strengths</h6>
+                        <ul class="list-unstyled">
+                            ${analysis.strengths.map(strength => `<li class="mb-2">• ${strength}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.weaknesses && analysis.weaknesses.length > 0 ? `
+                    <div class="mb-3">
+                        <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Areas to Improve</h6>
+                        <ul class="list-unstyled">
+                            ${analysis.weaknesses.map(weakness => `<li class="mb-2">• ${weakness}</li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                    
+                    ${analysis.quick_improvements && analysis.quick_improvements.length > 0 ? `
+                    <div class="mb-3">
+                        <h6><i class="fas fa-rocket text-info me-2"></i>Quick Improvements</h6>
+                        <ul class="list-unstyled">
+                            ${analysis.quick_improvements.map(imp => `
+                            <li class="mb-2">
+                                <strong>${imp.title}</strong> - ${imp.time_estimate} (Impact: ${imp.impact})
+                            </li>`).join('')}
+                        </ul>
+                    </div>
+                    ` : ''}
+                `;
+                showResult('cvAnalysisResult', resultHtml, true);
+            })
+            .catch(error => {
+                showResult('cvAnalysisResult', `
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="status-indicator status-error"></span>
+                        <h5 class="mb-0">Analysis Failed</h5>
+                    </div>
+                    <p class="text-muted">${error.message}</p>
+                `, false);
             });
+        }
+        
+        // Job Recommendations Functions
+        function getJobRecommendations() {
+            const username = document.getElementById('jobUsername').value;
+            if (!username) {
+                alert('Please enter your username');
+                return;
+            }
+            
+            showLoading('jobRecommendationsResult');
+            
+            fetch(`${AI_BASE_URL}/jobs/suggestions/${username}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Job suggestions response:', data); // Debug log
+                    
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    const jobs = data.matching_jobs || data.jobs || data.recommendations || data.results || [];
+                    console.log('Extracted jobs:', jobs); // Debug log
+                    
+                    const resultHtml = `
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="status-indicator status-success"></span>
+                            <h5 class="mb-0">Found ${data.total_matches || jobs.length} Job Matches</h5>
+                        </div>
+                        
+                        ${jobs.length > 0 ? `
+                        <div class="job-list">
+                            ${jobs.map(job => {
+                                // Handle different title formats - some include match percentage in title
+                                const displayTitle = job.title || job.position || 'Job Title';
+                                const company = job.company || 'Company';
+                                const matchPercentage = job.match_percentage || 0;
+                                const location = job.location || 'Location';
+                                const jobType = job.type || 'Full-time';
+                                const salary = job.salary || '';
+                                
+                                return `
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="card-title mb-0">${displayTitle}</h6>
+                                        <span class="badge bg-primary">${matchPercentage}% Match</span>
+                                    </div>
+                                    <p class="card-text">
+                                        <strong>${company}</strong><br>
+                                        <small class="text-muted">
+                                            <i class="fas fa-map-marker-alt me-1"></i>${location} • 
+                                            <i class="fas fa-clock me-1"></i>${jobType}
+                                        </small>
+                                    </p>
+                                    ${salary ? `<p class="card-text small"><strong>Salary:</strong> ${salary}</p>` : ''}
+                                </div>
+                            </div>
+                                `;}).join('')}
+                        </div>
+                        ` : '<p class="text-muted">No job matches found. Try uploading your CV first.</p>'}
+                    `;
+                    showResult('jobRecommendationsResult', resultHtml, true);
+                })
+                .catch(error => {
+                    showResult('jobRecommendationsResult', `
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-error"></span>
+                            <h5 class="mb-0">Job Search Failed</h5>
+                        </div>
+                        <p class="text-muted">${error.message}</p>
+                    `, false);
+                });
+        }
+        
+        function scrapeNewJobs() {
+            const username = document.getElementById('jobUsername').value;
+            if (!username) {
+                alert('Please enter your username');
+                return;
+            }
+            
+            showLoading('jobRecommendationsResult');
+            
+            fetch(`${AI_BASE_URL}/users/${username}/jobs`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    
+                    const resultHtml = `
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="status-indicator status-success"></span>
+                            <h5 class="mb-0">Job Listings Updated</h5>
+                        </div>
+                        <p class="text-muted">Found ${data.count || 0} new job opportunities.</p>
+                        <button class="btn btn-sm btn-outline-primary" onclick="getJobRecommendations()">
+                            <i class="fas fa-search me-1"></i>View Updated Jobs
+                        </button>
+                    `;
+                    showResult('jobRecommendationsResult', resultHtml, true);
+                })
+                .catch(error => {
+                    showResult('jobRecommendationsResult', `
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="status-indicator status-error"></span>
+                            <h5 class="mb-0">Job Update Failed</h5>
+                        </div>
+                        <p class="text-muted">${error.message}</p>
+                    `, false);
+                });
+        }
+        
+        // File Upload Handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('cvUploadArea');
+            const fileInput = document.getElementById('cvFileInput');
+            
+            // Auto-fill username if user is logged in
+            {{#if user}}
+                const cvUsernameInput = document.getElementById('cvAnalysisUsername');
+                const jobUsernameInput = document.getElementById('jobUsername');
+                
+                if (cvUsernameInput) {
+                    cvUsernameInput.value = '{{#if user.username}}{{user.username}}{{else}}{{user.name}}{{/if}}';
+                    cvUsernameInput.readOnly = true;
+                    cvUsernameInput.classList.add('bg-light');
+                }
+                
+                if (jobUsernameInput) {
+                    jobUsernameInput.value = '{{#if user.username}}{{user.username}}{{else}}{{user.name}}{{/if}}';
+                    jobUsernameInput.readOnly = true;
+                    jobUsernameInput.classList.add('bg-light');
+                }
+                
+                // Display existing CV data if available
+                {{#if userCVData}}
+                    const cvAnalysisResult = document.getElementById('cvAnalysisResult');
+                    if (cvAnalysisResult) {
+                        const username = '{{userCVData.username}}';
+                        const uploadedAt = '{{#if userCVData.uploaded_at}}{{userCVData.uploaded_at}}{{else}}Unknown{{/if}}';
+                        const fileSize = '{{#if userCVData.file_size}}{{userCVData.file_size}}{{else}}Unknown{{/if}}';
+                        const processedText = {{#if userCVData.processed_text}}true{{else}}false{{/if}};
+                        
+                        const resultHtml = `
+                            <div class="d-flex align-items-center mb-3">
+                                <span class="status-indicator status-success"></span>
+                                <h5 class="mb-0">Your CV is Ready</h5>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p><strong>Username:</strong> ${username}</p>
+                                    <p><strong>Uploaded:</strong> ${uploadedAt}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p><strong>File Size:</strong> ${fileSize} KB</p>
+                                    <p><strong>Processed:</strong> ${processedText ? 'Yes' : 'No'}</p>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <button class="btn btn-sm btn-outline-primary" onclick="getCVImprovements()">
+                                    <i class="fas fa-lightbulb me-1"></i>Get Detailed Analysis
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary ms-2" onclick="analyzeCV()">
+                                    <i class="fas fa-search me-1"></i>View CV Details
+                                </button>
+                            </div>
+                        `;
+                        cvAnalysisResult.innerHTML = resultHtml;
+                        cvAnalysisResult.className = 'result-container show border-success';
+                    }
+                {{/if}}
+            {{/if}}
+            
+            if (uploadArea && fileInput) {
+                uploadArea.addEventListener('click', () => fileInput.click());
+                
+                uploadArea.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', () => {
+                    uploadArea.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    uploadArea.classList.remove('dragover');
+                    handleFileUpload(e.dataTransfer.files[0]);
+                });
+                
+                fileInput.addEventListener('change', (e) => {
+                    handleFileUpload(e.target.files[0]);
+                });
+            }
         });
+        
+        function handleFileUpload(file) {
+            if (!file) return;
+            
+            const username = document.getElementById('cvAnalysisUsername').value;
+            if (!username) {
+                alert('Please enter your username first');
+                return;
+            }
+            
+            showLoading('cvAnalysisResult');
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('username', username);
+            
+            fetch(`${AI_BASE_URL}/resumes`, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                const resultHtml = `
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="status-indicator status-success"></span>
+                        <h5 class="mb-0">CV Uploaded Successfully</h5>
+                    </div>
+                    <p><strong>File:</strong> ${data.filename || file.name}</p>
+                    <p><strong>Size:</strong> ${data.size ? (data.size / 1024).toFixed(1) + ' KB' : 'Unknown'}</p>
+                    <p class="text-muted">Your CV is now ready for analysis!</p>
+                    <button class="btn btn-sm btn-outline-primary" onclick="analyzeCV()">
+                        <i class="fas fa-search me-1"></i>Analyze My CV
+                    </button>
+                `;
+                showResult('cvAnalysisResult', resultHtml, true);
+            })
+            .catch(error => {
+                showResult('cvAnalysisResult', `
+                    <div class="d-flex align-items-center mb-2">
+                        <span class="status-indicator status-error"></span>
+                        <h5 class="mb-0">Upload Failed</h5>
+                    </div>
+                    <p class="text-muted">${error.message}</p>
+                `, false);
+            });
+        }
     </script>
 </body>
 </html>

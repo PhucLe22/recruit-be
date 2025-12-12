@@ -3,13 +3,43 @@ const router = express.Router();
 const { isLogin } = require('../middlewares/isLogin');
 
 // CV Assistant page
-router.get('/', isLogin, (req, res) => {
+router.get('/', isLogin, async (req, res) => {
     try {
+        let userCVData = null;
+        
+        // If user is logged in, try to get their CV data
+        if (req.session?.user) {
+            try {
+                // Import AIServiceController to get CV data
+                const aiController = require('../app/controllers/ai/AIServiceController');
+                const username = req.session.user.username || req.session.user.name;
+                
+                if (username) {
+                    const cvResponse = await new Promise((resolve) => {
+                        const mockReq = { params: { username } };
+                        const mockRes = {
+                            json: (data) => resolve(data),
+                            status: () => ({ json: (data) => resolve(data) })
+                        };
+                        aiController.getResume(mockReq, mockRes);
+                    });
+                    
+                    if (!cvResponse.error) {
+                        userCVData = cvResponse;
+                    }
+                }
+            } catch (error) {
+                console.log('Could not fetch user CV data:', error.message);
+            }
+        }
+        
         res.render('cv-assistant', { 
             title: 'CV Assistant',
-            user: req.session.user || null,
-            layout: 'main',
-            currentUser: req.session.user || null
+            user: req.user || req.session.user || null,
+            currentUser: req.user || req.session.user || null,
+            isLogin: req.isLogin || false,
+            userCVData: userCVData,
+            layout: 'main'
         });
     } catch (error) {
         console.error('Error rendering CV Assistant page:', error);

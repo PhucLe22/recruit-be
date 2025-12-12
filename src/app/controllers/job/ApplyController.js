@@ -9,28 +9,37 @@ class ApplyController {
   // Apply for a job
   async apply(req, res, next) {
     try {
-      const userId = req.session.user._id;
-      // return res.json(userId)
-      const { slug } = req.params;
-      const { cvId, coverLetter, notes } = req.body;
-
-      if (!userId) {
+      // Validate session
+      if (!req.session || !req.session.user) {
         return res.status(401).json({
           success: false,
-          message: 'Authentication required'
+          message: "Authentication required"
         });
       }
 
-      // Check if job exists and is active
-      const job = await Job.findOne({ slug: slug }).populate('businessId');
+      const userId = req.session.user._id;
+
+      // Get user data
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({
+          success: false,
+          message: "User not found"
+        });
+      }
+
+      const { slug } = req.params;
+
+      // Get job
+      const job = await Job.findOne({ slug }).populate("businessId");
       if (!job || job.expiryTime < new Date()) {
         return res.status(404).json({
           success: false,
-          message: 'Job not found or expired'
+          message: "Job not found or expired"
         });
       }
 
-      // Check if already applied
+      // Check existing application
       const existingApplication = await AppliedJobs.findOne({
         user_id: userId,
         job_id: job._id
@@ -39,19 +48,17 @@ class ApplyController {
       if (existingApplication) {
         return res.status(400).json({
           success: false,
-          message: 'You have already applied for this job'
+          message: "You have already applied for this job"
         });
       }
 
-      // Verify CV belongs to user
-      if (cvId) {
-        const cv = await CV.findById(cvId);
-        if (!cv || cv.user_id.toString() !== userId) {
-          return res.status(400).json({
-            success: false,
-            message: 'Invalid CV'
-          });
-        }
+      // Check CV
+      const cv = await CV.findOne({ username: user.username });
+      if (!cv) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid CV, you need to update resume again!"
+        });
       }
 
       // Create application
@@ -59,56 +66,50 @@ class ApplyController {
         user_id: userId,
         job_id: job._id,
         business_id: job.businessId._id,
-        cv_id: cvId || null,
-        cover_letter: coverLetter || null,
-        notes: notes || null
+        cv_id: cv._id
       });
 
       await application.save();
 
-      // Track activity
-      await ActivityTracker.trackJobApplication(userId, job._id, {
-        cvId,
-        coverLetter: coverLetter ? 'provided' : null,
-        notes: notes ? 'provided' : null
-      }, req);
-
-      // Update job application count
+      // Increase application count
       await Job.findByIdAndUpdate(job._id, {
         $inc: { applicationCount: 1 }
       });
 
-      res.json({
+      return res.json({
         success: true,
-        message: 'Application submitted successfully',
+        message: "Application submitted successfully",
         application: {
           id: application._id,
           appliedAt: application.applied_at,
           status: application.status
         }
       });
+
     } catch (error) {
-      console.error('Apply error:', error);
-      res.status(500).json({
+      console.error("Apply error:", error);
+      return res.status(500).json({
         success: false,
-        message: 'Error submitting application',
+        message: "Error submitting application",
         error: error.message
       });
     }
   }
 
+
   // Get user's applications
   async getUserApplications(req, res) {
     try {
-      const userId = req.user?._id;
-      const { page = 1, limit = 10, status } = req.query;
-
-      if (!userId) {
+      // Use session-based authentication like other methods
+      if (!req.session || !req.session.user) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
         });
       }
+
+      const userId = req.session.user._id;
+      const { page = 1, limit = 10, status } = req.query;
 
       const applications = await AppliedJobs.getUserApplications(userId, {
         page: parseInt(page),
@@ -159,7 +160,7 @@ class ApplyController {
         .populate('business_id', 'companyName logo email phone')
         .populate('cv_id');
 
-      if (!application || application.user_id.toString() !== userId) {
+      if (!application || application.user_id !== userId) {
         return res.status(404).json({
           success: false,
           message: 'Application not found'
@@ -195,7 +196,7 @@ class ApplyController {
 
       const application = await AppliedJobs.findById(applicationId);
 
-      if (!application || application.user_id.toString() !== userId) {
+      if (!application || application.user_id !== userId) {
         return res.status(404).json({
           success: false,
           message: 'Application not found'

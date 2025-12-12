@@ -34,8 +34,8 @@ class JobController {
                 ...job.toObject(),
                 companyName: job.businessId?.companyName || job.companyName || 'Công ty',
                 companyLogo: job.logoPath || job.businessId?.logo || null,
-                createdAt: this.formatRelativeTime(job.createdAt),
-                expiryTime: this.formatDate(job.expiryTime)
+                createdAt: JobController.formatRelativeTime(job.createdAt),
+                expiryTime: JobController.formatDate(job.expiryTime)
             }));
             
             // Check if request expects JSON (API request)
@@ -82,19 +82,23 @@ class JobController {
             req.session.slug = req.params.slug;
             const businessId = job.businessId;
             const business = await Business.findById(businessId);
-            const jobs = await Job.find({ businessId, _id: { $ne: job._id } }); // loại bỏ job hiện tại
+            const jobs = await Job.find({ businessId, _id: { $ne: job._id } }); // delete the current job
 
             let jobApplied = null;
             let savedJob = null;
-            if (req.account && req.account.id) {
+            
+            // Use session-based authentication like ApplyController
+            if (req.session && req.session.user) {
+                const userId = req.session.user._id;
+                
                 jobApplied = await JobApplied.findOne({
-                    userId: req.account.id,
-                    jobId: job._id,
+                    user_id: userId,
+                    job_id: job._id,
                 });
 
                 savedJob = await SavedJob.findOne({
-                    userId: req.account.id,
-                    jobId: job._id,
+                    user_id: userId,
+                    job_id: job._id,
                 });
             }
 

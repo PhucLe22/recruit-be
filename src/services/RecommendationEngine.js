@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Job = require('../app/models/Job');
 const UserBehavior = require('../app/models/UserBehavior');
 const MBTIAssessment = require('../app/models/MBTIAssessment');
@@ -34,7 +35,7 @@ class RecommendationEngine {
       return recommendations;
     } catch (error) {
       console.error('Error getting recommendations:', error);
-      return await this.getFallbackRecommendations(limit);
+      return await this.getFallbackRecommendations(options.limit || 10);
     }
   }
 
@@ -55,7 +56,7 @@ class RecommendationEngine {
       return recommendations;
     } catch (error) {
       console.error('Error getting personalized recommendations:', error);
-      return await this.getFallbackRecommendations(limit);
+      return await this.getFallbackRecommendations(options.limit || 10);
     }
   }
 
@@ -173,7 +174,7 @@ class RecommendationEngine {
 
       // Exclude specific jobs
       if (exclude.length > 0) {
-        query._id = { $nin: exclude.map(id => mongoose.Types.ObjectId(id)) };
+        query._id = { $nin: exclude.map(id => new mongoose.Types.ObjectId(id)) };
       }
 
       // Build search criteria based on user profile
@@ -244,7 +245,7 @@ class RecommendationEngine {
 
     } catch (error) {
       console.error('Error getting personalized jobs:', error);
-      return await this.getFallbackRecommendations(limit);
+      return await this.getFallbackRecommendations(options.limit || 10);
     }
   }
 

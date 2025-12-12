@@ -44,14 +44,25 @@
 <!-- Features Section -->
 <section class="features-section">
     <div class="container">
+        <div class="section-header">
+            <h2 class="section-title">Công Cụ Tuyệt Vời Cho Sự Nghiệp</h2>
+            <p class="section-subtitle">Khám phá các tính năng thông minh giúp bạn tìm kiếm và phát triển sự nghiệp hiệu quả</p>
+        </div>
         <div class="features-grid">
             <!-- CV Assistant -->
             <div class="feature-card cv-assistant">
                 <div class="feature-icon">
                     <i class="fas fa-robot"></i>
                 </div>
-                <h3 class="feature-title">CV AI Assistant</h3>
-                <p class="feature-description">Công cụ AI thông minh giúp tạo và tối ưu CV chuyên nghiệp</p>
+                <div class="feature-content">
+                    <h3 class="feature-title">CV AI Assistant</h3>
+                    <p class="feature-description">Công cụ AI thông minh giúp tạo và tối ưu CV chuyên nghiệp trong vài phút với hơn 50 mẫu thiết kế hiện đại</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Tự động tối ưu nội dung</li>
+                        <li><i class="fas fa-check"></i> Gợi ý từ khóa phù hợp</li>
+                        <li><i class="fas fa-check"></i> Xuất PDF chất lượng cao</li>
+                    </ul>
+                </div>
                 <a href="/cv-assistant" class="feature-btn">
                     <i class="fas fa-magic"></i>
                     Trải nghiệm ngay
@@ -63,8 +74,15 @@
                 <div class="feature-icon">
                     <i class="fas fa-building"></i>
                 </div>
-                <h3 class="feature-title">Công Ty Hàng Đầu</h3>
-                <p class="feature-description">Khám phá danh sách các công ty uy tín và cơ hội nghề nghiệp</p>
+                <div class="feature-content">
+                    <h3 class="feature-title">Công Ty Hàng Đầu</h3>
+                    <p class="feature-description">Khám phá danh sách 500+ công ty uy tín với thông tin chi tiết về văn hóa, phúc lợi và cơ hội phát triển</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Đánh giá từ nhân viên</li>
+                        <li><i class="fas fa-check"></i> Lương và phúc lợi</li>
+                        <li><i class="fas fa-check"></i> Cơ hội thăng tiến</li>
+                    </ul>
+                </div>
                 <a href="/business/list" class="feature-btn">
                     <i class="fas fa-arrow-right"></i>
                     Khám phá ngay
@@ -76,8 +94,15 @@
                 <div class="feature-icon">
                     <i class="fas fa-th-large"></i>
                 </div>
-                <h3 class="feature-title">Ngành Nghề HOT</h3>
-                <p class="feature-description">Khám phá các ngành nghề và lĩnh vực đang tuyển dụng nhiều</p>
+                <div class="feature-content">
+                    <h3 class="feature-title">Ngành Nghề HOT</h3>
+                    <p class="feature-description">Cập nhật các ngành nghề đang tuyển dụng nhiều nhất: IT, Marketing, Kế toán, Nhân sự, Kinh doanh với lương cạnh tranh</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Xu hướng thị trường</li>
+                        <li><i class="fas fa-check"></i> Mức lương trung bình</li>
+                        <li><i class="fas fa-check"></i> Kỹ năng cần thiết</li>
+                    </ul>
+                </div>
                 <button class="feature-btn" onclick="scrollToJobs()">
                     <i class="fas fa-briefcase"></i>
                     Xem việc làm
@@ -89,8 +114,15 @@
                 <div class="feature-icon">
                     <i class="fas fa-brain"></i>
                 </div>
-                <h3 class="feature-title">Bài Kiểm Tra Tính Cách</h3>
-                <p class="feature-description">MBTI, Big Five, DISC - Khám phá bản thân và tìm công việc phù hợp</p>
+                <div class="feature-content">
+                    <h3 class="feature-title">Bài Kiểm Tra Tính Cách</h3>
+                    <p class="feature-description">MBTI, Big Five, DISC - Khám phá bản thân, điểm mạnh/yếu và tìm công việc phù hợp nhất với tính cách của bạn</p>
+                    <ul class="feature-list">
+                        <li><i class="fas fa-check"></i> Phân tích chi tiết</li>
+                        <li><i class="fas fa-check"></i> Gợi ý nghề nghiệp</li>
+                        <li><i class="fas fa-check"></i> Báo cáo chuyên sâu</li>
+                    </ul>
+                </div>
                 <a href="/personality-assessments" class="feature-btn">
                     <i class="fas fa-clipboard-check"></i>
                     Bắt đầu ngay
@@ -1533,6 +1565,7 @@ function renderJobs() {
     jobsToLoad.forEach((job, index) => {
         const jobCard = document.createElement("div");
         jobCard.className = "job-card";
+        jobCard.setAttribute('data-job-id', job._id || job.id);
         jobCard.style.animationDelay = `${index * 0.1}s`;
         jobCard.style.animation = 'fadeInUp 0.6s ease both';
 
@@ -1636,6 +1669,7 @@ function loadMoreJobs() {
         jobsToLoad.forEach((job, index) => {
             const jobCard = document.createElement("div");
             jobCard.className = "job-card";
+            jobCard.setAttribute('data-job-id', job._id || job.id);
             jobCard.style.animationDelay = `${index * 0.1}s`;
             jobCard.style.animation = 'fadeInUp 0.6s ease both';
 
@@ -3112,8 +3146,6 @@ window.loadMoreJobs = async function() {
                     ${time}
                 </span>
                 <div class="job-actions">
-                    <button class="btn-save" onclick="toggleSave(this)" title="Lưu công việc">
-                        <i class="far fa-heart"></i>
                     </button>
                     <a href="/jobs/${job.slug || job._id}" class="btn-apply">
                         <i class="fas fa-paper-plane"></i>
@@ -3217,16 +3249,136 @@ window.loadMoreJobs = async function() {
         }
     }
 
+    // Show notification function
+    function showNotification(type, title, message, duration = 5000) {
+        // Create notification container if it doesn't exist
+        let notificationContainer = document.getElementById('notificationContainer');
+        if (!notificationContainer) {
+            notificationContainer = document.createElement('div');
+            notificationContainer.id = 'notificationContainer';
+            notificationContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 9999;
+                max-width: 400px;
+            `;
+            document.body.appendChild(notificationContainer);
+        }
+
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.style.cssText = `
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            border-left: 4px solid ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'};
+            animation: slideInRight 0.3s ease;
+        `;
+        
+        const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+        
+        notification.innerHTML = `
+            <div style="display: flex; align-items: flex-start; gap: 12px;">
+                <i class="fas fa-${icon}" style="color: ${type === 'success' ? '#10b981' : type === 'error' ? '#ef4444' : '#3b82f6'}; font-size: 20px; margin-top: 2px;"></i>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #1f2937; margin-bottom: 4px;">${title}</div>
+                    <div style="color: #6b7280; font-size: 14px;">${message}</div>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" style="background: none; border: none; color: #9ca3af; cursor: pointer; font-size: 18px;">&times;</button>
+            </div>
+        `;
+        
+        notificationContainer.appendChild(notification);
+        
+        // Auto remove after duration
+        setTimeout(() => {
+            if (notificationContainer.contains(notification)) {
+                notificationContainer.removeChild(notification);
+            }
+        }, duration);
+    }
+
     // Toggle save job functionality
-    window.toggleSave = function(button) {
-        button.classList.toggle('saved');
-        const icon = button.querySelector('i');
-        if (button.classList.contains('saved')) {
-            icon.classList.remove('far');
-            icon.classList.add('fas');
-        } else {
-            icon.classList.remove('fas');
-            icon.classList.add('far');
+    window.toggleSave = async function(button) {
+        try {
+            // Get job ID from the card
+            const jobCard = button.closest('.job-card');
+            const jobId = jobCard.dataset.jobId || jobCard.querySelector('.btn-apply').getAttribute('href').split('/').pop();
+            
+            if (!jobId) {
+                console.error('Job ID not found');
+                showNotification('error', 'Lỗi', 'Không tìm thấy ID công việc');
+                return;
+            }
+
+            const isSaved = button.classList.contains('saved');
+            const originalContent = button.innerHTML;
+            
+            // Show loading state
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+            const url = `/jobs/save/${jobId}`;
+            const method = isSaved ? 'DELETE' : 'POST';
+
+            console.log('Making API call:', { url, method, jobId, isSaved });
+
+            const response = await fetch(url, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'same-origin' // Include cookies for session auth
+            });
+
+            console.log('API response status:', response.status);
+            console.log('API response headers:', response.headers);
+
+            const result = await response.json();
+            console.log('API response data:', result);
+
+            if (response.ok) {
+                // Toggle button state
+                button.classList.toggle('saved');
+                const icon = button.querySelector('i');
+                if (button.classList.contains('saved')) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                    showNotification('success', 'Đã lưu', 'Công việc đã được lưu thành công');
+                } else {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                    showNotification('success', 'Đã xóa', 'Công việc đã được xóa khỏi danh sách lưu');
+                }
+            } else {
+                // Show error message
+                showNotification('error', 'Có lỗi xảy ra', result.message || 'Đã có lỗi xảy ra. Vui lòng thử lại.');
+                // Restore original button state
+                button.innerHTML = originalContent;
+            }
+        } catch (error) {
+            console.error('Error saving/unsaving job:', error);
+            console.error('Error details:', error.message, error.stack);
+            
+            // Show specific error based on the error type
+            if (error.message.includes('Failed to fetch')) {
+                showNotification('error', 'Lỗi kết nối', 'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.');
+            } else if (error.message.includes('Authentication required')) {
+                showNotification('error', 'Cần đăng nhập', 'Bạn cần đăng nhập để lưu công việc.');
+            } else {
+                showNotification('error', 'Có lỗi xảy ra', 'Đã có lỗi xảy ra. Vui lòng thử lại sau.');
+            }
+        } finally {
+            button.disabled = false;
+            if (!button.classList.contains('saved')) {
+                button.innerHTML = '<i class="far fa-heart"></i>';
+            } else {
+                button.innerHTML = '<i class="fas fa-heart"></i>';
+            }
         }
     };
 });

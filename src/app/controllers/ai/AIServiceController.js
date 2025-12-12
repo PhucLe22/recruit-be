@@ -39,65 +39,186 @@ class AIServiceController {
     }
 
     // User Management
-    async createUser(userData) {
-        return this._makeRequest('POST', '/create_user', userData);
+    async createUser(req, res) {
+        try {
+            const response = await this._makeRequest('POST', '/create_user', req.body);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    async getUsers() {
-        return this._makeRequest('GET', '/users');
+    async getUsers(req, res) {
+        try {
+            const response = await this._makeRequest('GET', '/users');
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     // Resume Operations
-    async uploadResume(file, username) {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('username', username);
+    async uploadResume(req, res) {
+        try {
+            const { username } = req.body;
+            const file = req.file;
 
-        return this._makeRequest('POST', '/upload_resume', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
+            if (!username || !file) {
+                return res.status(400).json({
+                    error: 'Username and file are required'
+                });
             }
-        });
+
+            const formData = new FormData();
+            formData.append('username', username);
+            formData.append('file', file.buffer, file.originalname);
+
+            const response = await axios.post(`${this.AI_SERVICE_URL}/upload_resume`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                },
+                timeout: 60000 // 60 seconds for file upload
+            });
+
+            return res.json(response.data);
+        } catch (error) {
+            console.error('Upload resume error:', error.message);
+            return res.status(500).json({
+                error: 'Failed to upload resume',
+                details: error.response?.data?.error || error.message
+            });
+        }
     }
 
-    async getResume(username) {
-        return this._makeRequest('GET', `/resume/${username}`);
+    async getResume(req, res) {
+        try {
+            const { username } = req.params;
+            const response = await this._makeRequest('GET', `/resume/${username}`);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    async deleteResume(username) {
-        return this._makeRequest('DELETE', `/resume/${username}`);
+    async deleteResume(req, res) {
+        try {
+            const { username } = req.params;
+            const response = await this._makeRequest('DELETE', `/resume/${username}`);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    async suggestResumeImprovements(username, feedback = '') {
-        return this._makeRequest('POST', `/resume/${username}/suggest_improvements`, { feedback });
+    async suggestResumeImprovements(req, res) {
+        try {
+            const { username } = req.params;
+            const response = await this._makeRequest('POST', `/resume/${username}/suggest_improvements`);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     // Job Operations
-    async getUserJobs(username) {
-        return this._makeRequest('GET', `/users/${username}/jobs`);
+    async getUserJobs(req, res) {
+        try {
+            const { username } = req.params;
+            const response = await this._makeRequest('GET', `/users/${username}/jobs`);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    async getJobSuggestions(username) {
-        return this._makeRequest('GET', `/api/jobs-suggestion/${username}`);
+    async getJobSuggestions(req, res) {
+        try {
+            const { username } = req.params;
+            const response = await this._makeRequest('GET', `/api/jobs-suggestion/${username}`);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     // Google Meet Integration
-    async createGoogleMeet(meetData) {
-        return this._makeRequest('POST', '/api/create-meet', meetData);
+    async createGoogleMeet(req, res) {
+        try {
+            const response = await this._makeRequest('POST', '/api/create-meet', req.body);
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     // Health Check
-    async checkHealth() {
-        return this._makeRequest('GET', '/health');
+    async checkHealth(req, res) {
+        try {
+            const response = await this._makeRequest('GET', '/health');
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
     // Google Auth
-    async getGoogleAuthUrl() {
-        return `${this.AI_SERVICE_URL}/api/auth/google`;
+    async getGoogleAuthUrl(req, res) {
+        try {
+            const authUrl = `${this.AI_SERVICE_URL}/api/auth/google`;
+            return res.json({ url: authUrl });
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 
-    async handleGoogleAuthCallback(code) {
-        return this._makeRequest('GET', '/auth/google/callback', null, { code });
+    async handleGoogleAuthCallback(req, res) {
+        try {
+            const { code } = req.query;
+            const response = await this._makeRequest('GET', '/auth/google/callback', null, { code });
+            if (response.success) {
+                return res.json(response.data);
+            } else {
+                return res.status(response.status || 500).json({ error: response.error });
+            }
+        } catch (error) {
+            return res.status(500).json({ error: error.message });
+        }
     }
 }
 

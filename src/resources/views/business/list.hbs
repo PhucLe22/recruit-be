@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách Doanh nghiệp</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Section */
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1f2937;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: none;
+        }
+
+        .page-header p {
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+
+        /* Search Bar */
+        .search-container {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            margin-bottom: 3rem;
+        }
+
+        .search-wrapper {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3.5rem;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 1.2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+        .filter-select {
+            padding: 1rem 2rem;
+            border: 2px solid #e0e7ff;
+            border-radius: 12px;
+            font-size: 1rem;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 200px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* View Toggle */
+        .view-toggle {
+            display: flex;
+            gap: 0.5rem;
+            background: #f3f4f6;
+            padding: 0.3rem;
+            border-radius: 10px;
+        }
+
+        .view-btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .view-btn.active {
+            background: white;
+            color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Business Grid */
+        .business-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .business-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .business-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            height: 120px;
+            position: relative;
+        }
+
+        .company-logo {
+            position: absolute;
+            bottom: -40px;
+            left: 1.5rem;
+            width: 80px;
+            height: 80px;
+            border-radius: 16px;
+            background: white;
+            padding: 0.5rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .verified-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255,255,255,0.25);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .card-body {
+            padding: 3rem 1.5rem 1.5rem;
+        }
+
+        .company-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+        }
+
+        .company-description {
+            color: #6b7280;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .location {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .location i {
+            color: #667eea;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .card-actions {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-icon {
+            width: 45px;
+            height: 45px;
+            padding: 0;
+            background: #f3f4f6;
+            color: #667eea;
+        }
+
+        .btn-icon:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            background: white;
+            border-radius: 20px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .empty-state i {
+            font-size: 5rem;
+            color: #e0e7ff;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            color: #6b7280;
+            margin-bottom: 2rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            list-style: none;
+        }
+
+        .pagination li {
+            display: inline-block;
+        }
+
+        .pagination a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 45px;
+            height: 45px;
+            background: white;
+            color: #667eea;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .pagination a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination .active a {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pagination .disabled a {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .pagination .disabled a:hover {
+            background: white;
+            color: #667eea;
+            transform: none;
+        }
+
+        @media (max-width: 768px) {
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .search-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .business-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-select {
+                min-width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <h1>Danh sách Doanh nghiệp</h1>
+            <p>Khám phá các công ty uy tín và cơ hội việc làm hấp dẫn</p>
+        </div>
+
+        <!-- Search and Filter -->
+        <div class="search-container">
+            <div class="search-wrapper">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Tìm kiếm công ty, vị trí, ngành nghề..." id="searchInput">
+                </div>
+                <select class="filter-select" id="locationFilter">
+                    <option value="">Tất cả địa điểm</option>
+                    <option value="hanoi">Hà Nội</option>
+                    <option value="hcmc">TP. Hồ Chí Minh</option>
+                    <option value="danang">Đà Nẵng</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Business Listings -->
+        {{#if list.length}}
+            <div class="business-grid" id="businessList">
+                {{#each list}}
+                    <div class="business-card">
+                        <div class="card-header">
+                            {{#if verified}}
+                                <div class="verified-badge">
+                                    <i class="fas fa-check-circle"></i>
+                                    Đã xác thực
+                                </div>
+                            {{/if}}
+                        </div>
+                        <div class="company-logo">
+                            <img src="{{logoUrl}}" alt="{{name}}">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="company-name">{{name}}</h3>
+                            <p class="company-description">{{description}}</p>
+                            <div class="location">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{location}}</span>
+                            </div>
+                            <div class="stats-grid">
+                                <div class="stat-box">
+                                    <div class="stat-value">{{jobCount}}</div>
+                                    <div class="stat-label">Việc làm</div>
+                                </div>
+                                <div class="stat-box">
+                                    <div class="stat-value">{{employeeCount}}</div>
+                                    <div class="stat-label">Nhân viên</div>
+                                </div>
+                            </div>
+                            <div class="card-actions">
+                                <a href="/businesses/{{id}}" class="btn btn-primary">
+                                    <i class="fas fa-eye"></i>
+                                    Xem chi tiết
+                                </a>
+                                <a href="/businesses/{{id}}/jobs" class="btn btn-icon">
+                                    <i class="fas fa-briefcase"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+        {{else}}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <i class="fas fa-building"></i>
+                <h3>Chưa có doanh nghiệp nào</h3>
+                <p>Hiện tại chưa có doanh nghiệp nào được đăng ký trên hệ thống.</p>
+                {{#unless user}}
+                    <a href="/auth/register" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Đăng ký doanh nghiệp
+                    </a>
+                {{/unless}}
+            </div>
+        {{/if}}
+
+        <!-- Pagination -->
+        <nav>
+            <ul class="pagination">
+                <li class="disabled">
+                    <a href="#"><i class="fas fa-chevron-left"></i></a>
+                </li>
+                <li class="active"><a href="#">1</a></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li>
+                    <a href="#"><i class="fas fa-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+
+    <script>
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const businessCards = document.querySelectorAll('.business-card');
+
+        function filterBusinesses() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const locationValue = locationFilter.value.toLowerCase();
+
+            businessCards.forEach(card => {
+                const companyName = card.querySelector('.company-name').textContent.toLowerCase();
+                const description = card.querySelector('.company-description').textContent.toLowerCase();
+                const location = card.querySelector('.location span').textContent.toLowerCase();
+
+                const matchesSearch = companyName.includes(searchTerm) || description.includes(searchTerm);
+                const matchesLocation = !locationValue || location.includes(locationValue);
+
+                if (matchesSearch && matchesLocation) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        searchInput.addEventListener('input', filterBusinesses);
+        locationFilter.addEventListener('change', filterBusinesses);
+    </script>
+</body>
+</html>

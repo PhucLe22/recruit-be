@@ -28,37 +28,43 @@ class UserJobController {
     // Trang hiển thị jobs đã ứng tuyển
     async appliedJobs(req, res, next) {
         try {
-            const userId = req.account.id;
+            // Use req.user directly since req.account should be set by middleware
+            const user = req.user || req.account;
+            if (!user || !user._id) {
+                return res.status(401).send('Unauthorized');
+            }
+            
+            const userId = user._id;
 
             // Lấy các jobs đã ứng tuyển với populate thông tin chi tiết
             // Thử tìm với ObjectId trước, nếu không có thì thử với String
-            let appliedJobs = await AppliedJob.find({ userId })
-                .populate('jobId')
-                .populate('businessId')
+            let appliedJobs = await AppliedJob.find({ user_id: userId })
+                .populate('job_id')
+                .populate('business_id')
                 .sort({ createdAt: -1 });
 
             if (appliedJobs.length === 0) {
                 appliedJobs = await AppliedJob.find({
-                    userId: userId.toString(),
+                    user_id: userId.toString(),
                 })
-                    .populate('jobId')
-                    .populate('businessId')
+                    .populate('job_id')
+                    .populate('business_id')
                     .sort({ createdAt: -1 });
             }
 
             // Lấy danh sách job đã lưu để so sánh (cũng thử cả hai cách)
-            let savedJobs = await SavedJob.find({ userId });
+            let savedJobs = await SavedJob.find({ user_id: userId });
             if (savedJobs.length === 0) {
-                savedJobs = await SavedJob.find({ userId: userId.toString() });
+                savedJobs = await SavedJob.find({ user_id: userId.toString() });
             }
             const savedJobIds = savedJobs.map((savedJob) =>
-                savedJob.jobId.toString(),
+                savedJob.job_id.toString(),
             );
 
             // Transform data cho template
             const transformedJobs = appliedJobs.map((appliedJob) => {
-                const job = appliedJob.jobId;
-                const business = appliedJob.businessId;
+                const job = appliedJob.job_id;
+                const business = appliedJob.business_id;
 
                 if (!job) {
                     return {
@@ -72,6 +78,7 @@ class UserJobController {
                 return {
                     ...appliedJob.toObject(),
                     jobTitle: job.title || 'Không có tiêu đề',
+                    slug: job.slug || '', // Add slug for job detail link
                     salary: job.salary || 'Thỏa thuận',
                     city: job.city || 'Không xác định',
                     type: job.type || 'Full-time',
@@ -106,15 +113,21 @@ class UserJobController {
     // Trang hiển thị jobs đã lưu
     async savedJobs(req, res, next) {
         try {
-            const userId = req.account.id;
+            // Use req.user directly since req.account should be set by middleware
+            const user = req.user || req.account;
+            if (!user || !user._id) {
+                return res.status(401).send('Unauthorized');
+            }
+            
+            const userId = user._id;
 
             // Lấy các jobs đã lưu với populate thông tin chi tiết
             // Thử tìm với ObjectId trước, nếu không có thì thử với String
-            let savedJobs = await SavedJob.find({ userId })
+            let savedJobs = await SavedJob.find({ user_id: userId })
                 .populate({
-                    path: 'jobId',
+                    path: 'job_id',
                     populate: {
-                        path: 'businessId',
+                        path: 'businessId', // Fixed: businessId not business_id
                         model: 'Business',
                     },
                 })
@@ -122,11 +135,11 @@ class UserJobController {
 
             // Nếu không tìm thấy với ObjectId, thử với String
             if (savedJobs.length === 0) {
-                savedJobs = await SavedJob.find({ userId: userId.toString() })
+                savedJobs = await SavedJob.find({ user_id: userId.toString() })
                     .populate({
-                        path: 'jobId',
+                        path: 'job_id',
                         populate: {
-                            path: 'businessId',
+                            path: 'businessId', // Fixed: businessId not business_id
                             model: 'Business',
                         },
                     })
@@ -134,19 +147,19 @@ class UserJobController {
             }
 
             // Lấy danh sách job đã ứng tuyển để so sánh (cũng thử cả hai cách)
-            let appliedJobs = await AppliedJob.find({ userId });
+            let appliedJobs = await AppliedJob.find({ user_id: userId });
             if (appliedJobs.length === 0) {
                 appliedJobs = await AppliedJob.find({
-                    userId: userId.toString(),
+                    user_id: userId.toString(),
                 });
             }
             const appliedJobIds = appliedJobs.map((appliedJob) =>
-                appliedJob.jobId.toString(),
+                appliedJob.job_id.toString(),
             );
 
             // Transform data cho template
             const transformedJobs = savedJobs.map((savedJob) => {
-                const job = savedJob.jobId;
+                const job = savedJob.job_id;
 
                 if (!job) {
                     return {
@@ -161,6 +174,7 @@ class UserJobController {
                 return {
                     ...savedJob.toObject(),
                     jobId: job._id, // Đảm bảo có jobId
+                    slug: job.slug || '', // Add slug for job detail and apply links
                     jobTitle: job.title || 'Không có tiêu đề',
                     salary: job.salary || 'Thỏa thuận',
                     city: job.city || 'Không xác định',
@@ -193,10 +207,16 @@ class UserJobController {
     // API để unsave job
     async unsaveJob(req, res, next) {
         try {
-            const userId = req.account.id;
+            // Use req.user directly since req.account should be set by middleware
+            const user = req.user || req.account;
+            if (!user || !user._id) {
+                return res.status(401).send('Unauthorized');
+            }
+            
+            const userId = user._id;
             const { jobId } = req.params;
 
-            await SavedJob.findOneAndDelete({ userId, jobId });
+            await SavedJob.findOneAndDelete({ user_id: userId, job_id: jobId });
 
             res.json({
                 success: true,

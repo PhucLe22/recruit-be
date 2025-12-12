@@ -117,6 +117,11 @@
         });
     </script>
 
+    <!-- Auth Token Refresh Script -->
+    {{#if user}}
+        <script src="/js/auth-refresh.js"></script>
+    {{/if}}
+
     <!-- Page-specific JavaScript -->
     {{#if scripts}}
         {{#each scripts}}

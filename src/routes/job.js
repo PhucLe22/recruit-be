@@ -38,9 +38,9 @@ function formatRelativeTime(date) {
 
 // Apply routes
 router.post('/apply/:slug', isLogin, applyController.apply);
-router.post('/save/:jobId', verifyToken, saveJobController.saveJob);
-router.delete('/save/:jobId', verifyToken, saveJobController.unsaveJob);
-router.get('/saved/:jobId', verifyToken, saveJobController.checkJobSaved);
+router.post('/save/:jobId', isLogin, saveJobController.saveJob);
+router.delete('/save/:jobId', isLogin, saveJobController.unsaveJob);
+router.get('/saved/:jobId', isLogin, saveJobController.checkJobSaved);
 router.get('/export-jobs', jobController.exportJobsForFaiss);
 router.get('/search', searchController.search);
 
