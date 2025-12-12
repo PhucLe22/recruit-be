@@ -178,10 +178,15 @@ app.engine(
                 let hash = 0;
                 for (let i = 0; i < str.length; i++) {
                     hash = str.charCodeAt(i) + ((hash << 5) - hash);
-                    pages.push(totalPages);
                 }
-
-                return pages;
+                
+                // Convert hash to hex color
+                let color = '#';
+                for (let i = 0; i < 3; i++) {
+                    const value = (hash >> (i * 8)) & 0xFF;
+                    color += ('00' + value.toString(16)).substr(-2);
+                }
+                return color;
             },
         },
     }),
@@ -190,6 +195,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Session configuration
 const sessionConfig = {
@@ -199,13 +205,16 @@ const sessionConfig = {
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+        maxAge: 3 * 60 * 60 * 1000 // 3 hours
     },
     store: new (require('connect-mongodb-session')(session))({
         uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/your-db-name',
         collection: 'sessions'
     })
 };
+
+// Cookie parser - MUST be before session
+app.use(cookieParser());
 
 // Session middleware
 app.use(session(sessionConfig));
@@ -232,9 +241,6 @@ app.use((req, res, next) => {
     next();
 });
 
-// Cookie parser
-app.use(cookieParser());
-
 // Method override
 app.use(methodOverride('_method'));
 
@@ -245,18 +251,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// Session configuration
-app.use(
-    session({
-        secret: process.env.SESSION_SECRET || 'your-secret-key',
-        resave: false,
-        saveUninitialized: false,
-        cookie: {
-            secure: false,
-            maxAge: 3 * 60 * 60 * 1000,
-        },
-    }),
-);
+// Session configuration - REMOVED DUPLICATE
+
+// Authentication middleware - must run before userDataMiddleware
+app.use(isLogin);
 
 // Make user data available in all views
 app.use(userDataMiddleware);
@@ -290,26 +288,9 @@ hbs.registerHelper('formatDate', function (date) {
     return `${day}/${month}/${year}`;
 });
 
-app.use(cookieParser());
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(methodOverride('_method'));
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources', 'views')); //_dirname == contextPath
 
-app.use(flash());
-// Middleware để đưa flash message vào res.locals
-app.use((req, res, next) => {
-    res.locals.messages = {
-        success: req.flash('success'),
-        error: req.flash('error'),
-    };
-    next();
-});
-
-app.use(isLogin);
 route(app);
 
 app.listen(port, () => {

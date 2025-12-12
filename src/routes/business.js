@@ -1,7 +1,44 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const upload = multer({ dest: 'uploads/' });
+const path = require('path');
+const fs = require('fs');
+
+// Ensure uploads/logos directory exists
+const logoUploadDir = path.join(__dirname, '../uploads/logos');
+if (!fs.existsSync(logoUploadDir)) {
+    fs.mkdirSync(logoUploadDir, { recursive: true });
+}
+
+// Configure multer for logo uploads
+const logoStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, logoUploadDir);
+    },
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname).toLowerCase();
+        cb(null, `logo-${uniqueSuffix}${ext}`);
+    }
+});
+
+// File filter for images only
+const logoFileFilter = (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (allowedTypes.includes(file.mimetype)) {
+        cb(null, true);
+    } else {
+        cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed'), false);
+    }
+};
+
+const upload = multer({ 
+    storage: logoStorage,
+    fileFilter: logoFileFilter,
+    limits: {
+        fileSize: 2 * 1024 * 1024 // 2MB limit
+    }
+});
 const Business = require('../app/models/Business');
 const { multipleMongooseToObject } = require('../util/mongoose');
 const { verifyToken, isBusiness } = require('../middlewares/verifyToken');

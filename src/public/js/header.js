@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Setup dropdowns
   dropdowns.forEach(function(dropdown) {
     const toggle = dropdown.querySelector('.dropdown-toggle');
+    let dropdownTimeout;
 
     if (toggle) {
       console.log('Setting up dropdown toggle');
@@ -61,8 +62,10 @@ document.addEventListener('DOMContentLoaded', function() {
         dropdown.classList.toggle('active');
       });
 
-      // Hover events - Show on hover, hide on mouse leave
+      // Hover events - Show on hover, hide on mouse leave with delay
       dropdown.addEventListener('mouseenter', function() {
+        clearTimeout(dropdownTimeout);
+        
         // Close all other dropdowns first
         dropdowns.forEach(function(d) {
           if (d !== dropdown) {
@@ -75,8 +78,25 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
       dropdown.addEventListener('mouseleave', function() {
-        dropdown.classList.remove('active');
+        // Add delay before closing to allow clicking on items
+        dropdownTimeout = setTimeout(function() {
+          dropdown.classList.remove('active');
+        }, 300); // 300ms delay
       });
+
+      // Keep dropdown open when hovering over the dropdown menu itself
+      const dropdownMenu = dropdown.querySelector('.dropdown-menu, .mega-menu, .user-menu');
+      if (dropdownMenu) {
+        dropdownMenu.addEventListener('mouseenter', function() {
+          clearTimeout(dropdownTimeout);
+        });
+
+        dropdownMenu.addEventListener('mouseleave', function() {
+          dropdownTimeout = setTimeout(function() {
+            dropdown.classList.remove('active');
+          }, 300);
+        });
+      }
     }
   });
 

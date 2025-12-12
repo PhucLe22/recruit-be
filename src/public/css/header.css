@@ -692,6 +692,7 @@
   display: flex;
   gap: 1rem;
   align-items: center;
+  margin-right: 150px; 
 }
 
 .auth-buttons {
@@ -832,27 +833,92 @@
   transform: translateY(-1px) scale(1.01);
 }
 
-.user-avatar {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+/* Beautiful Avatar Container */
+.avatar-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Enhanced User Avatar - Perfect Circle */
+.user-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid white;
+  box-shadow: 
+    0 4px 12px rgba(59, 130, 246, 0.2),
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: block;
+  overflow: hidden;
+}
+
+.user-avatar:hover {
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 
+    0 6px 20px rgba(59, 130, 246, 0.3),
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Beautiful Avatar Placeholder - Perfect Circle */
+.avatar-placeholder,
 .user-avatar-placeholder {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--primary-gradient);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  border: 3px solid white;
+  box-shadow: 
+    0 4px 12px rgba(139, 92, 246, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+.avatar-placeholder:hover {
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 
+    0 6px 20px rgba(139, 92, 246, 0.35),
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Online Status Indicator */
+.online-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 12px;
+  height: 12px;
+  background: linear-gradient(135deg, #10B981 0%, #059669 100%);
   border: 2px solid white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+  }
+  50% {
+    box-shadow: 0 2px 12px rgba(16, 185, 129, 0.6);
+  }
+  100% {
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.4);
+  }
 }
 
 .user-info {

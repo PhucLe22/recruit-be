@@ -1,8 +1,22 @@
 <!-- Header CSS -->
 <link href="/css/header.css" rel="stylesheet">
+
+<!-- Debug info - remove in production -->
+{{!-- <div style="display: block; background: yellow; padding: 10px; margin: 10px; border: 1px solid red;">
+  <h3>DEBUG INFO</h3>
+  <strong>isLogin:</strong> {{isLogin}}<br>
+  <strong>user:</strong> {{#if user}}{{user.name}} ({{user.email}}){{else}}No user{{/if}}<br>
+  <strong>userType:</strong> {{userType}}<br>
+  <strong>headerData.isAuthenticated:</strong> {{headerData.isAuthenticated}}<br>
+  <strong>session user:</strong> {{#if req.session.user}}Exists{{else}}None{{/if}}<br>
+  <strong>session business:</strong> {{#if req.session.business}}Exists{{else}}None{{/if}}<br>
+  <strong>cookies:</strong> {{#if req.cookies.accessToken}}Token exists{{else}}No token{{/if}}<br>
+  <strong>isLogin:</strong> {{isLogin}}<br> 
+</div> --}}
+
+<!-- Your existing header content -->
 <header class="header">
   <div class="header-container">
-    <!-- Enhanced Logo -->
     <a href="/" class="logo">
       <div class="logo-icon">
         <i class="fas fa-rocket"></i>
@@ -12,8 +26,6 @@
         <span class="logo-tagline">Việc làm cho mọi người</span>
       </div>
     </a>
-
-    <!-- Enhanced Navigation Menu -->
     <nav class="main-nav">
       <ul class="nav-menu">
         <!-- Jobs Mega Dropdown -->
@@ -183,54 +195,10 @@
 
     <!-- Auth Actions -->
     <div class="auth-actions">
-      <!-- User/Business Avatar Icon -->
-      <div class="header-avatar-icon">
-        {{#if isLogin}}
-          {{#if (eq userType 'user')}}
-            <!-- Logged in as regular user -->
-            <a href="/profile" class="avatar-link">
-              {{#if user.avatar}}
-                <img src="{{user.avatar}}" alt="{{user.name}}" class="header-avatar" onerror="this.onerror=null; this.src='/images/default-avatar.png';">
-              {{else}}
-                <div class="avatar-placeholder" style="background-color: {{randomColor user._id}};">
-                  {{#if user.name}}
-                    {{substring (uppercase user.name) 0 1}}
-                  {{else}}
-                    <i class="fas fa-user"></i>
-                  {{/if}}
-                </div>
-              {{/if}}
-            </a>
-          {{else if (eq userType 'business')}}
-            <!-- Logged in as business -->
-            <a href="/business/dashboard" class="avatar-link">
-              {{#if business.logoPath}}
-                <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="header-avatar" onerror="this.onerror=null; this.src='/images/default-company.png';">
-              {{else}}
-                <div class="avatar-placeholder" style="background-color: {{randomColor business._id}};">
-                  {{#if business.companyName}}
-                    {{substring (uppercase business.companyName) 0 1}}
-                  {{else}}
-                    <i class="fas fa-building"></i>
-                  {{/if}}
-                </div>
-              {{/if}}
-            </a>
-          {{/if}}
-        {{else}}
-          <!-- Not logged in -->
-          <a href="/auth/login" class="avatar-link" title="Đăng nhập">
-            <div class="avatar-placeholder" style="background-color: #e2e8f0;">
-              <i class="fas fa-user" style="color: #718096;"></i>
-            </div>
-          </a>
-        {{/if}}
-      </div>
-      
-{{#if isLogin}}
-  {{#if (eq userType 'user')}}
-    <!-- User is logged in - Show avatar with dropdown -->
-    <div class="user-dropdown">
+      {{#if isLogin}}
+        {{#if (eq userType 'user')}}
+          <!-- User dropdown -->
+          <div class="user-dropdown">
             <button class="user-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
               <div class="avatar-container">
                 {{#if user.avatar}}
@@ -303,9 +271,9 @@
             </a>
       </div>
     </div>
-  {{else if business}}
-        <!-- Business account is logged in - Show business avatar with dropdown -->
-        <div class="user-dropdown">
+  {{else if (eq userType 'business')}}
+          <!-- Business dropdown -->
+          <div class="user-dropdown">
           <button class="user-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Business menu">
             <div class="avatar-container">
               {{#if business.logoPath}}
@@ -372,8 +340,8 @@
         </div>
       {{/if}}
     {{else}}
-        <!-- User is not logged in - Show login/register buttons -->
-        <div class="auth-buttons">
+          <!-- Login/Register buttons -->
+          <div class="auth-buttons">
           <a href="/auth/login" class="btn btn-login">
             <i class="fas fa-sign-in-alt"></i>
             Đăng nhập
@@ -386,7 +354,7 @@
       {{/if}}
     </div>
 
-    <!-- Enhanced Mobile Menu Toggle -->
+    <!-- Mobile Menu Toggle -->
     <button class="mobile-menu-toggle">
       <div class="hamburger">
         <span></span>
@@ -398,122 +366,4 @@
 </header>
 
 <!-- Header Spacer -->
-<div class="header-spacer"></div>
-
-<script>
-  // Smooth Dropdown Interactions
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle dropdown hover with delay for smooth UX
-    const navItems = document.querySelectorAll('.nav-item');
-    let dropdownTimeout;
-    let currentActiveItem = null;
-
-    navItems.forEach(item => {
-      item.addEventListener('mouseenter', function() {
-        clearTimeout(dropdownTimeout);
-        
-        // Close previous dropdown immediately
-        if (currentActiveItem && currentActiveItem !== this) {
-          currentActiveItem.classList.remove('active');
-        }
-        
-        // Add active class for styling
-        this.classList.add('active');
-        currentActiveItem = this;
-      });
-
-      item.addEventListener('mouseleave', function() {
-        // Delay removal for smooth transition
-        dropdownTimeout = setTimeout(() => {
-          if (currentActiveItem === this) {
-            this.classList.remove('active');
-            currentActiveItem = null;
-          }
-        }, 200);
-      });
-    });
-
-    // Handle user dropdown click for mobile
-    const userDropdown = document.querySelector('.user-dropdown');
-    if (userDropdown) {
-      const userToggle = userDropdown.querySelector('.user-menu-toggle');
-      if (userToggle) {
-        userToggle.addEventListener('click', function(e) {
-          e.preventDefault();
-          e.stopPropagation(); // Prevent event from bubbling up to document
-          userDropdown.classList.toggle('active');
-          
-          // Close other dropdowns
-          navItems.forEach(item => {
-            if (item !== userDropdown) {
-              item.classList.remove('active');
-            }
-          });
-        });
-      }
-    }
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!e.target.closest('.nav-item') && !e.target.closest('.user-dropdown')) {
-        navItems.forEach(item => item.classList.remove('active'));
-        currentActiveItem = null;
-        if (userDropdown) {
-          userDropdown.classList.remove('active');
-        }
-      }
-    });
-
-    // Smooth scroll for dropdown links
-    const dropdownLinks = document.querySelectorAll('.dropdown-item, .mega-menu-link, .category-item');
-    dropdownLinks.forEach(link => {
-      link.addEventListener('click', function(e) {
-        // Add ripple effect
-        const ripple = document.createElement('span');
-        ripple.style.position = 'absolute';
-        ripple.style.borderRadius = '50%';
-        ripple.style.background = 'rgba(255, 255, 255, 0.6)';
-        ripple.style.width = '20px';
-        ripple.style.height = '20px';
-        ripple.style.pointerEvents = 'none';
-        ripple.style.animation = 'ripple 0.6s ease-out';
-        
-        const rect = this.getBoundingClientRect();
-        ripple.style.left = (e.clientX - rect.left) + 'px';
-        ripple.style.top = (e.clientY - rect.top) + 'px';
-        
-        this.style.position = 'relative';
-        this.style.overflow = 'hidden';
-        this.appendChild(ripple);
-        
-        setTimeout(() => ripple.remove(), 600);
-      });
-    });
-
-    // Add ripple animation
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes ripple {
-        to {
-          transform: scale(4);
-          opacity: 0;
-        }
-      }
-    `;
-    document.head.appendChild(style);
-
-    // Keyboard navigation for accessibility
-    const dropdownToggles = document.querySelectorAll('.dropdown-toggle');
-    dropdownToggles.forEach((toggle, index) => {
-      toggle.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          this.closest('.nav-item, .user-dropdown').classList.toggle('active');
-        }
-        if (e.key === 'Escape') {
-          this.closest('.nav-item, .user-dropdown').classList.remove('active');
-        }
-      });
-    });
-  });
-</script> 
+<div class="header-spacer"></div> 

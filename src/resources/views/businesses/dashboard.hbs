@@ -1,217 +1,138 @@
 {{! business/dashboard.hbs }}
 
-<div class="container-fluid">
-    <div class="row">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse">
-            <div class="position-sticky pt-3">
-                <div class="text-center mb-4">
-                    <h4 class="text-white">Business Dashboard</h4>
-                </div>
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link active text-white" href="#">
-                            <i class="fas fa-tachometer-alt me-2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/business/jobs-list">
-                            <i class="fas fa-briefcase me-2"></i> Jobs
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/business/applicants-list">
-                            <i class="fas fa-users me-2"></i> Applicants
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/business/profile-page">
-                            <i class="fas fa-user me-2"></i> Profile
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-white" href="/business/logout">
-                            <i class="fas fa-sign-out-alt me-2"></i> Logout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">Dashboard</h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <button type="button" class="btn btn-sm btn-outline-secondary me-2">
-                        <i class="fas fa-download me-1"></i> Export
-                    </button>
-                    <button type="button" class="btn btn-sm btn-primary">
-                        <i class="fas fa-plus me-1"></i> New Job
-                    </button>
-                </div>
-            </div>
-
-            <!-- Stats Cards -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-primary h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title">Active Jobs</h6>
-                                    <h2 class="mb-0">12</h2>
-                                </div>
-                                <i class="fas fa-briefcase fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-success h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title">New Applicants</h6>
-                                    <h2 class="mb-0">8</h2>
-                                </div>
-                                <i class="fas fa-user-plus fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-warning h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title">Interviews</h6>
-                                    <h2 class="mb-0">5</h2>
-                                </div>
-                                <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card text-white bg-info h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <h6 class="card-title">Profile Views</h6>
-                                    <h2 class="mb-0">124</h2>
-                                </div>
-                                <i class="fas fa-eye fa-2x opacity-50"></i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Activity and Quick Actions -->
-            <div class="row">
-                <!-- Recent Applications -->
-                <div class="col-md-8 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Recent Applications</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-hover">
-                                    <thead>
-                                        <tr>
-                                            <th>Name</th>
-                                            <th>Position</th>
-                                            <th>Applied</th>
-                                            <th>Status</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>John Doe</td>
-                                            <td>Senior Developer</td>
-                                            <td>2 hours ago</td>
-                                            <td><span class="badge bg-warning">Pending</span></td>
-                                            <td><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Jane Smith</td>
-                                            <td>UX Designer</td>
-                                            <td>5 hours ago</td>
-                                            <td><span class="badge bg-success">Approved</span></td>
-                                            <td><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
-                                        </tr>
-                                        <tr>
-                                            <td>Alex Johnson</td>
-                                            <td>Product Manager</td>
-                                            <td>1 day ago</td>
-                                            <td><span class="badge bg-danger">Rejected</span></td>
-                                            <td><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="col-md-4 mb-4">
-                    <div class="card h-100">
-                        <div class="card-header">
-                            <h5 class="card-title mb-0">Quick Actions</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-grid gap-2">
-                                <button class="btn btn-primary btn-lg mb-2">
-                                    <i class="fas fa-plus me-2"></i> Post New Job
-                                </button>
-                                <button class="btn btn-outline-secondary btn-lg mb-2">
-                                    <i class="fas fa-search me-2"></i> Browse Candidates
-                                </button>
-                                <button class="btn btn-outline-secondary btn-lg mb-2">
-                                    <i class="fas fa-envelope me-2"></i> Message Candidates
-                                </button>
-                                <button class="btn btn-outline-secondary btn-lg">
-                                    <i class="fas fa-cog me-2"></i> Account Settings
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<!-- Dashboard Header -->
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2">Dashboard</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <button type="button" class="btn btn-sm btn-outline-secondary me-2">
+            <i class="fas fa-download me-1"></i> Export
+        </button>
+        <button type="button" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus me-1"></i> New Job
+        </button>
     </div>
 </div>
 
-<!-- Add Font Awesome for icons -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<!-- Stats Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Active Jobs</h6>
+                        <h2 class="mb-0">{{stats.activeJobs}}</h2>
+                    </div>
+                    <i class="fas fa-briefcase fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">New Applicants</h6>
+                        <h2 class="mb-0">{{applicationStats.pending}}</h2>
+                    </div>
+                    <i class="fas fa-user-plus fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Interviews</h6>
+                        <h2 class="mb-0">{{applicationStats.shortlisted}}</h2>
+                    </div>
+                    <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card text-white bg-info h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title">Profile Views</h6>
+                        <h2 class="mb-0">{{stats.totalViews}}</h2>
+                    </div>
+                    <i class="fas fa-eye fa-2x opacity-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<!-- Add custom styles -->
-<style>
-    .sidebar {
-        min-height: 100vh;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    .nav-link {
-        border-radius: 5px;
-        margin-bottom: 5px;
-    }
-    .nav-link:hover {
-        background-color: rgba(255,255,255,0.1);
-    }
-    .nav-link.active {
-        background-color: rgba(255,255,255,0.2);
-    }
-    .card {
-        border: none;
-        border-radius: 10px;
-        box-shadow: 0 0 15px rgba(0,0,0,0.05);
-    }
-    .card-header {
-        background-color: #fff;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
-    }
-</style>
+<!-- Recent Activity and Quick Actions -->
+<div class="row">
+    <!-- Recent Applications -->
+    <div class="col-md-8 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Recent Applications</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Position</th>
+                                <th>Applied</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each recentApplications}}
+                            <tr>
+                                <td>{{user_id.fullName}}</td>
+                                <td>{{job_id.title}}</td>
+                                <td>{{applied_at}}</td>
+                                <td><span class="badge bg-warning">{{status}}</span></td>
+                                <td><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                            </tr>
+                            {{/each}}
+                            {{#unless recentApplications}}
+                            <tr>
+                                <td colspan="5" class="text-center text-muted">No recent applications</td>
+                            </tr>
+                            {{/unless}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="/business/jobs/new" class="btn btn-primary btn-lg mb-2">
+                        <i class="fas fa-plus me-2"></i> Post New Job
+                    </a>
+                    <a href="/business/applications" class="btn btn-outline-secondary btn-lg mb-2">
+                        <i class="fas fa-search me-2"></i> Browse Candidates
+                    </a>
+                    <a href="/business/messages" class="btn btn-outline-secondary btn-lg mb-2">
+                        <i class="fas fa-envelope me-2"></i> Message Candidates
+                    </a>
+                    <a href="/business/settings" class="btn btn-outline-secondary btn-lg">
+                        <i class="fas fa-cog me-2"></i> Account Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

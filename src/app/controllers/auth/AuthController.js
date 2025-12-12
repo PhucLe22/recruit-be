@@ -91,10 +91,6 @@ class AuthController {
           // Include any other business-specific fields
           ...(user.businessData ? { businessData: user.businessData } : {})
         };
-        return res.json({
-          success: true,
-          user: req.session.business
-        });
       } else {
         // For regular users
         req.session.user = {
@@ -107,10 +103,6 @@ class AuthController {
           avatar: user.avatar || '/images/default-avatar.png',
           ...(user.profile ? { profile: user.profile } : {})
         };
-        // return res.json({
-        //   success: true,
-        //   user: req.session.user
-        // }); 
       }
 
       // Generate and set tokens
@@ -119,10 +111,17 @@ class AuthController {
       const { accessToken, refreshToken } = await generateToken(user, userAgent, ipAddress);
       await setToken(req, res, { accessToken, refreshToken });
 
-      // Set success message and redirect
-      const redirectPath = isBusiness ? '/business/dashboard' : '/?login=success';
-      req.flash('success_msg', 'Đăng nhập thành công!');
-      return res.redirect(redirectPath);
+      // Explicitly save session before redirect
+      req.session.save((err) => {
+        if (err) {
+          console.error('Session save error:', err);
+        }
+        
+        // Set success message and redirect
+        const redirectPath = isBusiness ? '/business/dashboard' : '/?login=success';
+        req.flash('success_msg', 'Đăng nhập thành công!');
+        return res.redirect(redirectPath);
+      });
 
     } catch (error) {
       console.error('Login error:', error);

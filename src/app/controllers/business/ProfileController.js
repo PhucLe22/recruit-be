@@ -236,16 +236,16 @@ class ProfileController {
       }
 
       // Update logo path
-      business.logo = `/uploads/logos/${req.file.filename}`;
+      business.logoPath = `/uploads/logos/${req.file.filename}`;
       await business.save();
 
       // Update session
-      req.session.business.logo = business.logo;
+      req.session.business.logoPath = business.logoPath;
 
       res.json({
         success: true,
         message: 'Logo uploaded successfully',
-        logo: business.logo
+        logoPath: business.logoPath
       });
     } catch (error) {
       console.error('Upload logo error:', error);
@@ -277,10 +277,10 @@ class ProfileController {
       }
 
       // TODO: Delete actual file from filesystem
-      if (business.logo) {
+      if (business.logoPath) {
         const fs = require('fs');
         const path = require('path');
-        const logoPath = path.join(__dirname, '../../../public', business.logo);
+        const logoPath = path.join(__dirname, '../../../public', business.logoPath);
         
         try {
           if (fs.existsSync(logoPath)) {
@@ -292,11 +292,11 @@ class ProfileController {
       }
 
       // Remove logo from database
-      business.logo = null;
+      business.logoPath = null;
       await business.save();
 
       // Update session
-      req.session.business.logo = null;
+      req.session.business.logoPath = null;
 
       res.json({
         success: true,

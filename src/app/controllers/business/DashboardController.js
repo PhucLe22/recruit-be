@@ -78,7 +78,8 @@ class DashboardController {
       });
 
       res.render('businesses/dashboard', {
-        layout: 'main',
+        layout: 'business',
+        business: req.session.business,
         stats,
         applicationStats: appStats,
         recentApplications,

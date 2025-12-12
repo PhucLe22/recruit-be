@@ -33,39 +33,51 @@ const extractToken = (req) => {
 
 const isLogin = (req, res, next) => {
   try {
+    console.log('=== isLogin middleware DEBUG ===');
+    console.log('Session user:', req.session?.user);
+    console.log('Session business:', req.session?.business);
+    console.log('Cookies:', req.cookies);
+    console.log('Auth header:', req.headers.authorization);
+    
     // Check session first (faster than JWT verification)
     if (req.session?.user) {
+      console.log('Found user in session');
       setRequestUser(req, req.session.user, 'user');
-      // return res.json("Found user in session:", req.session.user);
-      // return next();
+      return next();
     }
     if (req.session?.business) {
+      console.log('Found business in session');
       setRequestUser(req, req.session.business, 'business');
-      // return res.json("Found business in session:", req.session.business);
-      // return next();
+      return next();
     }
+    
     const token = extractToken(req) || null;
+    console.log('Extracted token:', token ? 'exists' : 'none');
+    
     if (!token) {
-      // return next();
-      return res.json('No token found', token);
+      console.log('No token found, proceeding as guest');
+      setGuestUser(req);
+      return next();
     }
     else {
       const decoded = verifyJwtToken(token);
+      console.log('Token decoded:', decoded ? 'success' : 'failed');
+      
       if (decoded) {
         setRequestUser(req, decoded, decoded.isBusiness ? 'business' : 'user');
+        console.log('User set from token, isLogin:', req.isLogin);
+        console.log('User data:', req.user);
         return next();
       }
       else {
-        return res.json('Token is invalid', token);
+        console.log('Token invalid, setting as guest');
+        setGuestUser(req);
+        return next();
       }
     }
-    // No valid session or token found
-    setGuestUser(req);
-    return next();
   } catch (error) {
     console.error('Authentication error:', error);
     setGuestUser(req);
-    // return res.json("Authentication error:", error);
     return next();
   }
 };
@@ -181,9 +193,10 @@ const requireAdmin = (req, res, next) => {
   next();
 };
 
-const makeUserDataAvailable = (req, res, next) => {
-  // Ensure headerData is set
-  if (!req.headerData) {
+const makeUserDataAvailable = (req, res, next) => {  
+  // Only set guest user if no authentication data exists at all
+  if (!req.headerData && !req.user && !req.isLogin) {
+    console.log('No auth data found, setting guest user');
     setGuestUser(req);
   }
   
@@ -197,6 +210,10 @@ const makeUserDataAvailable = (req, res, next) => {
   res.user = req.user;
   res.isLogin = req.isLogin;
   res.userType = req.userType;
+  
+  // Backward compatibility - set req.account to match existing codebase expectations
+  req.account = req.user;
+  res.account = req.user;
   
   next();
 };
