@@ -38,19 +38,93 @@
 
 <!-- Profile Content -->
 <div class="row">
+    <!-- CV Upload Section -->
+    <div class="col-12 mb-4">
+        <!-- Debug: Business data check -->
+        {{#if business}}
+        <div class="alert alert-info" style="margin-bottom: 10px;">
+            <small>Debug: Business found - {{business.companyName}} | CV Path: {{business.cvPath}}</small>
+        </div>
+        {{else}}
+        <div class="alert alert-warning" style="margin-bottom: 10px;">
+            <small>Debug: No business data found</small>
+        </div>
+        {{/if}}
+        
+        <div class="card shadow-sm border-primary">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    CV Management
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <div class="cv-info">
+                            {{#if business.cvPath}}
+                            <div class="cv-item d-flex align-items-center">
+                                <i class="fas fa-file-pdf text-danger me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <div class="cv-filename fw-bold">{{business.cvFilename || 'CV Document'}}</div>
+                                    <small class="text-muted">Uploaded: {{business.cvUploadedAt}}</small>
+                                </div>
+                            </div>
+                            {{else}}
+                            <div class="cv-placeholder text-muted d-flex align-items-center">
+                                <i class="fas fa-upload me-3" style="font-size: 1.5rem;"></i>
+                                <div>
+                                    <div class="fw-bold">No CV uploaded yet</div>
+                                    <small>Upload your CV to enhance your business profile</small>
+                                </div>
+                            </div>
+                            {{/if}}
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        {{#if business.cvPath}}
+                        <button class="btn btn-outline-primary btn-sm me-2" id="viewCVBtn">
+                            <i class="fas fa-eye me-1"></i>
+                            View CV
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" id="deleteCVBtn">
+                            <i class="fas fa-trash me-1"></i>
+                            Delete
+                        </button>
+                        {{else}}
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#cvUploadModal">
+                            <i class="fas fa-upload me-1"></i>
+                            Upload CV
+                        </button>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Company Info Card -->
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="d-flex align-items-center mb-4">
                     <div class="company-logo-container me-3">
-                        {{#if business.logoPath}}
-                        <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="company-logo">
-                        {{else}}
-                        <div class="company-logo-placeholder">
-                            <i class="fas fa-building"></i>
+                        <div class="logo-wrapper" id="logoClickArea">
+                            {{#if business.logoPath}}
+                            <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="company-logo" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="company-logo-placeholder" style="display: none;">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            {{else}}
+                            <div class="company-logo-placeholder">
+                                <i class="fas fa-building"></i>
+                            </div>
+                            {{/if}}
+                            <div class="logo-overlay">
+                                <i class="fas fa-camera"></i>
+                                <span>Thay đổi logo</span>
+                            </div>
                         </div>
-                        {{/if}}
                     </div>
                     <div class="flex-grow-1">
                         <h4 class="mb-1">{{business.companyName}}</h4>
@@ -268,6 +342,71 @@
     </div>
 </div>
 
+<!-- CV Upload Modal -->
+<div class="modal fade" id="cvUploadModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    Upload CV
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="cvUploadForm" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select CV File</label>
+                        <input type="file" class="form-control" name="file" accept=".pdf,.doc,.docx" required>
+                        <div class="form-text">Accepted formats: PDF, DOC, DOCX. Maximum file size: 5MB.</div>
+                    </div>
+                    <div class="cv-upload-preview" id="cvUploadPreview" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-file-pdf me-2"></i>
+                            <span id="cvFileName"></span>
+                            <span class="text-muted ms-2" id="cvFileSize"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadCVBtn">
+                        <i class="fas fa-upload me-2"></i>
+                        Upload CV
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- CV View Modal -->
+<div class="modal fade" id="cvViewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-eye me-2"></i>
+                    View CV
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="cv-viewer-container">
+                    <iframe id="cvViewer" style="width: 100%; height: 600px; border: none;"></iframe>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="#" id="downloadCVLink" class="btn btn-primary" download>
+                    <i class="fas fa-download me-2"></i>
+                    Download CV
+                </a>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Logo Upload Modal -->
 <div class="modal fade" id="logoModal" tabindex="-1">
     <div class="modal-dialog">
@@ -281,18 +420,24 @@
             </div>
             <form id="logoUploadForm" enctype="multipart/form-data">
                 <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <div class="logo-upload-preview">
+                            <img src="{{#if business.logoPath}}{{business.logoPath}}{{else}}/images/default-company-logo.png{{/if}}" 
+                                 id="logoPreview" 
+                                 alt="Logo Preview" 
+                                 class="img-fluid rounded"
+                                 style="max-width: 200px; max-height: 200px; border: 2px solid #e9ecef;">
+                        </div>
+                    </div>
                     <div class="mb-3">
                         <label class="form-label">Chọn file logo</label>
-                        <input type="file" class="form-control" name="logo" accept="image/*" required>
-                        <div class="form-text">Chấp nhận các định dạng: JPG, PNG, GIF. Tối đa 5MB.</div>
-                    </div>
-                    <div class="text-center">
-                        <div id="logoPreview" class="logo-preview"></div>
+                        <input type="file" class="form-control" name="logo" accept="image/*" id="logoInput">
+                        <div class="form-text">Chấp nhận các định dạng: JPG, PNG, GIF, WebP. Tối đa 2MB.</div>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="uploadLogoBtn">
                         <i class="fas fa-upload me-2"></i>
                         Tải lên
                     </button>
@@ -327,12 +472,29 @@
     position: relative;
 }
 
+.logo-wrapper {
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.logo-wrapper:hover .logo-overlay {
+    opacity: 1;
+}
+
+.logo-wrapper:hover .company-logo,
+.logo-wrapper:hover .company-logo-placeholder {
+    transform: scale(1.05);
+    filter: brightness(0.8);
+}
+
 .company-logo {
     width: 100px;
     height: 100px;
     border-radius: 10px;
     object-fit: cover;
     border: 3px solid #e9ecef;
+    transition: all 0.3s ease;
 }
 
 .company-logo-placeholder {
@@ -345,6 +507,34 @@
     justify-content: center;
     font-size: 2rem;
     color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.logo-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.logo-overlay i {
+    font-size: 1.5rem;
+    margin-bottom: 5px;
+}
+
+.logo-overlay span {
+    font-size: 0.8rem;
+    font-weight: 500;
 }
 
 .company-actions {
@@ -426,12 +616,150 @@
 </style>
 
 <script>
+// CV Upload functionality
+document.getElementById('cvUploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = document.getElementById('uploadCVBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+    
+    try {
+        const response = await fetch('/cv/assistant-upload', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('cvUploadModal')).hide();
+            // Show success message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${result.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.page-header').after(alertDiv);
+            
+            // Reload page after a short delay to show updated CV
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
+        } else {
+            // Show error message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${result.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.page-header').after(alertDiv);
+        }
+    } catch (error) {
+        console.error('CV upload error:', error);
+        // Show error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Error uploading CV. Please try again.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.page-header').after(alertDiv);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+
+// CV file preview
+document.querySelector('input[name="file"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('cvUploadPreview');
+    const fileName = document.getElementById('cvFileName');
+    const fileSize = document.getElementById('cvFileSize');
+    
+    if (file) {
+        // Validate file size
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size cannot exceed 5MB');
+            this.value = '';
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Only PDF, DOC, and DOCX files are allowed');
+            this.value = '';
+            return;
+        }
+        
+        // Show preview
+        fileName.textContent = file.name;
+        fileSize.textContent = `(${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+        preview.style.display = 'block';
+    } else {
+        preview.style.display = 'none';
+    }
+});
+
+// View CV functionality
+document.getElementById('viewCVBtn')?.addEventListener('click', function() {
+    const cvPath = '{{business.cvPath}}';
+    if (cvPath) {
+        const cvViewer = document.getElementById('cvViewer');
+        const downloadLink = document.getElementById('downloadCVLink');
+        
+        cvViewer.src = cvPath;
+        downloadLink.href = cvPath;
+        
+        const cvViewModal = new bootstrap.Modal(document.getElementById('cvViewModal'));
+        cvViewModal.show();
+    }
+});
+
+// Delete CV functionality
+document.getElementById('deleteCVBtn')?.addEventListener('click', async function() {
+    if (confirm('Are you sure you want to delete this CV?')) {
+        try {
+            const response = await fetch('/business/delete-cv', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + result.message);
+            }
+        } catch (error) {
+            console.error('Delete CV error:', error);
+            alert('Error occurred while deleting CV');
+        }
+    }
+});
+
+// Make logo clickable to trigger upload modal
+document.getElementById('logoClickArea').addEventListener('click', function() {
+    const logoModal = new bootstrap.Modal(document.getElementById('logoModal'));
+    logoModal.show();
+});
+
 // Logo upload functionality
 document.getElementById('logoUploadForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     
     const formData = new FormData(this);
-    const submitBtn = this.querySelector('button[type="submit"]');
+    const submitBtn = document.getElementById('uploadLogoBtn');
     const originalText = submitBtn.innerHTML;
     
     submitBtn.disabled = true;
@@ -447,12 +775,42 @@ document.getElementById('logoUploadForm').addEventListener('submit', async funct
         
         if (result.success) {
             bootstrap.Modal.getInstance(document.getElementById('logoModal')).hide();
-            location.reload();
+            // Show success message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-check-circle me-2"></i>
+                ${result.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.page-header').after(alertDiv);
+            
+            // Reload page after a short delay to show updated logo
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         } else {
-            alert('Lỗi: ' + result.message);
+            // Show error message
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+            alertDiv.innerHTML = `
+                <i class="fas fa-exclamation-circle me-2"></i>
+                ${result.message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            document.querySelector('.page-header').after(alertDiv);
         }
     } catch (error) {
-        alert('Đã xảy ra lỗi khi tải lên logo');
+        console.error('Logo upload error:', error);
+        // Show error message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            <i class="fas fa-exclamation-circle me-2"></i>
+            Đã xảy ra lỗi khi tải lên logo. Vui lòng thử lại.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.querySelector('.page-header').after(alertDiv);
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
@@ -460,23 +818,36 @@ document.getElementById('logoUploadForm').addEventListener('submit', async funct
 });
 
 // Logo preview
-document.querySelector('input[name="logo"]').addEventListener('change', function(e) {
+document.getElementById('logoInput').addEventListener('change', function(e) {
     const file = e.target.files[0];
     const preview = document.getElementById('logoPreview');
     
     if (file) {
+        // Validate file size
+        if (file.size > 2 * 1024 * 1024) {
+            alert('File không được vượt quá 2MB');
+            this.value = '';
+            return;
+        }
+        
+        // Validate file type
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            alert('Chỉ chấp nhận file ảnh (JPEG, PNG, GIF, WebP)');
+            this.value = '';
+            return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
-            preview.innerHTML = `<img src="${e.target.result}" alt="Logo preview">`;
+            preview.src = e.target.result;
         };
         reader.readAsDataURL(file);
-    } else {
-        preview.innerHTML = '';
     }
 });
 
 // Delete logo
-document.getElementById('deleteLogoBtn').addEventListener('click', async function() {
+document.getElementById('deleteLogoBtn')?.addEventListener('click', async function() {
     if (confirm('Bạn có chắc chắn muốn xóa logo này?')) {
         try {
             const response = await fetch('/business/delete-logo', {
@@ -491,6 +862,7 @@ document.getElementById('deleteLogoBtn').addEventListener('click', async functio
                 alert('Lỗi: ' + result.message);
             }
         } catch (error) {
+            console.error('Delete logo error:', error);
             alert('Đã xảy ra lỗi khi xóa logo');
         }
     }

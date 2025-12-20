@@ -58,8 +58,8 @@ class UserController{
                 return res.redirect('/');
             }
 
-            // Get latest assessment results
-            const [mbtiResult, bigFiveResult, discResult] = await Promise.all([
+            // Get latest assessment results and CV data
+            const [mbtiResult, bigFiveResult, discResult, cvData] = await Promise.all([
                 MBTIAssessment.findOne({ userId })
                     .sort({ createdAt: -1 })
                     .lean(),
@@ -68,6 +68,9 @@ class UserController{
                     .lean(),
                 DISCAssessment.findOne({ userId })
                     .sort({ createdAt: -1 })
+                    .lean(),
+                require('../../models/CV').findOne({ user_id: userId })
+                    .sort({ uploaded_at: -1 })
                     .lean()
             ]);
 
@@ -80,7 +83,15 @@ class UserController{
                     bigFive: bigFiveResult ? this.formatBigFiveResult(bigFiveResult) : null,
                     disc: discResult ? this.formatDISResult(discResult) : null
                 },
-                hasAssessments: !!(mbtiResult || bigFiveResult || discResult)
+                hasAssessments: !!(mbtiResult || bigFiveResult || discResult),
+                cvData: cvData ? {
+                    hasCV: true,
+                    uploadedAt: cvData.uploaded_at,
+                    filename: cvData.filename || 'CV Document',
+                    message: cvData.message
+                } : {
+                    hasCV: false
+                }
             };
 
             res.render('users/profile', {

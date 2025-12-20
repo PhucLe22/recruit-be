@@ -194,7 +194,14 @@
                     <div class="business-avatar position-relative">
                         {{#if business}}
                             {{#if business.logoPath}}
-                                <img src="/uploads{{business.logoPath}}" alt="{{business.companyName}}" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #fff;" onerror="this.onerror=null; this.style.display='none'; this.parentNode.innerHTML='<div class=\'avatar-placeholder rounded-circle mb-3\' style=\'width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;\'><i class=\'fas fa-building\'></i></div>';">
+                                <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="rounded-circle mb-3" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #fff;" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                <div class="avatar-placeholder rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold; display: none;">
+                                    {{#if business.companyName}}
+                                        {{substring (uppercase business.companyName) 0 1}}
+                                    {{else}}
+                                        <i class="fas fa-building"></i>
+                                    {{/if}}
+                                </div>
                             {{else}}
                                 <div class="avatar-placeholder rounded-circle mb-3" style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
                                     {{#if business.companyName}}
@@ -219,7 +226,7 @@
                         </div>
                     </div>
                     <h4 class="text-white mb-1">{{#if business}}{{business.companyName}}{{else}}Business Panel{{/if}}</h4>
-                    <small class="text-muted">{{#if business}}{{business.email}}{{else}}Manage your business{{/if}}</small>
+                    <small class="text-muted">{{#if business}}{{business.companyName}}{{else}}Manage your business{{/if}}</small>
                 </div>
                 
                 <!-- Navigation Menu -->

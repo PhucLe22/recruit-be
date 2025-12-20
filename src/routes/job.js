@@ -117,8 +117,8 @@ router.get('/search-results', async (req, res, next) => {
             sorted: formattedJobs,
             keyword: searchQuery || '', // Ensure empty string if no search query
             totalCount: results.totalResults || results.jobs?.length || 0,
-            currentPage: results.pagination?.currentPage || results.currentPage || 1,
-            totalPages: results.pagination?.totalPages || results.totalPages || 1,
+            currentPage: parseInt(results.pagination?.currentPage || results.currentPage || 1),
+            totalPages: parseInt(results.pagination?.totalPages || results.totalPages || 1),
             hasMore: results.pagination?.hasNextPage || results.hasMore || false,
             filters: filters,
             sortBy: sortBy,

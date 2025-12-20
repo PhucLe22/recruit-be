@@ -3,14 +3,18 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const businessDataMiddleware = require('../middlewares/businessDataMiddleware');
 const userProfileController = require('../app/controllers/business/UserProfileController');
 const detailApplicantController = require('../app/controllers/business/DetailApplicantController');
 const profileViewsController = require('../app/controllers/business/ProfileViewsController');
 const jobsController = require('../app/controllers/business/JobsController');
 const jobDetailController = require('../app/controllers/business/JobDetailController');
 
+// Apply business data middleware to all routes
+router.use(businessDataMiddleware);
+
 // Ensure uploads/logos directory exists
-const logoUploadDir = path.join(__dirname, '../uploads/logos');
+const logoUploadDir = path.join(__dirname, '../public/uploads/logos');
 if (!fs.existsSync(logoUploadDir)) {
     fs.mkdirSync(logoUploadDir, { recursive: true });
 }
@@ -122,15 +126,14 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-router.get('/profile', verifyToken, profileController.showProfile);
-router.post('/profile/edit', verifyToken, profileController.updateProfile);
+router.get('/profile', isBusiness, profileController.showProfile);
+router.post('/profile/edit', isBusiness, profileController.updateProfile);
 router.post('/job/create', isBusiness, jobCreateController.createJob);
 router.post('/login', loginController.login);
 router.get('/logout', businessLoginController.logout);
 // Registration routes
 router.get('/register', registerController.showRegisterPage);
 router.post('/register/step1', registerController.showRegisterPage);
-router.post('/register/step2', upload.single('logo'), registerController.register);
 router.post('/register/submit', registerController.register);
 router.post(
     '/register-direct',
@@ -139,10 +142,15 @@ router.post(
 );
 router.post(
     '/upload-logo',
+    isBusiness,
     upload.single('logo'),
     profileController.uploadLogo,
 );
-router.get('/applications', isBusiness, detailApplicantController.detail);
+router.post('/delete-logo', isBusiness, profileController.deleteLogo);
+
+// CV Management Routes
+router.post('/delete-cv', isBusiness, profileController.deleteCV);
+
 router.get('/applications', isBusiness, detailApplicantController.detail);
 router.get('/jobs-list', verifyToken, businessController.jobList);
 router.get('/jobs', isBusiness, businessController.jobList);
@@ -166,14 +174,7 @@ router.get('/applicant/cv/:id', verifyToken, (req, res, next) => {
     SchelduleController.viewCV(req, res, next);
 });
 
-router.get('/upload-logo-page', verifyToken, (req, res, next) => {
-    try {
-        res.render('business/uploadLogo');
-    } catch (error) {
-        next(error);
-    }
-});
-// Public business list route (no authentication required)
+// Business list route (public)
 router.get('/list', async (req, res, next) => {
     try {
         // const business = await Business.find({});

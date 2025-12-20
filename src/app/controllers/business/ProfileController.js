@@ -1,3 +1,5 @@
+const fs = require('fs');
+const path = require('path');
 const Business = require('../../../app/models/Business');
 const Job = require('../../../app/models/Job');
 
@@ -5,11 +7,11 @@ class ProfileController {
   // Show profile page
   async showProfile(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.redirect('/business/login');
       }
 
-      const businessId = req.session.business._id;
+      const businessId = req.user.id || req.user._id;
       const errors = req.session.errors || [];
       const success = req.session.success || '';
       
@@ -50,11 +52,11 @@ class ProfileController {
   // Update profile
   async updateProfile(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.redirect('/business/login');
       }
 
-      const businessId = req.session.business._id;
+      const businessId = req.user.id || req.user._id;
       const {
         companyName,
         phone,
@@ -73,7 +75,7 @@ class ProfileController {
         errors.push('Tên công ty phải có ít nhất 2 ký tự');
       }
 
-      if (website && !this.isValidUrl(website)) {
+      if (website && !ProfileController.isValidUrl(website)) {
         errors.push('Website không hợp lệ');
       }
 
@@ -111,8 +113,10 @@ class ProfileController {
 
       await business.save();
 
-      // Update session
-      req.session.business.companyName = business.companyName;
+      // Update session if using session-based auth
+      if (req.session.business) {
+        req.session.business.companyName = business.companyName;
+      }
 
       req.session.success = 'Cập nhật hồ sơ thành công!';
       res.redirect('/business/profile');
@@ -126,7 +130,7 @@ class ProfileController {
   // Show change password page
   showChangePasswordPage(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.redirect('/business/login');
       }
 
@@ -155,7 +159,7 @@ class ProfileController {
   // Change password
   async changePassword(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.redirect('/business/login');
       }
 
@@ -181,7 +185,7 @@ class ProfileController {
         return res.redirect('/business/change-password');
       }
 
-      const business = await Business.findById(req.session.business._id);
+      const business = await Business.findById(req.user.id || req.user._id);
       
       if (!business) {
         req.session.errors = ['Không tìm thấy thông tin công ty'];
@@ -212,7 +216,7 @@ class ProfileController {
   // Upload logo
   async uploadLogo(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
@@ -222,36 +226,108 @@ class ProfileController {
       if (!req.file) {
         return res.status(400).json({
           success: false,
-          message: 'No file uploaded'
+          message: 'Please select a logo file'
         });
       }
 
-      const business = await Business.findById(req.session.business._id);
+      // Additional file validation
+      const file = req.file;
+      const allowedMimes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
       
-      if (!business) {
-        return res.status(404).json({
+      if (!allowedMimes.includes(file.mimetype)) {
+        // Delete the uploaded file if it's not a valid image
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+        
+        return res.status(400).json({
           success: false,
-          message: 'Business not found'
+          message: 'Only image files (jpeg, jpg, png, gif, webp) are allowed'
         });
       }
 
-      // Update logo path
-      business.logoPath = `/uploads/logos/${req.file.filename}`;
-      await business.save();
+      // Check file size (additional validation)
+      const maxSize = 2 * 1024 * 1024; // 2MB for logos
+      if (file.size > maxSize) {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+        
+        return res.status(400).json({
+          success: false,
+          message: 'Logo file size cannot exceed 2MB'
+        });
+      }
 
-      // Update session
-      req.session.business.logoPath = business.logoPath;
+      const businessId = req.user.id || req.user._id;
+      const logoPath = `/uploads/logos/${file.filename}`;
 
-      res.json({
-        success: true,
-        message: 'Logo uploaded successfully',
-        logoPath: business.logoPath
-      });
+      try {
+        // Get old logo to delete it later
+        const oldBusiness = await Business.findById(businessId).select('logoPath');
+        
+        // Update business's logo in database
+        const business = await Business.findByIdAndUpdate(
+          businessId,
+          { $set: { logoPath } },
+          { new: true, runValidators: true }
+        );
+
+        if (!business) {
+          return res.status(404).json({
+            success: false,
+            message: 'Business not found'
+          });
+        }
+
+        // Delete old logo file if it exists and is not default
+        if (oldBusiness && oldBusiness.logoPath && 
+            fs.existsSync(path.join(__dirname, '../../../public', oldBusiness.logoPath))) {
+          fs.unlinkSync(path.join(__dirname, '../../../public', oldBusiness.logoPath));
+        }
+
+        // Update session if using session-based auth
+        if (req.session.business) {
+          req.session.business.logoPath = logoPath;
+        }
+
+        res.json({
+          success: true,
+          message: 'Logo uploaded successfully',
+          logoPath: logoPath
+        });
+
+      } catch (dbError) {
+        // If database update fails, delete the uploaded file
+        console.error('Database error during logo upload:', dbError);
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+        
+        throw dbError;
+      }
+
     } catch (error) {
       console.error('Upload logo error:', error);
+      
+      // Handle multer errors specifically
+      if (error.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({
+          success: false,
+          message: 'Logo file size cannot exceed 2MB'
+        });
+      }
+      
+      if (error.code === 'LIMIT_FILE_COUNT') {
+        return res.status(400).json({
+          success: false,
+          message: 'Only one logo file can be uploaded'
+        });
+      }
+      
       res.status(500).json({
         success: false,
-        message: 'Error uploading logo',
+        message: 'Error uploading logo. Please try again.',
         error: error.message
       });
     }
@@ -260,14 +336,14 @@ class ProfileController {
   // Delete logo
   async deleteLogo(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.user) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
         });
       }
 
-      const business = await Business.findById(req.session.business._id);
+      const business = await Business.findById(req.user.id || req.user._id);
       
       if (!business) {
         return res.status(404).json({
@@ -278,8 +354,6 @@ class ProfileController {
 
       // TODO: Delete actual file from filesystem
       if (business.logoPath) {
-        const fs = require('fs');
-        const path = require('path');
         const logoPath = path.join(__dirname, '../../../public', business.logoPath);
         
         try {
@@ -295,8 +369,10 @@ class ProfileController {
       business.logoPath = null;
       await business.save();
 
-      // Update session
-      req.session.business.logoPath = null;
+      // Update session if using session-based auth
+      if (req.session.business) {
+        req.session.business.logoPath = null;
+      }
 
       res.json({
         success: true,
@@ -312,8 +388,79 @@ class ProfileController {
     }
   }
 
-  // Helper method to validate URL
-  isValidUrl(string) {
+  async deleteCV(req, res) {
+    try {
+      if (!req.user) {
+        return res.status(401).json({
+          success: false,
+          message: 'Authentication required'
+        });
+      }
+
+      const businessId = req.user.id || req.user._id;
+
+      try {
+        // Get business to find CV path
+        const business = await Business.findById(businessId);
+        
+        if (!business) {
+          return res.status(404).json({
+            success: false,
+            message: 'Business not found'
+          });
+        }
+
+        // Delete CV file if it exists
+        if (business.cvPath) {
+          const cvFilePath = path.join(__dirname, '../../../public', business.cvPath);
+          
+          try {
+            if (fs.existsSync(cvFilePath)) {
+              fs.unlinkSync(cvFilePath);
+            }
+          } catch (fileError) {
+            console.error('Error deleting CV file:', fileError);
+          }
+        }
+
+        // Update business to remove CV information
+        await Business.findByIdAndUpdate(
+          businessId,
+          { 
+            $unset: { 
+              cvPath: 1, 
+              cvFilename: 1, 
+              cvUploadedAt: 1 
+            } 
+          },
+          { new: true, runValidators: true }
+        );
+
+        res.json({
+          success: true,
+          message: 'CV deleted successfully'
+        });
+
+      } catch (dbError) {
+        console.error('Database error during CV deletion:', dbError);
+        return res.status(500).json({
+          success: false,
+          message: 'Error deleting CV. Please try again.',
+          error: dbError.message
+        });
+      }
+
+    } catch (error) {
+      console.error('Delete CV error:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error deleting CV. Please try again.',
+        error: error.message
+      });
+    }
+  }
+
+  static isValidUrl(string) {
     try {
       new URL(string);
       return true;

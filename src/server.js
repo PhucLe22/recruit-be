@@ -301,6 +301,24 @@ hbs.registerHelper('formatISODate', function (date) {
     return `${year}-${month}-${day}`;
 });
 
+// Register additional helpers
+hbs.registerHelper('eq', (a, b) => a === b);
+hbs.registerHelper('gt', (a, b) => a > b);
+hbs.registerHelper('lt', (a, b) => a < b);
+hbs.registerHelper('sub', (a, b) => a - b);
+hbs.registerHelper('add', (a, b) => a + b);
+hbs.registerHelper('paginationRange', (currentPage, totalPages) => {
+    const range = [];
+    const start = Math.max(1, currentPage - 2);
+    const end = Math.min(totalPages, currentPage + 2);
+    
+    for (let i = start; i <= end; i++) {
+        range.push(i);
+    }
+    
+    return range;
+});
+
 app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'resources', 'views')); //_dirname == contextPath
 

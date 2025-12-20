@@ -10,14 +10,14 @@ router.post('/users', AIServiceController.createUser.bind(AIServiceController));
 router.get('/users', isLogin, AIServiceController.getUsers.bind(AIServiceController));
 
 // Resume Operations
-router.post('/resumes', isLogin, upload.single('file'), AIServiceController.uploadResume.bind(AIServiceController));
-router.get('/resumes/:username', isLogin, AIServiceController.getResume.bind(AIServiceController));
-router.delete('/resumes/:username', isLogin, AIServiceController.deleteResume.bind(AIServiceController));
-router.post('/resumes/:username/improve', isLogin, AIServiceController.suggestResumeImprovements.bind(AIServiceController));
+router.post('/upload_resume', isLogin, upload.single('file'), AIServiceController.uploadResume.bind(AIServiceController));
+router.get('/resume/:username', isLogin, AIServiceController.getResume.bind(AIServiceController));
+router.delete('/resume/:username', isLogin, AIServiceController.deleteResume.bind(AIServiceController));
+router.post('/resume/:username/suggest_improvements', isLogin, AIServiceController.suggestResumeImprovements.bind(AIServiceController));
 
 // Job Operations
 router.get('/users/:username/jobs', isLogin, AIServiceController.getUserJobs.bind(AIServiceController));
-router.get('/jobs/suggestions/:username', isLogin, AIServiceController.getJobSuggestions.bind(AIServiceController));
+router.get('/api/jobs-suggestion/:username', isLogin, AIServiceController.getJobSuggestions.bind(AIServiceController));
 
 // Google Meet
 router.post('/meets', isLogin, AIServiceController.createGoogleMeet.bind(AIServiceController));
