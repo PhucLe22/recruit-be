@@ -467,6 +467,52 @@
       align-items: center;
       gap: 10px;
     }
+
+    /* Search Form Styles */
+    .search-section .form-control,
+    .search-section .form-select {
+      background: rgba(255, 255, 255, 0.1) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: white !important;
+      border-radius: 10px;
+      padding: 12px 15px;
+      transition: all 0.3s ease;
+    }
+
+    .search-section .form-control:focus,
+    .search-section .form-select:focus {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border-color: #6366f1 !important;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2) !important;
+      outline: none;
+      color: white !important;
+    }
+
+    .search-section .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .search-section .form-label {
+      color: rgba(255, 255, 255, 0.9) !important;
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+
+    .search-section .form-select option {
+      background: #1a1a3a;
+      color: white;
+    }
+
+    .search-results-info {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 10px;
+      padding: 15px;
+    }
+
+    .search-results-info strong {
+      color: #c4b5fd;
+    }
   </style>
 </head>
 
@@ -500,10 +546,74 @@
 
     <!-- Table Container -->
     <div class="table-container">
+      <!-- Search Form -->
+      <div class="search-section" style="margin-bottom: 30px; padding: 25px; background: rgba(255, 255, 255, 0.05); border-radius: 15px; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);">
+        <form method="GET" action="/business/applications" class="search-form">
+          <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+              <label for="search" class="form-label text-white">
+                <i class="fas fa-search me-2"></i>Tìm kiếm ứng viên
+              </label>
+              <input type="text" class="form-control" id="search" name="search" 
+                     placeholder="Tên hoặc email ứng viên..." 
+                     value="{{search}}"
+                     style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+            </div>
+            <div class="col-md-3">
+              <label for="status" class="form-label text-white">
+                <i class="fas fa-filter me-2"></i>Trạng thái
+              </label>
+              <select class="form-select" id="status" name="status" 
+                      style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+                <option value="">Tất cả trạng thái</option>
+                <option value="pending" {{#if (eq status 'pending')}}selected{{/if}}>⏳ Chờ xử lý</option>
+                <option value="reviewing" {{#if (eq status 'reviewing')}}selected{{/if}}>👁️ Đang xem xét</option>
+                <option value="interviewing" {{#if (eq status 'interviewing')}}selected{{/if}}>💬 Phỏng vấn</option>
+                <option value="hired" {{#if (eq status 'hired')}}selected{{/if}}>✅ Đã tuyển</option>
+                <option value="rejected" {{#if (eq status 'rejected')}}selected{{/if}}>❌ Từ chối</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="jobTitle" class="form-label text-white">
+                <i class="fas fa-briefcase me-2"></i>Vị trí công việc
+              </label>
+              <input type="text" class="form-control" id="jobTitle" name="jobTitle" 
+                     placeholder="Tên vị trí..." 
+                     value="{{jobTitle}}"
+                     style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: white;">
+            </div>
+            <div class="col-md-2">
+              <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary flex-fill">
+                  <i class="fas fa-search me-2"></i>Tìm kiếm
+                </button>
+                <a href="/business/applications" class="btn btn-secondary">
+                  <i class="fas fa-times me-2"></i>Xóa
+                </a>
+              </div>
+            </div>
+          </div>
+        </form>
+        
+        <!-- Search Results Info -->
+        {{#if search}}
+        <div class="search-results-info mt-3">
+          <p class="text-white-50 mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Kết quả tìm kiếm cho: <strong>"{{search}}"</strong>
+            {{#if status}} - Trạng thái: <strong>"{{status}}"</strong>{{/if}}
+            {{#if jobTitle}} - Vị trí: <strong>"{{jobTitle}}"</strong>{{/if}}
+            - Tìm thấy <strong>{{pagination.total}}</strong> kết quả
+          </p>
+        </div>
+        {{/if}}
+      </div>
+
       <table id="candidateTable">
         <thead>
           <tr>
-            <th><i class="fas fa-user me-2"></i>Ứng Viên</th>
+            <th><i class="fas fa-user me-2"></i>Tên Ứng Viên</th>
+            <th><i class="fas fa-envelope me-2"></i>Email</th>
             <th><i class="fas fa-toggle-on me-2"></i>Trạng Thái</th>
             <th><i class="fas fa-briefcase me-2"></i>Vị Trí</th>
             <th><i class="fas fa-calendar me-2"></i>Ngày Tạo</th>
@@ -517,15 +627,15 @@
               <td>
                 <div class="user-info">
                   {{#if this.userAvatar}}
-                    <img src="{{this.userAvatar}}" alt="{{this.userName}}" class="user-avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'avatar-placeholder\'>{{substring this.userName 0 2}}</div>'">
+                    <img src="{{this.userAvatar}}" alt="{{this.username}}" class="user-avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'avatar-placeholder\'>{{substring this.username 0 2}}</div>'">
                   {{else}}
-                    <div class="avatar-placeholder">{{substring this.userName 0 2}}</div>
+                    <div class="avatar-placeholder">{{substring this.username 0 2}}</div>
                   {{/if}}
-                  <div>
-                    <div class="email-text">{{this.userName}}</div>
-                    <small style="color: rgba(255, 255, 255, 0.6); font-size: 0.85rem;">{{this.userEmail}}</small>
-                  </div>
+                  <div class="email-text">{{this.username}}</div>
                 </div>
+              </td>
+              <td>
+                <div class="email-text">{{this.userEmail}}</div>
               </td>
               <td>
                 <select class="status-select" data-id="{{this._id}}">
@@ -557,7 +667,7 @@
             {{/each}}
           {{else}}
             <tr>
-              <td colspan="5" class="no-data">
+              <td colspan="6" class="no-data">
                 <i class="fas fa-inbox"></i>
                 <p>Chưa có ứng viên nào</p>
               </td>

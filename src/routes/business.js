@@ -3,6 +3,11 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const userProfileController = require('../app/controllers/business/UserProfileController');
+const detailApplicantController = require('../app/controllers/business/DetailApplicantController');
+const profileViewsController = require('../app/controllers/business/ProfileViewsController');
+const jobsController = require('../app/controllers/business/JobsController');
+const jobDetailController = require('../app/controllers/business/JobDetailController');
 
 // Ensure uploads/logos directory exists
 const logoUploadDir = path.join(__dirname, '../uploads/logos');
@@ -48,7 +53,6 @@ const registerController = require('../app/controllers/business/RegisterControll
 const loginController = require('../app/controllers/business/LoginController');
 const businessLoginController = require('../app/controllers/business/LoginController');
 const jobCreateController = require('../app/controllers/business/JobCreateController');
-const detailApplicantController = require('../app/controllers/business/DetailApplicantController');
 const dashboardController = require('../app/controllers/business/DashboardController');
 const profileController = require('../app/controllers/business/ProfileController');
 const businessController = require('../app/controllers/business/BusinessController');
@@ -118,11 +122,13 @@ router.get('/', async (req, res, next) => {
     }
 });
 
-router.get('/profile-page', verifyToken, profileController.showProfile);
+router.get('/profile', verifyToken, profileController.showProfile);
 router.post('/profile/edit', verifyToken, profileController.updateProfile);
-router.post('/job/create', verifyToken, jobCreateController.createJob);
+router.post('/job/create', isBusiness, jobCreateController.createJob);
 router.post('/login', loginController.login);
 router.get('/logout', businessLoginController.logout);
+// Registration routes
+router.get('/register', registerController.showRegisterPage);
 router.post('/register/step1', registerController.showRegisterPage);
 router.post('/register/step2', upload.single('logo'), registerController.register);
 router.post('/register/submit', registerController.register);
@@ -136,9 +142,10 @@ router.post(
     upload.single('logo'),
     profileController.uploadLogo,
 );
-router.get('/applicants-list', verifyToken, detailApplicantController.detail);
-router.put('/:jobAppliedId/update', businessController.update);
+router.get('/applications', isBusiness, detailApplicantController.detail);
+router.get('/applications', isBusiness, detailApplicantController.detail);
 router.get('/jobs-list', verifyToken, businessController.jobList);
+router.get('/jobs', isBusiness, businessController.jobList);
 router.get('/dashboard', isBusiness, dashboardController.showDashboard);
 router.post('/dashboard', isBusiness, dashboardController.showDashboard);
 // Route to view scheduled applicants list
@@ -204,6 +211,7 @@ router.get('/list', async (req, res, next) => {
         next(error);
     }
 });
+
 
 // Protected business list route (for authenticated users)
 router.get('/list-protected', verifyToken, async (req, res, next) => {
@@ -293,6 +301,25 @@ router.get(
                 businessName: job.businessId?.name || business.name,
             }));
 
+            // Fetch other businesses (excluding current one)
+            const otherBusinesses = await Business.find({
+                _id: { $ne: req.params.id }
+            })
+            .limit(8)
+            .sort({ createdAt: -1 });
+
+            // Transform other businesses for template
+            const transformedOtherBusinesses = otherBusinesses.map((otherBusiness) => ({
+                id: otherBusiness._id,
+                name: otherBusiness.name || otherBusiness.companyName || 'Chưa có tên công ty',
+                description: otherBusiness.description ? (otherBusiness.description.length > 100 ? otherBusiness.description.substring(0, 100) + '...' : otherBusiness.description) : 'Chưa có mô tả',
+                location: (otherBusiness.address?.city || otherBusiness.address?.state) || 'Chưa cập nhật địa chỉ',
+                logoUrl: otherBusiness.logo || otherBusiness.logoPath || '/images/default-company.png',
+                verified: otherBusiness.isVerified || false,
+                employeeCount: otherBusiness.employeeCount || Math.floor(Math.random() * 500) + 50,
+                jobCount: Math.floor(Math.random() * 20) + 1 // Mock job count for now
+            }));
+
             const businessData = {
                 ...business.toObject(),
                 jobCount: jobCount,
@@ -302,11 +329,17 @@ router.get(
                 foundedYear: 2010 + Math.floor(Math.random() * 15),
                 isFollowing: false,
                 isVerified: Math.random() > 0.3,
+                email: business.email,
+                phone: business.phone,
+                website: business.website,
+                industry: business.industry,
+                companySize: business.companySize,
             };
 
-            res.render('business/businessDetail', {
-                business: businessData,
-                companyJobs: transformedJobs,
+            res.render('business/detail', {
+                company: businessData,
+                jobs: transformedJobs,
+                otherBusinesses: transformedOtherBusinesses,
                 layout: false,
             });
         } catch (error) {
@@ -366,11 +399,16 @@ router.get('/detail-protected/:id', verifyToken, async (req, res, next) => {
             foundedYear: 2010 + Math.floor(Math.random() * 15),
             isFollowing: false,
             isVerified: Math.random() > 0.3,
+            email: business.email,
+            phone: business.phone,
+            website: business.website,
+            industry: business.industry,
+            companySize: business.companySize,
         };
 
-        res.render('business/businessDetail', {
-            business: businessData,
-            companyJobs: transformedJobs,
+        res.render('business/detail', {
+            company: businessData,
+            jobs: transformedJobs,
             layout: false,
         });
     } catch (error) {
@@ -477,7 +515,7 @@ router.post('/connect/:id', verifyToken, async (req, res, next) => {
         });
     }
 });
-router.get('/job/create-page', verifyToken, async (req, res, next) => {
+router.get('/job/create-page', isBusiness, async (req, res, next) => {
     try {
         const jobFields = await JobField.find({});
         res.render('business/jobs/createJob', {
@@ -495,13 +533,13 @@ router.get('/login-page', (req, res) => {
         isBusinessLogin: true // Add this flag to customize the login form for business users if needed
     });
 });
-router.get('/register-page', (req, res) => {
-    try {
-        res.render('business/register', { layout: false });
-    } catch (error) {
-        next(error);
-    }
-});
+// router.get('/register-page', (req, res) => {
+//     try {
+//         res.render('business/register', { layout: false });
+//     } catch (error) {
+//         next(error);
+//     }
+// });
 router.get('/featured-company', verifyToken, async (req, res, next) => {
     try {
         const jobs = await Job.find();
@@ -563,4 +601,88 @@ router.post('/schedule/meeting', async (req, res) => {
     }
 });
 
+// Real-time applications streaming endpoint
+router.get('/applications/stream', (req, res) => {
+    const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+    
+    if (!businessId) {
+        return res.status(401).end();
+    }
+
+    // Set headers for Server-Sent Events
+    res.writeHead(200, {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Cache-Control'
+    });
+
+    // Send initial connection message
+    res.write('data: {"type": "connected", "message": "Connected to applications stream"}\n\n');
+
+    // Store the response to send updates later
+    req.app.locals.applicationStreams = req.app.locals.applicationStreams || new Map();
+    req.app.locals.applicationStreams.set(businessId, res);
+
+    // Handle client disconnect
+    req.on('close', () => {
+        console.log(`Client disconnected from business ${businessId}`);
+        req.app.locals.applicationStreams.delete(businessId);
+    });
+
+    req.on('aborted', () => {
+        console.log(`Client aborted connection for business ${businessId}`);
+        req.app.locals.applicationStreams.delete(businessId);
+    });
+});
+
+// Helper function to send real-time updates to business clients
+const sendApplicationUpdate = (businessId, application) => {
+    const streams = req.app.locals?.applicationStreams || new Map();
+    const clientStream = streams.get(businessId);
+    
+    if (clientStream && !clientStream.destroyed) {
+        const message = {
+            type: 'new_application',
+            application: {
+                _id: application._id,
+                user_id: {
+                    fullName: application.user_id?.fullName || 'Unknown User'
+                },
+                job_id: {
+                    title: application.job_id?.title || 'Unknown Position'
+                },
+                applied_at: application.applied_at,
+                status: application.status
+            }
+        };
+        
+        clientStream.write(`data: ${JSON.stringify(message)}\n\n`);
+        console.log(`Sent real-time update to business ${businessId}: New application for ${application.job_id?.title}`);
+    }
+};
+
+// User Profile and CV viewing routes
+router.get('/user-profile/:userId', userProfileController.viewUserProfile);
+router.get('/cv/download/:cvId', userProfileController.downloadCV);
+router.get('/cv/view/:cvId', userProfileController.viewCVDetails);
+
+// Applicant detail route
+router.get('/applicants/:id', detailApplicantController.viewApplicant);
+
+// Profile views analytics route
+router.get('/profile-views', profileViewsController.viewProfileViews);
+
+// Jobs management route
+router.get('/jobs', jobsController.viewJobs);
+
+// Job detail route
+router.get('/job/:id', jobDetailController.viewJobDetail);
+
+// Update application status route
+router.put('/:id/update', detailApplicantController.updateApplicationStatus);
+
+// Make helper available globally
+module.exports.sendApplicationUpdate = sendApplicationUpdate;
 module.exports = router;

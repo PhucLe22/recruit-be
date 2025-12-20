@@ -6,13 +6,19 @@ class DashboardController {
   // Show dashboard
   async showDashboard(req, res) {
     try {
-      if (!req.session.business) {
+      console.log('=== DASHBOARD REQUEST ===');
+      console.log('Request user:', JSON.stringify(req.user, null, 2));
+      console.log('Request account:', JSON.stringify(req.account, null, 2));
+      
+      const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+      console.log('Business ID for dashboard:', businessId);
+
+      if (!businessId) {
         return res.redirect('/business/login');
       }
 
-      const businessId = req.session.business._id;
-
       // Get dashboard stats
+      console.log('Fetching dashboard stats...');
       const [
         totalJobs,
         activeJobs,
@@ -21,11 +27,11 @@ class DashboardController {
         recentJobs
       ] = await Promise.all([
         Job.countDocuments({ businessId }),
-        Job.countDocuments({ businessId, isActive: true, expiryTime: { $gte: new Date() } }),
+        Job.countDocuments({ businessId, status: 'active', expiryTime: { $gte: new Date() } }),
         AppliedJobs.countDocuments({ business_id: businessId }),
         AppliedJobs.find({ business_id: businessId })
           .populate('user_id', 'fullName email phone')
-          .populate('job_id', 'title')
+          .populate('job_id', 'title field')
           .sort({ applied_at: -1 })
           .limit(5),
         Job.find({ businessId })
@@ -77,9 +83,9 @@ class DashboardController {
         appStats[stat._id] = stat.count;
       });
 
-      res.render('businesses/dashboard', {
+      res.render('business/dashboard', {
         layout: 'business',
-        business: req.session.business,
+        business: req.account,
         stats,
         applicationStats: appStats,
         recentApplications,
@@ -99,14 +105,14 @@ class DashboardController {
   // Get dashboard data (API endpoint)
   async getDashboardData(req, res) {
     try {
-      if (!req.session.business) {
+      const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+      
+      if (!businessId) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
         });
       }
-
-      const businessId = req.session.business._id;
       const { period = '7d' } = req.query;
 
       // Calculate date range
@@ -200,14 +206,14 @@ class DashboardController {
   // Get application trends
   async getApplicationTrends(req, res) {
     try {
-      if (!req.session.business) {
+      const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+      
+      if (!businessId) {
         return res.status(401).json({
           success: false,
           message: 'Authentication required'
         });
       }
-
-      const businessId = req.session.business._id;
       const { period = '30d' } = req.query;
 
       // Calculate date range

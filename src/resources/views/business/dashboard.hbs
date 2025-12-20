@@ -7,65 +7,73 @@
         <button type="button" class="btn btn-sm btn-outline-secondary me-2">
             <i class="fas fa-download me-1"></i> Export
         </button>
-        <button type="button" class="btn btn-sm btn-primary">
-            <i class="fas fa-plus me-1"></i> New Job
-        </button>
+        <a href="/business/job/create-page" class="btn btn-sm btn-primary">
+            <i class="fas fa-plus me-1"></i> Post New Job
+        </a>
     </div>
 </div>
 
 <!-- Stats Cards -->
 <div class="row mb-4">
     <div class="col-md-3 mb-3">
-        <div class="card text-white bg-primary h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title">Active Jobs</h6>
-                        <h2 class="mb-0">{{stats.activeJobs}}</h2>
+        <a href="/business/jobs" class="text-decoration-none">
+            <div class="card text-white bg-primary h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Active Jobs</h6>
+                            <h2 class="mb-0">{{stats.activeJobs}}</h2>
+                        </div>
+                        <i class="fas fa-briefcase fa-2x opacity-50"></i>
                     </div>
-                    <i class="fas fa-briefcase fa-2x opacity-50"></i>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="card text-white bg-success h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title">New Applicants</h6>
-                        <h2 class="mb-0">{{applicationStats.pending}}</h2>
+        <a href="/business/applications?status=pending" class="text-decoration-none">
+            <div class="card text-white bg-success h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">New Applicants</h6>
+                            <h2 class="mb-0">{{applicationStats.pending}}</h2>
+                        </div>
+                        <i class="fas fa-user-plus fa-2x opacity-50"></i>
                     </div>
-                    <i class="fas fa-user-plus fa-2x opacity-50"></i>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="card text-white bg-warning h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title">Interviews</h6>
-                        <h2 class="mb-0">{{applicationStats.shortlisted}}</h2>
+        <a href="/business/applications?status=shortlisted" class="text-decoration-none">
+            <div class="card text-white bg-warning h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Interviews</h6>
+                            <h2 class="mb-0">{{applicationStats.shortlisted}}</h2>
+                        </div>
+                        <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
                     </div>
-                    <i class="fas fa-calendar-alt fa-2x opacity-50"></i>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
     <div class="col-md-3 mb-3">
-        <div class="card text-white bg-info h-100">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h6 class="card-title">Profile Views</h6>
-                        <h2 class="mb-0">{{stats.totalViews}}</h2>
+        <a href="/business/profile-views" class="text-decoration-none">
+            <div class="card text-white bg-info h-100 hover-card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="card-title">Profile Views</h6>
+                            <h2 class="mb-0">{{stats.totalViews}}</h2>
+                        </div>
+                        <i class="fas fa-eye fa-2x opacity-50"></i>
                     </div>
-                    <i class="fas fa-eye fa-2x opacity-50"></i>
                 </div>
             </div>
-        </div>
+        </a>
     </div>
 </div>
 
@@ -82,26 +90,74 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Applied</th>
-                                <th>Status</th>
-                                <th>Action</th>
+                                <th><i class="fas fa-user me-1"></i> Applicant</th>
+                                <th><i class="fas fa-briefcase me-1"></i> Position</th>
+                                <th><i class="fas fa-calendar me-1"></i> Applied</th>
+                                <th><i class="fas fa-info-circle me-1"></i> Status</th>
+                                <th><i class="fas fa-envelope me-1"></i> Contact</th>
+                                <th><i class="fas fa-eye me-1"></i> Action</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="recent-applications-tbody">
                             {{#each recentApplications}}
-                            <tr>
-                                <td>{{user_id.fullName}}</td>
-                                <td>{{job_id.title}}</td>
-                                <td>{{applied_at}}</td>
-                                <td><span class="badge bg-warning">{{status}}</span></td>
-                                <td><a href="#" class="btn btn-sm btn-outline-primary">View</a></td>
+                            <tr data-application-id="{{_id}}">
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center">
+                                            {{#if user_id.fullName}}
+                                                {{firstLetter user_id.fullName}}
+                                            {{else}}
+                                                U
+                                            {{/if}}
+                                        </div>
+                                        <div>
+                                            <div class="fw-medium">{{user_id.fullName}}</div>
+                                            <small class="text-muted"><i class="fas fa-envelope me-1"></i>{{user_id.email}}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="fw-medium">{{job_id.title}}</div>
+                                    <small class="text-muted">{{job_id.field}}</small>
+                                </td>
+                                <td>
+                                    <div class="text-muted">{{applied_at}}</div>
+                                </td>
+                                <td>
+                                    {{#if (eq status 'pending')}}
+                                        <span class="badge bg-warning">Pending</span>
+                                    {{else if (eq status 'viewed')}}
+                                        <span class="badge bg-info">Viewed</span>
+                                    {{else if (eq status 'shortlisted')}}
+                                        <span class="badge bg-primary">Shortlisted</span>
+                                    {{else if (eq status 'rejected')}}
+                                        <span class="badge bg-danger">Rejected</span>
+                                    {{else if (eq status 'hired')}}
+                                        <span class="badge bg-success">Hired</span>
+                                    {{else}}
+                                        <span class="badge bg-secondary">{{status}}</span>
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    <a href="mailto:{{user_id.email}}" class="btn btn-sm btn-outline-info me-1" title="Email">
+                                        <i class="fas fa-envelope"></i>
+                                    </a>
+                                    {{#if user_id.phone}}
+                                        <a href="tel:{{user_id.phone}}" class="btn btn-sm btn-outline-success" title="Call">
+                                            <i class="fas fa-phone"></i>
+                                        </a>
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    <a href="/business/applicants/{{_id}}" class="btn btn-sm btn-primary">
+                                        <i class="fas fa-eye me-1"></i> View
+                                    </a>
+                                </td>
                             </tr>
                             {{/each}}
                             {{#unless recentApplications}}
                             <tr>
-                                <td colspan="5" class="text-center text-muted">No recent applications</td>
+                                <td colspan="6" class="text-center text-muted">No recent applications</td>
                             </tr>
                             {{/unless}}
                         </tbody>
@@ -119,16 +175,16 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a href="/business/jobs/new" class="btn btn-primary btn-lg mb-2">
+                    <a href="/business/job/create-page" class="btn btn-primary btn-lg mb-2">
                         <i class="fas fa-plus me-2"></i> Post New Job
                     </a>
                     <a href="/business/applications" class="btn btn-outline-secondary btn-lg mb-2">
                         <i class="fas fa-search me-2"></i> Browse Candidates
                     </a>
-                    <a href="/business/messages" class="btn btn-outline-secondary btn-lg mb-2">
+                    <a href="/business/applicants-scheduled-list" class="btn btn-outline-secondary btn-lg mb-2">
                         <i class="fas fa-envelope me-2"></i> Message Candidates
                     </a>
-                    <a href="/business/settings" class="btn btn-outline-secondary btn-lg">
+                    <a href="/business/profile-page" class="btn btn-outline-secondary btn-lg">
                         <i class="fas fa-cog me-2"></i> Account Settings
                     </a>
                 </div>
@@ -136,3 +192,229 @@
         </div>
     </div>
 </div>
+
+<!-- Real-time Updates Script -->
+<style>
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 14px;
+        font-weight: 600;
+    }
+    
+    .fw-medium {
+        font-weight: 500;
+    }
+    
+    .new-application {
+        animation: slideInRight 0.5s ease-out;
+        background-color: #d4edda !important;
+    }
+    
+    @keyframes slideInRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    .hover-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+    }
+    
+    .hover-card .card-body {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover .card-body {
+        background-color: rgba(255,255,255,0.1);
+    }
+    
+    .hover-card i {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover i {
+        opacity: 1 !important;
+        transform: scale(1.1);
+    }
+    
+    .hover-card h2 {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover h2 {
+        transform: scale(1.05);
+    }
+    
+    .table td, .table th {
+        vertical-align: middle;
+    }
+    
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    
+    .fw-medium {
+        font-weight: 500;
+    }
+    
+    .new-application {
+        animation: highlightNew 2s ease-in-out;
+        background-color: #d1ecf1d;
+    }
+    
+    @keyframes highlightNew {
+        0% { background-color: #d1ecf1d; }
+        50% { background-color: #fff3cd; }
+        100% { background-color: #d1ecf1d; }
+    }
+    
+    .notification-badge {
+        animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+        100% { transform: scale(1); }
+        vertical-align: middle;
+    }
+    
+    .table th {
+        border-top: none;
+        font-weight: 600;
+        color: #495057;
+        background-color: #f8f9fa;
+    }
+</style>
+<script>
+    // Real-time updates for recent applications
+    document.addEventListener('DOMContentLoaded', function() {
+        const tbody = document.getElementById('recent-applications-tbody');
+        if (!tbody) return;
+
+        // Create EventSource for real-time updates
+        const eventSource = new EventSource('/business/applications/stream');
+        
+        eventSource.onmessage = function(event) {
+            try {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'new_application') {
+                    // Add new application to the top of table
+                    const newRow = createApplicationRow(data.application);
+                    const firstRow = tbody.querySelector('tr');
+                    
+                    if (firstRow && firstRow.textContent.includes('No recent applications')) {
+                        // Remove "No recent applications" row
+                        tbody.innerHTML = '';
+                    }
+                    
+                    tbody.insertBefore(newRow, tbody.firstChild);
+                    
+                    // Highlight new row
+                    newRow.classList.add('table-success');
+                    setTimeout(() => {
+                        newRow.classList.remove('table-success');
+                    }, 3000);
+                    
+                    // Update notification badge if exists
+                    updateNotificationBadge();
+                }
+            } catch (error) {
+                console.error('Error parsing real-time update:', error);
+            }
+        };
+        
+        eventSource.onerror = function(error) {
+            console.error('EventSource error:', error);
+            // Retry connection after 5 seconds
+            setTimeout(() => {
+                eventSource.close();
+                location.reload(); // Simple fallback
+            }, 5000);
+        };
+    });
+
+    function createApplicationRow(application) {
+        const row = document.createElement('tr');
+        row.setAttribute('data-application-id', application._id);
+        row.className = 'new-application';
+        
+        const appliedDate = new Date(application.applied_at).toLocaleString('vi-VN');
+        const firstLetter = application.user_id?.fullName ? application.user_id.fullName.charAt(0).toUpperCase() : 'U';
+        
+        row.innerHTML = `
+            <td>
+                <div class="d-flex align-items-center">
+                    <div class="avatar-sm bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center">
+                        ${firstLetter}
+                    </div>
+                    <div>
+                        <div class="fw-medium">${application.user_id?.fullName || 'Unknown User'}</div>
+                        <small class="text-muted">${application.user_id?.email || 'No email'}</small>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="fw-medium">${application.job_id?.title || 'Unknown Position'}</div>
+                <small class="text-muted">${application.job_id?.field || 'No field'}</small>
+            </td>
+            <td>
+                <div class="text-muted">${appliedDate}</div>
+            </td>
+            <td>
+                ${getStatusBadge(application.status)}
+            </td>
+            <td>
+                <a href="mailto:${application.user_id?.email || ''}" class="btn btn-sm btn-outline-info me-1" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+                ${application.user_id?.phone ? `
+                    <a href="tel:${application.user_id.phone}" class="btn btn-sm btn-outline-success" title="Call">
+                        <i class="fas fa-phone"></i>
+                    </a>
+                ` : ''}
+            </td>
+            <td>
+                <a href="/business/applicants/${application._id}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-eye me-1"></i> View
+                </a>
+            </td>
+        `;
+        
+        return row;
+    }
+
+    function getStatusBadge(status) {
+        const statusMap = {
+            'pending': '<span class="badge bg-warning">Pending</span>',
+            'viewed': '<span class="badge bg-info">Viewed</span>',
+            'shortlisted': '<span class="badge bg-primary">Shortlisted</span>',
+            'rejected': '<span class="badge bg-danger">Rejected</span>',
+            'hired': '<span class="badge bg-success">Hired</span>'
+        };
+        return statusMap[status] || `<span class="badge bg-secondary">${status}</span>`;
+    }
+
+    function updateNotificationBadge() {
+        // Update any notification badges in UI
+        const badges = document.querySelectorAll('.notification-badge');
+        badges.forEach(badge => {
+            const currentCount = parseInt(badge.textContent) || 0;
+            badge.textContent = currentCount + 1;
+            badge.classList.add('badge-pulse');
+            setTimeout(() => {
+                badge.classList.remove('badge-pulse');
+            }, 2000);
+        });
+    }
+</script>

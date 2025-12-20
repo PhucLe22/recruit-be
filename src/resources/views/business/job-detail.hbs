@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{title}}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #0f0f23 0%, #1a1a3a 50%, #2d1b69 100%);
+      min-height: 100vh;
+      color: #ffffff;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 20px auto;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px 20px 0 0;
+      padding: 30px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header p {
+      opacity: 0.8;
+      font-size: 1.1rem;
+    }
+
+    .job-info {
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .job-title {
+      font-size: 2rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .job-meta {
+      display: flex;
+      gap: 30px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 1rem;
+    }
+
+    .meta-item i {
+      color: #667eea;
+      font-size: 1.2rem;
+    }
+
+    .job-field {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(102, 126, 234, 0.2);
+      color: #667eea;
+      border-radius: 25px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .job-description {
+      margin-bottom: 25px;
+      line-height: 1.6;
+      font-size: 1.1rem;
+    }
+
+    .job-requirements {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+    }
+
+    .requirements-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 15px;
+    }
+
+    .requirements-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .requirements-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      padding-left: 30px;
+    }
+
+    .requirements-list li:before {
+      content: '✓';
+      position: absolute;
+      left: 0;
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .requirements-list li:last-child {
+      border-bottom: none;
+    }
+
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.3);
+      border-color: rgba(102, 126, 234, 0.5);
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .stat-label {
+      opacity: 0.8;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .applications-section {
+      padding: 30px;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .application-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .application-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+      border-color: rgba(102, 126, 234, 0.4);
+    }
+
+    .applicant-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .applicant-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #667eea;
+    }
+
+    .applicant-info {
+      flex-grow: 1;
+    }
+
+    .applicant-name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      margin-bottom: 5px;
+    }
+
+    .applicant-contact {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    .application-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .applied-date {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      padding: 10px 20px;
+      border-radius: 25px;
+      border: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .badge {
+      padding: 5px 12px;
+      border-radius: 15px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .bg-warning { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
+    .bg-info { background: rgba(13, 202, 240, 0.2); color: #0dcfe8; }
+    .bg-primary { background: rgba(102, 126, 234, 0.2); color: #667eea; }
+    .bg-danger { background: rgba(220, 53, 69, 0.2); color: #dc3545; }
+    .bg-success { background: rgba(40, 167, 69, 0.2); color: #28a745; }
+    .bg-secondary { background: rgba(108, 117, 125, 0.2); color: #6c757d; }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 30px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .empty-state i {
+      font-size: 4rem;
+      margin-bottom: 20px;
+      color: rgba(102, 126, 234, 0.5);
+    }
+
+    .empty-state h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+    }
+
+    .back-button {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    .back-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 15px;
+      }
+
+      .header {
+        padding: 20px;
+      }
+
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .job-meta {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+        padding: 20px;
+      }
+
+      .applications-section {
+        padding: 20px;
+      }
+
+      .applicant-header {
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <a href="/business/jobs" class="back-button">
+    <i class="fas fa-arrow-left"></i>
+    Back to Jobs
+  </a>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <div>
+        <h1>{{job.title}}</h1>
+        <p>View job details and manage applications</p>
+      </div>
+    </div>
+
+    <!-- Job Information -->
+    <div class="job-info">
+      <h2 class="job-title">{{job.title}}</h2>
+      
+      <div class="job-meta">
+        <div class="meta-item">
+          <i class="fas fa-map-marker-alt"></i>
+          <span>{{job.location}}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-money-bill-wave"></i>
+          <span>{{job.salary}}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-clock"></i>
+          <span>{{job.deadline}}</span>
+        </div>
+        <div class="meta-item">
+          <i class="fas fa-tag"></i>
+          <span class="job-field">{{job.field}}</span>
+        </div>
+      </div>
+
+      <div class="job-description">
+        <h3>Job Description</h3>
+        <p>{{job.description}}</p>
+      </div>
+
+      <div class="job-requirements">
+        <h3 class="requirements-title">Requirements</h3>
+        <ul class="requirements-list">
+          <li>Relevant experience in {{job.field}}</li>
+          <li>Strong communication skills</li>
+          <li>Ability to work in a team environment</li>
+          <li>Problem-solving mindset</li>
+          <li>Professional attitude and work ethic</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Application Statistics -->
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number">{{stats.totalApplications}}</div>
+        <div class="stat-label">Total Applications</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{stats.pendingApplications}}</div>
+        <div class="stat-label">Pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{stats.shortlistedApplications}}</div>
+        <div class="stat-label">Shortlisted</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{stats.hiredApplications}}</div>
+        <div class="stat-label">Hired</div>
+      </div>
+    </div>
+
+    <!-- Applications List -->
+    <div class="applications-section">
+      <h2 class="section-title">
+        <i class="fas fa-users"></i>
+        Applications ({{stats.totalApplications}})
+      </h2>
+
+      {{#each applications}}
+      <div class="application-card">
+        <div class="applicant-header">
+          {{#if user_id.avatar}}
+            <img src="/uploads/avatars/{{user_id.avatar}}" alt="{{user_id.fullName}}" class="applicant-avatar">
+          {{else}}
+            <div class="applicant-avatar bg-primary text-white d-flex align-items-center justify-content-center">
+              <i class="fas fa-user"></i>
+            </div>
+          {{/if}}
+          
+          <div class="applicant-info">
+            <h4 class="applicant-name">{{user_id.fullName}}</h4>
+            <div class="applicant-contact">
+              <i class="fas fa-envelope me-2"></i>{{user_id.email}}
+              {{#if user_id.phone}}
+                <span class="ms-3"><i class="fas fa-phone me-1"></i>{{user_id.phone}}</span>
+              {{/if}}
+            </div>
+          </div>
+        </div>
+
+        <div class="application-meta">
+          <div class="applied-date">
+            <i class="fas fa-calendar me-2"></i>Applied: {{applied_at}}
+          </div>
+          <div>
+            {{{statusBadge}}}
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <a href="/business/applicants/{{user_id._id}}" class="btn-action btn-primary">
+            <i class="fas fa-user"></i>
+            View Profile
+          </a>
+          <a href="/business/user-profile/{{user_id._id}}" class="btn-action btn-secondary">
+            <i class="fas fa-eye"></i>
+            Full Profile
+          </a>
+          <a href="/business/cv/view/{{user_id._id}}" class="btn-action btn-secondary">
+            <i class="fas fa-file-pdf"></i>
+            View CV
+          </a>
+        </div>
+      </div>
+      {{/each}}
+
+      {{#unless applications}}
+      <div class="empty-state">
+        <i class="fas fa-users"></i>
+        <h3>No Applications Yet</h3>
+        <p>Applications for this position will appear here once candidates start applying.</p>
+      </div>
+      {{/unless}}
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

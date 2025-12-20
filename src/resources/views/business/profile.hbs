@@ -1,0 +1,498 @@
+<div class="main-content">
+    <div class="content-wrapper">
+<!-- Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h3 mb-0">
+                <i class="fas fa-building me-2"></i>
+                Hồ sơ công ty
+            </h1>
+            <p class="text-muted mb-0">Quản lý thông tin công ty của bạn</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal">
+            <i class="fas fa-edit me-2"></i>
+            Chỉnh sửa hồ sơ
+        </button>
+    </div>
+</div>
+
+<!-- Success/Error Messages -->
+{{#if success}}
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="fas fa-check-circle me-2"></i>
+    {{success}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/if}}
+
+{{#if errors}}
+{{#each errors}}
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {{this}}
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+</div>
+{{/each}}
+{{/if}}
+
+<!-- Profile Content -->
+<div class="row">
+    <!-- Company Info Card -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div class="d-flex align-items-center mb-4">
+                    <div class="company-logo-container me-3">
+                        {{#if business.logoPath}}
+                        <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="company-logo">
+                        {{else}}
+                        <div class="company-logo-placeholder">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        {{/if}}
+                    </div>
+                    <div class="flex-grow-1">
+                        <h4 class="mb-1">{{business.companyName}}</h4>
+                        <p class="text-muted mb-2">{{business.industry}}</p>
+                        <div class="company-actions">
+                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#logoModal">
+                                <i class="fas fa-camera me-1"></i>
+                                {{#if business.logoPath}}Thay đổi logo{{else}}Thêm logo{{/if}}
+                            </button>
+                            {{#if business.logoPath}}
+                            <button class="btn btn-sm btn-outline-danger" id="deleteLogoBtn">
+                                <i class="fas fa-trash me-1"></i>
+                                Xóa logo
+                            </button>
+                            {{/if}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row company-info">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-envelope me-2"></i>Email
+                            </label>
+                            <p class="info-value">{{business.email}}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-phone me-2"></i>Điện thoại
+                            </label>
+                            <p class="info-value">{{business.phone}}</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-globe me-2"></i>Website
+                            </label>
+                            <p class="info-value">
+                                {{#if business.website}}
+                                <a href="{{business.website}}" target="_blank">{{business.website}}</a>
+                                {{else}}
+                                <span class="text-muted">Chưa cập nhật</span>
+                                {{/if}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-users me-2"></i>Quy mô công ty
+                            </label>
+                            <p class="info-value">{{business.companySize}}</p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                            </label>
+                            <p class="info-value">
+                                {{#if business.address}}
+                                {{business.address.street}}, {{business.address.city}}, {{business.address.country}}
+                                {{else}}
+                                <span class="text-muted">Chưa cập nhật</span>
+                                {{/if}}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-info-circle me-2"></i>Mô tả công ty
+                            </label>
+                            <p class="info-value">{{business.description}}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Card -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h5 class="card-title mb-4">
+                    <i class="fas fa-chart-bar me-2"></i>
+                    Thống kê
+                </h5>
+                <div class="stat-item">
+                    <div class="stat-icon bg-primary">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6 class="stat-title">Tổng số tin tuyển dụng</h6>
+                        <p class="stat-number">{{stats.totalJobs}}</p>
+                    </div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-icon bg-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h6 class="stat-title">Tin đang hoạt động</h6>
+                        <p class="stat-number">{{stats.activeJobs}}</p>
+                    </div>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/business/jobs" class="btn btn-outline-primary">
+                        <i class="fas fa-list me-2"></i>
+                        Quản lý tin tuyển dụng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-edit me-2"></i>
+                    Chỉnh sửa hồ sơ công ty
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="/business/profile/edit" method="POST">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Tên công ty *</label>
+                                <input type="text" class="form-control" name="companyName" value="{{business.companyName}}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Điện thoại</label>
+                                <input type="tel" class="form-control" name="phone" value="{{business.phone}}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url" class="form-control" name="website" value="{{business.website}}" placeholder="https://example.com">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Ngành nghề</label>
+                                <input type="text" class="form-control" name="industry" value="{{business.industry}}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Quy mô công ty</label>
+                                <select class="form-select" name="companySize">
+                                    <option value="">Chọn quy mô</option>
+                                    <option value="1-10" {{#if (eq business.companySize "1-10")}}selected{{/if}}>1-10 nhân viên</option>
+                                    <option value="11-50" {{#if (eq business.companySize "11-50")}}selected{{/if}}>11-50 nhân viên</option>
+                                    <option value="51-200" {{#if (eq business.companySize "51-200")}}selected{{/if}}>51-200 nhân viên</option>
+                                    <option value="201-500" {{#if (eq business.companySize "201-500")}}selected{{/if}}>201-500 nhân viên</option>
+                                    <option value="500+" {{#if (eq business.companySize "500+")}}selected{{/if}}>500+ nhân viên</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Năm thành lập</label>
+                                <input type="number" class="form-control" name="foundedYear" value="{{business.foundedYear}}" min="1900" max="{{currentYear}}">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Địa chỉ</label>
+                                <input type="text" class="form-control" name="address[street]" value="{{business.address.street}}" placeholder="Địa chỉ cụ thể">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Thành phố</label>
+                                <input type="text" class="form-control" name="address[city]" value="{{business.address.city}}">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Quốc gia</label>
+                                <input type="text" class="form-control" name="address[country]" value="{{business.address.country}}">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả công ty</label>
+                                <textarea class="form-control" name="description" rows="4">{{business.description}}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save me-2"></i>
+                        Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Logo Upload Modal -->
+<div class="modal fade" id="logoModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-camera me-2"></i>
+                    {{#if business.logoPath}}Thay đổi logo{{else}}Thêm logo{{/if}}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="logoUploadForm" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Chọn file logo</label>
+                        <input type="file" class="form-control" name="logo" accept="image/*" required>
+                        <div class="form-text">Chấp nhận các định dạng: JPG, PNG, GIF. Tối đa 5MB.</div>
+                    </div>
+                    <div class="text-center">
+                        <div id="logoPreview" class="logo-preview"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-upload me-2"></i>
+                        Tải lên
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.main-content {
+    margin-left: 280px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    min-height: 100vh;
+}
+
+.content-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    margin-bottom: 30px;
+}
+
+.company-logo-container {
+    position: relative;
+}
+
+.company-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 3px solid #e9ecef;
+}
+
+.company-logo-placeholder {
+    width: 100px;
+    height: 100px;
+    border-radius: 10px;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    color: #6c757d;
+}
+
+.company-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.info-item {
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.info-value {
+    margin: 0;
+    color: #212529;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-right: 15px;
+    font-size: 1.2rem;
+}
+
+.stat-content {
+    flex-grow: 1;
+}
+
+.stat-title {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.stat-number {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #212529;
+}
+
+.logo-preview {
+    margin-top: 15px;
+}
+
+.logo-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+}
+
+@media (max-width: 992px) {
+    .main-content {
+        margin-left: 0;
+        padding: 15px;
+    }
+}
+</style>
+
+<script>
+// Logo upload functionality
+document.getElementById('logoUploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tải lên...';
+    
+    try {
+        const response = await fetch('/business/upload-logo', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            bootstrap.Modal.getInstance(document.getElementById('logoModal')).hide();
+            location.reload();
+        } else {
+            alert('Lỗi: ' + result.message);
+        }
+    } catch (error) {
+        alert('Đã xảy ra lỗi khi tải lên logo');
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+    }
+});
+
+// Logo preview
+document.querySelector('input[name="logo"]').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('logoPreview');
+    
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.innerHTML = `<img src="${e.target.result}" alt="Logo preview">`;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        preview.innerHTML = '';
+    }
+});
+
+// Delete logo
+document.getElementById('deleteLogoBtn').addEventListener('click', async function() {
+    if (confirm('Bạn có chắc chắn muốn xóa logo này?')) {
+        try {
+            const response = await fetch('/business/delete-logo', {
+                method: 'POST'
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                location.reload();
+            } else {
+                alert('Lỗi: ' + result.message);
+            }
+        } catch (error) {
+            alert('Đã xảy ra lỗi khi xóa logo');
+        }
+    }
+});
+</script>

@@ -84,6 +84,7 @@ class JobController {
             const business = await Business.findById(businessId);
             const jobs = await Job.find({ businessId, _id: { $ne: job._id } }); // delete the current job
 
+
             let jobApplied = null;
             let savedJob = null;
             

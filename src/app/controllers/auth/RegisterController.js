@@ -18,7 +18,7 @@ module.exports = {
         });
       }
       req.flash('error', 'Vui lòng điền đầy đủ thông tin bắt buộc');
-      return res.redirect('/auth/register-page');
+      return res.redirect('/auth/login-page');
     }
 
     // Check if passwords match
@@ -30,7 +30,7 @@ module.exports = {
         });
       }
       req.flash('error', 'Mật khẩu không khớp');
-      return res.redirect('/auth/register-page');
+      return res.redirect('/auth/login-page');
     }
 
     // Check if user already exists
@@ -43,7 +43,7 @@ module.exports = {
         });
       }
       req.flash('error', 'Email đã được sử dụng');
-      return res.redirect('/auth/register-page');
+      return res.redirect('/auth/login-page');
     }
 
     // Hash password
@@ -72,7 +72,7 @@ module.exports = {
 
     // Handle web response
     req.flash('success', 'Đăng ký thành công! Vui lòng đăng nhập.');
-    res.redirect('/auth/login-page');
+    res.redirect('/auth/login');
 
   } catch (error) {
     console.error('Register error:', error);
@@ -92,7 +92,7 @@ module.exports = {
       }
 
       req.flash('error', 'Vui lòng kiểm tra lại thông tin');
-      return res.redirect('/auth/register-page');
+      return res.redirect('/auth/login');
     }
 
     // Handle other errors
@@ -105,7 +105,7 @@ module.exports = {
     }
 
     req.flash('error', errorMessage);
-    res.redirect('/auth/register-page');
+    res.redirect('/auth/login');
   }
 }
 }

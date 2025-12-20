@@ -6,6 +6,7 @@ const passport = require('passport');
 const { generateToken, setToken } = require('../../../middlewares/verifyToken');
 const RefreshToken = require('../../../models/RefreshToken');
 const { multipleMongooseToObject } = require('../../../util/mongoose');
+const EmailService = require('../../../services/EmailService');
 
 class AuthController {
   // GET /auth/login
@@ -354,15 +355,28 @@ class AuthController {
       const { email } = req.body;
       
       const user = await User.findOne({ email });
+      const user2 = await Business.findOne({ email });
       
-      if (!user) {
+      if (!user && !user2) {
         req.flash('error', 'Email không tồn tại');
         return res.redirect('/auth/forgot-password');
       }
 
-      // TODO: Send reset email
-      req.flash('success', 'Email đặt lại mật khẩu đã được gửi');
-      res.redirect('/auth/login');
+      // Send OTP for password reset
+      const otpResult = await EmailService.sendOTP(email, 'password reset');
+      
+      if (!otpResult.success) {
+        console.error('Failed to send OTP:', otpResult.error);
+        req.flash('error', 'Gửi email OTP thất bại. Vui lòng thử lại sau.');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Store email in session for verification
+      req.session.resetEmail = email;
+      req.session.otpExpiresAt = otpResult.expiresAt;
+
+      req.flash('success', 'Mã OTP đã được gửi đến email của bạn. Vui lòng kiểm tra email.');
+      res.redirect('/auth/verify-otp');
     } catch (error) {
       console.error('Forgot password error:', error);
       req.flash('error', 'Gửi email thất bại');
@@ -379,18 +393,156 @@ class AuthController {
     });
   }
 
+  // GET /auth/verify-otp
+  showVerifyOTP(req, res) {
+    if (!req.session.resetEmail) {
+      req.flash('error', 'Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại.');
+      return res.redirect('/auth/forgot-password');
+    }
+
+    res.render('auth/verify-otp', {
+      title: 'Xác thực OTP',
+      email: req.session.resetEmail,
+      expiresAt: req.session.otpExpiresAt,
+      user: null
+    });
+  }
+
+  // POST /auth/verify-otp
+  async verifyOTP(req, res) {
+    try {
+      const { otp } = req.body;
+      const email = req.session.resetEmail;
+
+      if (!email) {
+        req.flash('error', 'Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại.');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Verify OTP using EmailService
+      const verificationResult = EmailService.verifyOTP(email, otp);
+
+      if (!verificationResult.success) {
+        req.flash('error', verificationResult.message);
+        return res.redirect('/auth/verify-otp');
+      }
+
+      // OTP verified successfully, generate reset token
+      const resetToken = jwt.sign(
+        { email, type: 'password-reset' },
+        process.env.JWT_SECRET || 'your-secret-key',
+        { expiresIn: '15m' }
+      );
+
+      // Clear session data
+      delete req.session.resetEmail;
+      delete req.session.otpExpiresAt;
+
+      req.flash('success', 'OTP đã được xác thực. Vui lòng đặt lại mật khẩu của bạn.');
+      res.redirect(`/auth/reset-password/${resetToken}`);
+
+    } catch (error) {
+      console.error('OTP verification error:', error);
+      req.flash('error', 'Xác thực OTP thất bại');
+      res.redirect('/auth/verify-otp');
+    }
+  }
+
+  // POST /auth/resend-otp
+  async resendOTP(req, res) {
+    try {
+      const email = req.session.resetEmail;
+
+      if (!email) {
+        req.flash('error', 'Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại.');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Send new OTP
+      const otpResult = await EmailService.sendOTP(email, 'password reset');
+      
+      if (!otpResult.success) {
+        console.error('Failed to resend OTP:', otpResult.error);
+        req.flash('error', 'Gửi lại OTP thất bại. Vui lòng thử lại sau.');
+        return res.redirect('/auth/verify-otp');
+      }
+
+      req.session.otpExpiresAt = otpResult.expiresAt;
+      req.flash('success', 'Mã OTP mới đã được gửi đến email của bạn.');
+      res.redirect('/auth/verify-otp');
+
+    } catch (error) {
+      console.error('Resend OTP error:', error);
+      req.flash('error', 'Gửi lại OTP thất bại');
+      res.redirect('/auth/verify-otp');
+    }
+  }
+
   async resetPassword(req, res) {
     try {
-      const { token } = req.params;
-      const { password } = req.body;
+      // Get token from URL parameter or request body
+      const token = req.params.token || req.body.token;
+      const { password, confirmPassword } = req.body;
 
-      // TODO: Verify token and update password
-      req.flash('success', 'Mật khẩu đã được đặt lại');
+      if (!token) {
+        req.flash('error', 'Token không hợp lệ hoặc đã hết hạn');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Verify reset token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      } catch (error) {
+        req.flash('error', 'Token không hợp lệ hoặc đã hết hạn');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Check if token is for password reset
+      if (decoded.type !== 'password-reset') {
+        req.flash('error', 'Token không hợp lệ');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      // Validate passwords
+      if (!password || !confirmPassword) {
+        req.flash('error', 'Vui lòng điền đầy đủ mật khẩu');
+        return res.redirect(`/auth/reset-password/${token}`);
+      }
+
+      if (password !== confirmPassword) {
+        req.flash('error', 'Mật khẩu không khớp');
+        return res.redirect(`/auth/reset-password/${token}`);
+      }
+
+      // Find user and update password
+      const user = await User.findOne({ email: decoded.email });
+      const business = await Business.findOne({ email: decoded.email });
+
+      if (user) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.updateOne(
+          { email: decoded.email },
+          { password: hashedPassword }
+        );
+      } else if (business) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await Business.updateOne(
+          { email: decoded.email },
+          { password: hashedPassword }
+        );
+      } else {
+        req.flash('error', 'Người dùng không tồn tại');
+        return res.redirect('/auth/forgot-password');
+      }
+
+      req.flash('success', 'Mật khẩu đã được đặt lại thành công. Vui lòng đăng nhập.');
       res.redirect('/auth/login');
+
     } catch (error) {
       console.error('Reset password error:', error);
       req.flash('error', 'Đặt lại mật khẩu thất bại');
-      res.redirect('/auth/reset-password/' + token);
+      res.redirect(`/auth/reset-password/${token}`);
     }
   }
 
@@ -399,9 +551,43 @@ class AuthController {
     try {
       const { token } = req.params;
       
-      // TODO: Verify email token
-      req.flash('success', 'Email đã được xác thực');
+      // Verify JWT token
+      let decoded;
+      try {
+        decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+      } catch (error) {
+        req.flash('error', 'Token không hợp lệ hoặc đã hết hạn');
+        return res.redirect('/auth/login');
+      }
+
+      // Check if token is for email verification
+      if (decoded.type !== 'email-verification') {
+        req.flash('error', 'Token không hợp lệ');
+        return res.redirect('/auth/login');
+      }
+
+      // Find and update user verification status
+      const user = await User.findOne({ email: decoded.email });
+      const business = await Business.findOne({ email: decoded.email });
+
+      if (user) {
+        await User.updateOne(
+          { email: decoded.email },
+          { emailVerified: true, emailVerifiedAt: new Date() }
+        );
+      } else if (business) {
+        await Business.updateOne(
+          { email: decoded.email },
+          { emailVerified: true, emailVerifiedAt: new Date() }
+        );
+      } else {
+        req.flash('error', 'Người dùng không tồn tại');
+        return res.redirect('/auth/login');
+      }
+
+      req.flash('success', 'Email đã được xác thực thành công');
       res.redirect('/auth/login');
+
     } catch (error) {
       console.error('Verify email error:', error);
       req.flash('error', 'Xác thực email thất bại');
@@ -409,18 +595,104 @@ class AuthController {
     }
   }
 
-  // GET /auth/resend-verification
+  // POST /auth/resend-verification
   async resendVerification(req, res) {
     try {
       const { email } = req.body;
       
-      // TODO: Resend verification email
-      req.flash('success', 'Email xác thực đã được gửi lại');
-      res.redirect('/auth/login');
+      // Find user
+      const user = await User.findOne({ email });
+      const business = await Business.findOne({ email });
+
+      if (!user && !business) {
+        req.flash('error', 'Email không tồn tại');
+        return res.redirect('/auth/login');
+      }
+
+      // Send OTP for email verification
+      const otpResult = await EmailService.sendOTP(email, 'email verification');
+      
+      if (!otpResult.success) {
+        console.error('Failed to send verification OTP:', otpResult.error);
+        req.flash('error', 'Gửi email xác thực thất bại. Vui lòng thử lại sau.');
+        return res.redirect('/auth/login');
+      }
+
+      // Store email in session for verification
+      req.session.verificationEmail = email;
+      req.session.verificationExpiresAt = otpResult.expiresAt;
+
+      req.flash('success', 'Mã OTP xác thực đã được gửi đến email của bạn.');
+      res.redirect('/auth/verify-email-otp');
+
     } catch (error) {
       console.error('Resend verification error:', error);
       req.flash('error', 'Gửi lại email thất bại');
       res.redirect('/auth/login');
+    }
+  }
+
+  // GET /auth/verify-email-otp
+  showVerifyEmailOTP(req, res) {
+    if (!req.session.verificationEmail) {
+      req.flash('error', 'Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại.');
+      return res.redirect('/auth/login');
+    }
+
+    res.render('auth/verify-email-otp', {
+      title: 'Xác thực Email',
+      email: req.session.verificationEmail,
+      expiresAt: req.session.verificationExpiresAt,
+      user: null
+    });
+  }
+
+  // POST /auth/verify-email-otp
+  async verifyEmailOTP(req, res) {
+    try {
+      const { otp } = req.body;
+      const email = req.session.verificationEmail;
+
+      if (!email) {
+        req.flash('error', 'Phiên làm việc đã hết hạn. Vui lòng bắt đầu lại.');
+        return res.redirect('/auth/login');
+      }
+
+      // Verify OTP using EmailService
+      const verificationResult = EmailService.verifyOTP(email, otp);
+
+      if (!verificationResult.success) {
+        req.flash('error', verificationResult.message);
+        return res.redirect('/auth/verify-email-otp');
+      }
+
+      // OTP verified successfully, update user verification status
+      const user = await User.findOne({ email });
+      const business = await Business.findOne({ email });
+
+      if (user) {
+        await User.updateOne(
+          { email },
+          { emailVerified: true, emailVerifiedAt: new Date() }
+        );
+      } else if (business) {
+        await Business.updateOne(
+          { email },
+          { emailVerified: true, emailVerifiedAt: new Date() }
+        );
+      }
+
+      // Clear session data
+      delete req.session.verificationEmail;
+      delete req.session.verificationExpiresAt;
+
+      req.flash('success', 'Email đã được xác thực thành công. Vui lòng đăng nhập.');
+      res.redirect('/auth/login');
+
+    } catch (error) {
+      console.error('Email OTP verification error:', error);
+      req.flash('error', 'Xác thực email thất bại');
+      res.redirect('/auth/verify-email-otp');
     }
   }
 }

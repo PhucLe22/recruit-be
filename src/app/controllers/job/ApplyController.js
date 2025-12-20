@@ -4,6 +4,9 @@ const CV = require('../../../app/models/CV');
 const Business = require('../../../app/models/Business');
 const User = require('../../../app/models/User');
 const ActivityTracker = require('../../../middlewares/activityTracker');
+const EmailService = require('../../../services/EmailService');
+const fs = require('fs');
+const path = require('path');
 
 class ApplyController {
   // Apply for a job
@@ -68,13 +71,92 @@ class ApplyController {
         business_id: job.businessId._id,
         cv_id: cv._id
       });
-
       await application.save();
+
+      // Trigger real-time update to business dashboard
+      try {
+        const businessRoutes = require('../../../routes/business');
+        if (businessRoutes.sendApplicationUpdate && job.businessId) {
+          // Populate application data for real-time update
+          const populatedApplication = await AppliedJobs.findById(application._id)
+            .populate('user_id', 'fullName email')
+            .populate('job_id', 'title');
+          
+          businessRoutes.sendApplicationUpdate(job.businessId._id, populatedApplication);
+          console.log('Real-time update triggered for business:', job.businessId._id);
+        }
+      } catch (realtimeError) {
+        console.error('Failed to send real-time update:', realtimeError);
+      }
+
+      // Get business details from AppliedJobs
+      const appliedJob = await AppliedJobs.findById(application._id);
+      console.log('AppliedJob data:', {
+        appliedJobId: appliedJob._id,
+        business_id: appliedJob.businessId,
+        businessId: appliedJob.businessId
+      });
+      
+      let business = null;
+      if (appliedJob.businessId) {
+        business = await Business.findById(appliedJob.businessId);
+      }
+      
+      console.log('Business data:', {
+        businessId: business?._id,
+        companyName: business?.companyName,
+        found: !!business,
+        allBusinessFields: business ? Object.keys(business.toObject()) : null
+      });
+      
+      // Fallback to job's businessId if business lookup fails
+      if (!business && job.businessId) {
+        console.log('Using fallback job.businessId:', job.businessId);
+        business = await Business.findById(job.businessId._id);
+        console.log('Fallback business data:', {
+          businessId: business?._id,
+          companyName: business?.companyName,
+          found: !!business
+        });
+      }
 
       // Increase application count
       await Job.findByIdAndUpdate(job._id, {
         $inc: { applicationCount: 1 }
       });
+
+      // Send confirmation email to applicant
+      try {
+        const templatePath = path.join(__dirname, '../../../templates/job-application-confirmation.html');
+        const emailTemplate = fs.readFileSync(templatePath, 'utf8');
+        
+        console.log('Template variables:', {
+          applicantName: user.name || user.username,
+          jobTitle: job.title,
+          companyName: business?.companyName || 'Unknown Company',
+          appliedDate: new Date().toLocaleDateString(),
+          applicationId: application._id
+        });
+        
+        const emailContent = emailTemplate
+          .replace(/\{\{applicantName\}\}/g, user.name || user.username)
+          .replace(/\{\{jobTitle\}\}/g, job.title)
+          .replace(/\{\{companyName\}\}/g, business?.companyName || 'Unknown Company')
+          .replace(/\{\{appliedDate\}\}/g, new Date().toLocaleDateString())
+          .replace(/\{\{applicationId\}\}/g, application._id)
+          .replace(/\{\{dashboardUrl\}\}/g, 'http://localhost:3000/dashboard');
+
+        console.log('Email content preview:', emailContent.substring(0, 500));
+
+        await EmailService.sendEmail(
+          user.email,
+          'Application Submitted Successfully',
+          emailContent
+        );
+      } catch (emailError) {
+        console.error('Failed to send application confirmation email:', emailError);
+        // Continue with response even if email fails
+      }
 
       return res.json({
         success: true,

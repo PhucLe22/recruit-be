@@ -30,7 +30,7 @@ class ProfileController {
       ]);
 
       res.render('business/profile', {
-        layout: 'business/main',
+        layout: 'business',
         business,
         stats: { totalJobs, activeJobs },
         errors,

@@ -22,6 +22,10 @@ app.engine(
     'hbs',
     exphbs.engine({
         extname: '.hbs',
+        runtimeOptions: {
+            allowProtoPropertiesByDefault: true,
+            allowProtoMethodsByDefault: true
+        },
         helpers: {
             json: (context) => JSON.stringify(context),
             sum: (a, b) => a + b,
@@ -299,12 +303,22 @@ app.listen(port, () => {
 
 const originalLog = console.log;
 console.log = (...args) => {
-    const str = args.join(' ');
-    if (
-        str.includes('Example app listening on port') ||
-        str.includes('success') ||
-        str.includes('Debugger listening')
-    ) {
-        originalLog(...args);
+    try {
+        const str = args.map(arg => {
+            if (typeof arg === 'object' && arg !== null) {
+                return JSON.stringify(arg);
+            }
+            return String(arg);
+        }).join(' ');
+        
+        if (
+            str.includes('Example app listening on port') ||
+            str.includes('success') ||
+            str.includes('Debugger listening')
+        ) {
+            originalLog(...args);
+        }
+    } catch (error) {
+        originalLog('Console log error:', error.message);
     }
 };

@@ -14,7 +14,7 @@ class RegisterController {
       req.session.success = null;
       
       res.render('business/register', {
-        layout: 'business/main',
+        layout: false,
         errors,
         success,
         formData: req.session.formData || {},

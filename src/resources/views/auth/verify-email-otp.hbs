@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xác thực Email - CV Recruitment Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .auth-container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 40px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo i {
+            font-size: 48px;
+            color: #667eea;
+        }
+        .otp-input {
+            letter-spacing: 10px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: bold;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+        .otp-input:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .countdown {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .btn-outline-secondary {
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: bold;
+        }
+        .alert {
+            border-radius: 10px;
+            border: none;
+        }
+        .email-display {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .verification-icon {
+            font-size: 64px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container">
+            <div class="logo">
+                <i class="fas fa-envelope-open-text verification-icon"></i>
+                <h3 class="mt-3">Xác thực Email</h3>
+            </div>
+
+            {{#if error_msg}}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>{{error_msg}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {{/if}}
+
+            {{#if success_msg}}
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>{{success_msg}}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {{/if}}
+
+            <div class="email-display">
+                <i class="fas fa-envelope me-2"></i>
+                <strong>Mã OTP đã được gửi đến:</strong><br>
+                {{email}}
+            </div>
+
+            <form action="/auth/verify-email-otp" method="POST">
+                <div class="mb-4">
+                    <label for="otp" class="form-label">
+                        <i class="fas fa-key me-2"></i>Nhập mã OTP 6 số
+                    </label>
+                    <input type="text" 
+                           class="form-control otp-input" 
+                           id="otp" 
+                           name="otp" 
+                           maxlength="6" 
+                           pattern="[0-9]{6}" 
+                           required 
+                           autocomplete="off"
+                           placeholder="000000">
+                    <div class="form-text text-muted">
+                        <i class="fas fa-info-circle me-1"></i>
+                        Mã OTP có hiệu lực trong 10 phút
+                    </div>
+                </div>
+
+                <div class="countdown" id="countdown">
+                    <i class="fas fa-clock me-2"></i>
+                    <span id="timer">10:00</span> remaining
+                </div>
+
+                <div class="d-grid gap-3">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check-circle me-2"></i>Xác thực Email
+                    </button>
+                    
+                    <form action="/auth/resend-verification" method="POST" style="display: inline;">
+                        <input type="hidden" name="email" value="{{email}}">
+                        <button type="submit" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-redo me-2"></i>Gửi lại OTP
+                        </button>
+                    </form>
+                </div>
+            </form>
+
+            <div class="text-center mt-4">
+                <a href="/auth/login" class="text-muted">
+                    <i class="fas fa-arrow-left me-2"></i>Quay lại đăng nhập
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Auto-format OTP input
+        const otpInput = document.getElementById('otp');
+        otpInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // Countdown timer
+        {{#if expiresAt}}
+        const expiresAt = new Date('{{expiresAt}}').getTime();
+        const countdown = document.getElementById('countdown');
+        const timer = document.getElementById('timer');
+        
+        const updateTimer = setInterval(function() {
+            const now = new Date().getTime();
+            const distance = expiresAt - now;
+            
+            if (distance < 0) {
+                clearInterval(updateTimer);
+                countdown.innerHTML = '<i class="fas fa-exclamation-triangle me-2"></i>OTP đã hết hạn';
+                countdown.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+                otpInput.disabled = true;
+                document.querySelector('button[type="submit"]').disabled = true;
+                return;
+            }
+            
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+            
+            timer.textContent = minutes.toString().padStart(2, '0') + ':' + seconds.toString().padStart(2, '0');
+            
+            if (distance < 60000) { // Less than 1 minute
+                countdown.style.background = 'linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%)';
+            }
+        }, 1000);
+        {{/if}}
+
+        // Focus OTP input on page load
+        otpInput.focus();
+    </script>
+</body>
+</html>

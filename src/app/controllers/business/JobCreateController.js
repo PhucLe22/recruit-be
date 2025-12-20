@@ -6,7 +6,7 @@ class JobCreateController {
   // Show create job form
   showCreateJobForm(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.account || req.userType !== 'business') {
         return res.redirect('/business/login');
       }
 
@@ -38,7 +38,7 @@ class JobCreateController {
   // Process job creation
   async createJob(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.account || req.userType !== 'business') {
         return res.redirect('/business/login');
       }
 
@@ -104,7 +104,7 @@ class JobCreateController {
       }
 
       // Check business subscription limits
-      const business = await Business.findById(req.session.business._id);
+      const business = await Business.findById(req.account.id);
       if (!business.canPostJob()) {
         errors.push('Bạn đã đạt giới hạn đăng tin. Vui lòng nâng cấp gói đăng ký.');
       }
@@ -160,7 +160,7 @@ class JobCreateController {
   // Show edit job form
   async showEditJobForm(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.account || req.userType !== 'business') {
         return res.redirect('/business/login');
       }
 
@@ -173,7 +173,7 @@ class JobCreateController {
 
       const job = await Job.findById(id);
       
-      if (!job || job.businessId.toString() !== req.session.business._id) {
+      if (!job || job.businessId.toString() !== req.account.id) {
         req.session.errors = ['Tin tuyển dụng không tồn tại hoặc bạn không có quyền chỉnh sửa'];
         return res.redirect('/business/manage-jobs');
       }
@@ -198,7 +198,7 @@ class JobCreateController {
   // Process job update
   async updateJob(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.account || req.userType !== 'business') {
         return res.redirect('/business/login');
       }
 
@@ -243,7 +243,7 @@ class JobCreateController {
 
       const job = await Job.findById(id);
       
-      if (!job || job.businessId.toString() !== req.session.business._id) {
+      if (!job || job.businessId.toString() !== req.account.id) {
         req.session.errors = ['Tin tuyển dụng không tồn tại hoặc bạn không có quyền chỉnh sửa'];
         return res.redirect('/business/manage-jobs');
       }
@@ -287,7 +287,7 @@ class JobCreateController {
   // Delete job
   async deleteJob(req, res) {
     try {
-      if (!req.session.business) {
+      if (!req.account || req.userType !== 'business') {
         return res.redirect('/business/login');
       }
 
@@ -295,7 +295,7 @@ class JobCreateController {
 
       const job = await Job.findById(id);
       
-      if (!job || job.businessId.toString() !== req.session.business._id) {
+      if (!job || job.businessId.toString() !== req.account.id) {
         req.session.errors = ['Tin tuyển dụng không tồn tại hoặc bạn không có quyền xóa'];
         return res.redirect('/business/manage-jobs');
       }
@@ -303,7 +303,7 @@ class JobCreateController {
       await Job.findByIdAndDelete(id);
 
       // Update business job stats
-      const business = await Business.findById(req.session.business._id);
+      const business = await Business.findById(req.account.id);
       await business.updateJobStats();
 
       req.session.success = 'Xóa tin tuyển dụng thành công!';

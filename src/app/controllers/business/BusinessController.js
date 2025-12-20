@@ -28,10 +28,13 @@ class BusinessController {
     }
     async jobList(req, res, next) {
         try {
-            const business = req.account;
-            if (!business || !business.id) {
+            const business = req.user;
+            if (!business || (!business.id && !business._id)) {
                 return res.status(400).send('Business account not found');
             }
+
+            // Use either id or _id field
+            const businessId = business.id || business._id;
 
             // Pagination settings
             const page = parseInt(req.query.page) || 1;
@@ -39,10 +42,10 @@ class BusinessController {
             const skip = (page - 1) * limit;
 
             // Count total documents for pagination
-            const total = await Job.countDocuments({ businessId: business.id });
+            const total = await Job.countDocuments({ businessId });
 
             // Get paginated jobs
-            const jobs = await Job.find({ businessId: business.id })
+            const jobs = await Job.find({ businessId })
                 .populate({
                     path: 'businessId',
                     select: 'companyName email',
@@ -69,8 +72,8 @@ class BusinessController {
             const hasPreviousPage = page > 1;
 
             res.status(200).render('business/jobs/list', {
+                layout: 'business',
                 jobsList: jobsList,
-                layout: false,
                 pagination: {
                     page,
                     limit,

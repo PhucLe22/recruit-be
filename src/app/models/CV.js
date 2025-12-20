@@ -4,6 +4,11 @@ const { Schema } = mongoose;
 
 const cvSchema = new Schema(
     {
+        user_id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+            required: true
+        },
         username: {
             type: String,
             required: [true, 'Username is required'],

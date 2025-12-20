@@ -391,6 +391,24 @@
             text-decoration: underline;
         }
 
+        .forgot-password-link {
+            text-align: right;
+            margin-top: 8px;
+        }
+
+        .forgot-password {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-password:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
         .security-note {
             background: rgba(255, 193, 7, 0.1);
             border: 1px solid rgba(255, 193, 7, 0.3);
@@ -542,6 +560,9 @@
                     </button>
                 </div>
                 <div class="error-message" id="passwordError">Mật khẩu phải có ít nhất 6 ký tự</div>
+                <div class="forgot-password-link">
+                    <a href="/auth/forgot-password" class="forgot-password">Quên mật khẩu?</a>
+                </div>
             </div>
 
             <div class="form-group">

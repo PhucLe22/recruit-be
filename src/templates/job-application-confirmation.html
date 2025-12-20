@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Application Confirmation</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #f9f9f9;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9;">
+        <div style="background-color: #007bff; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0;">
+            <h1 style="margin: 0; font-size: 24px;">Application Confirmed!</h1>
+        </div>
+        
+        <div style="background-color: white; padding: 30px; border-radius: 0 0 8px 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                Dear <strong>{{applicantName}}</strong>,
+            </p>
+            
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                Thank you for applying for the position of <strong>{{jobTitle}}</strong> at <strong>{{companyName}}</strong>. Your application has been successfully submitted and is now being reviewed by the hiring team.
+            </p>
+            
+            <div style="background-color: #e9ecef; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                <h3 style="color: #007bff; margin-top: 0;">Application Details:</h3>
+                <ul style="color: #333; line-height: 1.6;">
+                    <li><strong>Position:</strong> {{jobTitle}}</li>
+                    <li><strong>Company:</strong> {{companyName}}</li>
+                    <li><strong>Applied Date:</strong> {{appliedDate}}</li>
+                    <li><strong>Application ID:</strong> {{applicationId}}</li>
+                </ul>
+            </div>
+            
+            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">
+                You will receive updates about your application status via email. You can also track your application status in your dashboard.
+            </p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{dashboardUrl}}" style="background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; display: inline-block;">
+                    View Your Applications
+                </a>
+            </div>
+            
+            <p style="font-size: 14px; color: #666; margin-top: 30px; text-align: center;">
+                Best regards,<br>
+                The {{companyName}} Recruitment Team
+            </p>
+        </div>
+    </div>
+</body>
+</html>

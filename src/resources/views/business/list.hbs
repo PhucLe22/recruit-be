@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Danh sách Doanh nghiệp</title>
+    <title>Danh sách Doanh nghiệp - Job Portal</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -13,126 +13,186 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
             min-height: 100vh;
-            padding: 2rem 1rem;
+            color: #1e293b;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 2rem 1rem;
         }
 
         /* Header Section */
         .page-header {
             text-align: center;
-            margin-bottom: 3rem;
-            color: #1f2937;
+            margin-bottom: 4rem;
+            position: relative;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            border-radius: 2px;
         }
 
         .page-header h1 {
-            font-size: 3rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            text-shadow: none;
+            font-size: 3.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
         }
 
         .page-header p {
-            font-size: 1.2rem;
-            opacity: 0.8;
+            font-size: 1.25rem;
+            color: #64748b;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
         }
 
-        /* Search Bar */
-        .search-container {
+        /* Search Section */
+        .search-section {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 2rem;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
             margin-bottom: 3rem;
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .search-wrapper {
+        .search-grid {
             display: grid;
-            grid-template-columns: 1fr auto;
+            grid-template-columns: 1fr auto auto;
             gap: 1rem;
             align-items: center;
         }
 
-        .search-box {
+        .search-input-wrapper {
             position: relative;
-            flex: 1;
         }
 
-        .search-box input {
+        .search-input {
             width: 100%;
             padding: 1rem 1rem 1rem 3.5rem;
-            border: 2px solid #e0e7ff;
-            border-radius: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
             font-size: 1rem;
             transition: all 0.3s ease;
+            background: #f8fafc;
         }
 
-        .search-box input:focus {
+        .search-input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: #3b82f6;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
         }
 
-        .search-box i {
+        .search-icon {
             position: absolute;
-            left: 1.2rem;
+            left: 1.25rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #667eea;
-            font-size: 1.2rem;
+            color: #64748b;
+            font-size: 1.1rem;
+            pointer-events: none;
         }
 
-        .filter-select {
-            padding: 1rem 2rem;
-            border: 2px solid #e0e7ff;
-            border-radius: 12px;
-            font-size: 1rem;
+        .filter-btn, .view-toggle-btn {
+            padding: 1rem 1.5rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
             background: white;
+            color: #475569;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 200px;
-        }
-
-        .filter-select:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        /* View Toggle */
-        .view-toggle {
             display: flex;
+            align-items: center;
             gap: 0.5rem;
-            background: #f3f4f6;
-            padding: 0.3rem;
-            border-radius: 10px;
+            font-size: 0.95rem;
         }
 
-        .view-btn {
-            padding: 0.6rem 1.2rem;
-            border: none;
-            background: transparent;
-            border-radius: 8px;
+        .filter-btn:hover, .view-toggle-btn:hover {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: #f0f9ff;
+        }
+
+        .view-toggle-btn.active {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1.5rem 2rem;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+        }
+
+        .stats-info {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .sort-dropdown {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #475569;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
-            color: #6b7280;
         }
 
-        .view-btn.active {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .sort-dropdown:focus {
+            outline: none;
+            border-color: #3b82f6;
         }
 
         /* Business Grid */
         .business-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
             gap: 2rem;
             margin-bottom: 3rem;
         }
@@ -141,131 +201,173 @@
             background: white;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
         .business-card:hover {
             transform: translateY(-8px);
-            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+            border-color: #3b82f6;
         }
 
-        .card-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .card-banner {
             height: 120px;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
             position: relative;
+            overflow: hidden;
+        }
+
+        .card-banner::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .verified-ribbon {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: #059669;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.2);
+        }
+
+        .company-logo-section {
+            padding: 0 2rem;
+            margin-top: -2.5rem;
+            position: relative;
+            z-index: 10;
         }
 
         .company-logo {
-            position: absolute;
-            bottom: -40px;
-            left: 1.5rem;
             width: 80px;
             height: 80px;
             border-radius: 16px;
             background: white;
             padding: 0.5rem;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            border: 3px solid white;
         }
 
         .company-logo img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 8px;
         }
 
-        .verified-badge {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: rgba(255,255,255,0.25);
-            backdrop-filter: blur(10px);
-            padding: 0.5rem 1rem;
-            border-radius: 20px;
-            color: white;
-            font-size: 0.85rem;
-            font-weight: 600;
+        .logo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             display: flex;
             align-items: center;
-            gap: 0.3rem;
+            justify-content: center;
+            color: #64748b;
+            font-size: 1.5rem;
+            border-radius: 8px;
         }
 
-        .card-body {
-            padding: 3rem 1.5rem 1.5rem;
+        .card-content {
+            padding: 2rem 2rem 1.5rem;
         }
 
         .company-name {
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #1f2937;
+            color: #1e293b;
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
         }
 
         .company-description {
-            color: #6b7280;
+            color: #64748b;
             font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 1.5rem;
             display: -webkit-box;
-            -webkit-line-clamp: 2;
+            -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
             overflow: hidden;
         }
 
-        .location {
+        .company-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            color: #6b7280;
+            color: #64748b;
             font-size: 0.9rem;
-            margin-bottom: 1.5rem;
         }
 
-        .location i {
-            color: #667eea;
+        .meta-item i {
+            color: #3b82f6;
+            font-size: 0.9rem;
         }
 
-        .stats-grid {
+        .company-stats {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
             margin-bottom: 1.5rem;
         }
 
-        .stat-box {
-            background: linear-gradient(135deg, #f0f4ff 0%, #e0e7ff 100%);
+        .stat-card {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             padding: 1rem;
             border-radius: 12px;
             text-align: center;
+            border: 1px solid #e2e8f0;
         }
 
-        .stat-value {
-            font-size: 1.5rem;
+        .stat-card-value {
+            font-size: 1.25rem;
             font-weight: 700;
-            color: #667eea;
-            margin-bottom: 0.3rem;
+            color: #1e293b;
+            margin-bottom: 0.25rem;
         }
 
-        .stat-label {
-            font-size: 0.85rem;
-            color: #6b7280;
+        .stat-card-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
         }
 
         .card-actions {
-            display: grid;
-            grid-template-columns: 1fr auto;
+            display: flex;
             gap: 0.75rem;
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 10px;
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
             font-weight: 600;
             text-decoration: none;
             display: inline-flex;
@@ -275,122 +377,196 @@
             transition: all 0.3s ease;
             border: none;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
+            flex: 1;
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
         .btn-primary:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
         }
 
-        .btn-icon {
-            width: 45px;
-            height: 45px;
-            padding: 0;
-            background: #f3f4f6;
-            color: #667eea;
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 2px solid #e2e8f0;
         }
 
-        .btn-icon:hover {
-            background: #667eea;
-            color: white;
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
         }
 
         /* Empty State */
         .empty-state {
             background: white;
-            border-radius: 20px;
+            border-radius: 24px;
             padding: 4rem 2rem;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.06);
+            border: 2px dashed #cbd5e1;
         }
 
-        .empty-state i {
-            font-size: 5rem;
-            color: #e0e7ff;
-            margin-bottom: 1.5rem;
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            color: #1f2937;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state p {
-            color: #6b7280;
-            margin-bottom: 2rem;
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            list-style: none;
-        }
-
-        .pagination li {
-            display: inline-block;
-        }
-
-        .pagination a {
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 2rem;
+            color: #64748b;
+        }
+
+        .empty-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-description {
+            color: #64748b;
+            margin-bottom: 2rem;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Pagination */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-top: 3rem;
+        }
+
+        .pagination {
+            display: flex;
+            gap: 0.5rem;
+            background: white;
+            padding: 0.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .pagination-btn {
             width: 45px;
             height: 45px;
-            background: white;
-            color: #667eea;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            border-radius: 12px;
+            cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .pagination a:hover {
-            background: #667eea;
+        .pagination-btn:hover {
+            background: #f1f5f9;
+            color: #3b82f6;
+        }
+
+        .pagination-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
-            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
 
-        .pagination .active a {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .pagination .disabled a {
+        .pagination-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .pagination .disabled a:hover {
-            background: white;
-            color: #667eea;
-            transform: none;
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .business-grid {
+                grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            }
+
+            .stats-bar {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .stats-info {
+                justify-content: space-around;
+            }
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
             .page-header h1 {
                 font-size: 2rem;
             }
 
-            .search-wrapper {
-                grid-template-columns: 1fr;
+            .page-header p {
+                font-size: 1.1rem;
+            }
+
+            .search-section {
+                padding: 1.5rem;
             }
 
             .business-grid {
                 grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
 
-            .filter-select {
-                min-width: 100%;
+            .stats-info {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: center;
+            }
+
+            .card-content {
+                padding: 1.5rem;
+            }
+
+            .company-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .page-header h1 {
+                font-size: 1.75rem;
+            }
+
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-btn, .view-toggle-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .card-actions {
+                flex-direction: column;
             }
         }
     </style>
@@ -399,24 +575,49 @@
     <div class="container">
         <!-- Header -->
         <div class="page-header">
-            <h1>Danh sách Doanh nghiệp</h1>
-            <p>Khám phá các công ty uy tín và cơ hội việc làm hấp dẫn</p>
+            <h1>Khám phá Doanh nghiệp</h1>
+            <p>Tìm kiếm cơ hội việc làm tại các công ty hàng đầu Việt Nam</p>
         </div>
 
-        <!-- Search and Filter -->
-        <div class="search-container">
-            <div class="search-wrapper">
-                <div class="search-box">
-                    <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Tìm kiếm công ty, vị trí, ngành nghề..." id="searchInput">
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="search-grid">
+                <div class="search-input-wrapper">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" class="search-input" placeholder="Tìm kiếm công ty, vị trí, ngành nghề..." id="searchInput">
                 </div>
-                <select class="filter-select" id="locationFilter">
-                    <option value="">Tất cả địa điểm</option>
-                    <option value="hanoi">Hà Nội</option>
-                    <option value="hcmc">TP. Hồ Chí Minh</option>
-                    <option value="danang">Đà Nẵng</option>
-                </select>
+                <button class="filter-btn">
+                    <i class="fas fa-filter"></i>
+                    Bộ lọc
+                </button>
+                <button class="view-toggle-btn active" id="gridViewBtn">
+                    <i class="fas fa-th"></i>
+                    Lưới
+                </button>
             </div>
+        </div>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+            <div class="stats-info">
+                <div class="stat-item">
+                    <div class="stat-value">{{list.length}}</div>
+                    <div class="stat-label">Doanh nghiệp</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{totalBusinesses}}</div>
+                    <div class="stat-label">Tổng số</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">{{activeBusinesses}}</div>
+                    <div class="stat-label">Đang tuyển</div>
+                </div>
+            </div>
+            <select class="sort-dropdown" id="sortDropdown">
+                <option value="newest">Mới nhất</option>
+                <option value="name">Tên A-Z</option>
+                <option value="jobs">Nhiều việc nhất</option>
+            </select>
         </div>
 
         <!-- Business Listings -->
@@ -424,41 +625,56 @@
             <div class="business-grid" id="businessList">
                 {{#each list}}
                     <div class="business-card">
-                        <div class="card-header">
+                        <div class="card-banner">
                             {{#if verified}}
-                                <div class="verified-badge">
+                                <div class="verified-ribbon">
                                     <i class="fas fa-check-circle"></i>
                                     Đã xác thực
                                 </div>
                             {{/if}}
                         </div>
-                        <div class="company-logo">
-                            <img src="{{logoUrl}}" alt="{{name}}">
+                        <div class="company-logo-section">
+                            <div class="company-logo">
+                                {{#if logoUrl}}
+                                    <img src="{{logoUrl}}" alt="{{name}}">
+                                {{else}}
+                                    <div class="logo-placeholder">
+                                        <i class="fas fa-building"></i>
+                                    </div>
+                                {{/if}}
+                            </div>
                         </div>
-                        <div class="card-body">
+                        <div class="card-content">
                             <h3 class="company-name">{{name}}</h3>
                             <p class="company-description">{{description}}</p>
-                            <div class="location">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <span>{{location}}</span>
-                            </div>
-                            <div class="stats-grid">
-                                <div class="stat-box">
-                                    <div class="stat-value">{{jobCount}}</div>
-                                    <div class="stat-label">Việc làm</div>
+                            <div class="company-meta">
+                                <div class="meta-item">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <span>{{location}}</span>
                                 </div>
-                                <div class="stat-box">
-                                    <div class="stat-value">{{employeeCount}}</div>
-                                    <div class="stat-label">Nhân viên</div>
+                                <div class="meta-item">
+                                    <i class="fas fa-industry"></i>
+                                    <span>{{industry}}</span>
+                                </div>
+                            </div>
+                            <div class="company-stats">
+                                <div class="stat-card">
+                                    <div class="stat-card-value">{{jobCount}}</div>
+                                    <div class="stat-card-label">Việc làm</div>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-card-value">{{employeeCount}}</div>
+                                    <div class="stat-card-label">Nhân viên</div>
                                 </div>
                             </div>
                             <div class="card-actions">
-                                <a href="/businesses/{{id}}" class="btn btn-primary">
+                                <a href="/business/detail/{{id}}" class="btn btn-primary">
                                     <i class="fas fa-eye"></i>
                                     Xem chi tiết
                                 </a>
-                                <a href="/businesses/{{id}}/jobs" class="btn btn-icon">
+                                <a href="/businesses/{{id}}/jobs" class="btn btn-secondary">
                                     <i class="fas fa-briefcase"></i>
+                                    Việc làm
                                 </a>
                             </div>
                         </div>
@@ -468,9 +684,11 @@
         {{else}}
             <!-- Empty State -->
             <div class="empty-state">
-                <i class="fas fa-building"></i>
-                <h3>Chưa có doanh nghiệp nào</h3>
-                <p>Hiện tại chưa có doanh nghiệp nào được đăng ký trên hệ thống.</p>
+                <div class="empty-icon">
+                    <i class="fas fa-building"></i>
+                </div>
+                <h3 class="empty-title">Chưa có doanh nghiệp nào</h3>
+                <p class="empty-description">Hiện tại chưa có doanh nghiệp nào được đăng ký trên hệ thống. Vui lòng quay lại sau.</p>
                 {{#unless user}}
                     <a href="/auth/register" class="btn btn-primary">
                         <i class="fas fa-plus me-2"></i>Đăng ký doanh nghiệp
@@ -480,41 +698,43 @@
         {{/if}}
 
         <!-- Pagination -->
-        <nav>
-            <ul class="pagination">
-                <li class="disabled">
-                    <a href="#"><i class="fas fa-chevron-left"></i></a>
-                </li>
-                <li class="active"><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li>
-                    <a href="#"><i class="fas fa-chevron-right"></i></a>
-                </li>
-            </ul>
-        </nav>
+        {{#if list.length}}
+            <div class="pagination-wrapper">
+                <div class="pagination">
+                    <button class="pagination-btn" disabled>
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="pagination-btn active">1</button>
+                    <button class="pagination-btn">2</button>
+                    <button class="pagination-btn">3</button>
+                    <button class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        {{/if}}
     </div>
 
     <script>
         // Search functionality
         const searchInput = document.getElementById('searchInput');
-        const locationFilter = document.getElementById('locationFilter');
         const businessCards = document.querySelectorAll('.business-card');
+        const sortDropdown = document.getElementById('sortDropdown');
+        const gridViewBtn = document.getElementById('gridViewBtn');
 
         function filterBusinesses() {
             const searchTerm = searchInput.value.toLowerCase();
-            const locationValue = locationFilter.value.toLowerCase();
 
             businessCards.forEach(card => {
                 const companyName = card.querySelector('.company-name').textContent.toLowerCase();
                 const description = card.querySelector('.company-description').textContent.toLowerCase();
-                const location = card.querySelector('.location span').textContent.toLowerCase();
+                const location = card.querySelector('.meta-item span').textContent.toLowerCase();
 
-                const matchesSearch = companyName.includes(searchTerm) || description.includes(searchTerm);
-                const matchesLocation = !locationValue || location.includes(locationValue);
+                const matchesSearch = companyName.includes(searchTerm) || 
+                                  description.includes(searchTerm) || 
+                                  location.includes(searchTerm);
 
-                if (matchesSearch && matchesLocation) {
+                if (matchesSearch) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -522,8 +742,38 @@
             });
         }
 
+        function sortBusinesses() {
+            const sortValue = sortDropdown.value;
+            const businessList = document.getElementById('businessList');
+            const cards = Array.from(businessList.children);
+
+            cards.sort((a, b) => {
+                switch(sortValue) {
+                    case 'name':
+                        const nameA = a.querySelector('.company-name').textContent;
+                        const nameB = b.querySelector('.company-name').textContent;
+                        return nameA.localeCompare(nameB);
+                    case 'jobs':
+                        const jobsA = parseInt(a.querySelector('.stat-card-value').textContent);
+                        const jobsB = parseInt(b.querySelectorAll('.stat-card-value')[0].textContent);
+                        return jobsB - jobsA;
+                    default:
+                        return 0;
+                }
+            });
+
+            cards.forEach(card => businessList.appendChild(card));
+        }
+
+        // Event listeners
         searchInput.addEventListener('input', filterBusinesses);
-        locationFilter.addEventListener('change', filterBusinesses);
+        sortDropdown.addEventListener('change', sortBusinesses);
+
+        // View toggle (placeholder for future implementation)
+        gridViewBtn.addEventListener('click', function() {
+            this.classList.toggle('active');
+            // Future: Implement list view
+        });
     </script>
 </body>
 </html>

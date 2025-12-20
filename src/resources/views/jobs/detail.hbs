@@ -1007,7 +1007,7 @@
                                 <div class="info-content">
                                     <div class="info-label">Số điện thoại</div>
                                     <div class="info-value">
-                                        <a href="tel:{{job.contact}}">{{job.contact}}</a>
+                                        <span id="contact-display" data-contact="{{business.phone}}" data-email="{{job.email}}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -1153,6 +1153,23 @@
     <script>
         // JavaScript functionality
         document.addEventListener('DOMContentLoaded', function () {
+            // Handle contact field display (email vs phone)
+            const contactDisplay = document.getElementById('contact-display');
+            if (contactDisplay) {
+                const phone = contactDisplay.dataset.contact;
+                const email = contactDisplay.dataset.email;
+                
+                if (phone && phone.trim()) {
+                    // Use business phone number
+                    contactDisplay.innerHTML = `<a href="tel:${phone}">${phone}</a>`;
+                } else if (email && email.trim()) {
+                    // Fallback to job email if no phone
+                    contactDisplay.innerHTML = `<a href="mailto:${email}">${email}</a>`;
+                } else {
+                    contactDisplay.innerHTML = '<span>Chưa cập nhật</span>';
+                }
+            }
+
             // Save job functionality
             const saveJobBtn = document.getElementById('saveJobBtn');
             if (saveJobBtn) {
