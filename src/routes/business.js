@@ -152,6 +152,7 @@ router.post('/delete-logo', isBusiness, profileController.deleteLogo);
 router.post('/delete-cv', isBusiness, profileController.deleteCV);
 
 router.get('/applications', isBusiness, detailApplicantController.detail);
+// router.get('/applications/cv/:userId', isBusiness, userProfileController.viewCVDetails);
 router.get('/jobs-list', verifyToken, businessController.jobList);
 router.get('/jobs', isBusiness, businessController.jobList);
 router.get('/dashboard', isBusiness, dashboardController.showDashboard);
@@ -667,7 +668,13 @@ const sendApplicationUpdate = (businessId, application) => {
 // User Profile and CV viewing routes
 router.get('/user-profile/:userId', userProfileController.viewUserProfile);
 router.get('/cv/download/:cvId', userProfileController.downloadCV);
-router.get('/cv/view/:cvId', userProfileController.viewCVDetails);
+router.get('/cv/view/:cvId', userProfileController.viewApplicantCV);
+
+// API endpoint for CV data (for modal)
+router.get('/api/cv/:cvId', detailApplicantController.getCvData);
+
+// Direct PDF viewing endpoint
+router.get('/api/cv-view/:cvId', detailApplicantController.viewCvDirect);
 
 // Applicant detail route
 router.get('/applicants/:id', detailApplicantController.viewApplicant);

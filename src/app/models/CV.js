@@ -15,18 +15,6 @@ const cvSchema = new Schema(
             trim: true,
             index: true
         },
-        saved: {
-            type: Boolean,
-            default: false,
-        },
-        inserted_id: {
-            type: String,
-            default: null,
-        },
-        message: {
-            type: String,
-            default: '',
-        },
         processed_text: {
             type: String,
             default: '',
@@ -53,6 +41,14 @@ const cvSchema = new Schema(
         uploaded_at: {
             type: Date,
             default: Date.now,
+        },
+        file_path: {
+            type: String,
+            default: '',
+        },
+        filename: {
+            type: String,
+            default: '',
         },
     },
     {
@@ -82,7 +78,6 @@ cvSchema.statics.findOrCreate = async function(username) {
     
     return this.create({
         username: username,
-        saved: false
     });
 };
 

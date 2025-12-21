@@ -193,6 +193,7 @@ class HomeControllerEnhanced {
                     'Phù hợp với hồ sơ của bạn',
                 isPersonalized: personalized,
             }));
+            // return res.json(formattedRecommendations)
 
             // Sort all jobs by match score for logged-in users
             let displayJobs = validJobs;
@@ -215,6 +216,7 @@ class HomeControllerEnhanced {
                         b.matchScore - a.matchScore,
                 );
             }
+            
 
             res.status(200).render('home', {
                 validJobs: displayJobs.slice(0, 12), // Show top 12 jobs with recommendations first

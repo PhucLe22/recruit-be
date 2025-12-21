@@ -6,10 +6,7 @@ const { multipleMongooseToObject } = require('../../../util/mongoose');
 class DetailApplicantController {
     // View individual applicant details
     async viewApplicant(req, res, next) {
-        try {
-            console.log('=== APPLICANT DETAIL REQUEST ===');
-            console.log('Application ID:', req.params.id);
-            
+        try {            
             const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
             const applicationId = req.params.id;
 
@@ -19,7 +16,7 @@ class DetailApplicantController {
 
             // Find application with all populated data
             const application = await AppliedJobs.findById(applicationId)
-                .populate('user_id', 'fullName email phone avatar')
+                .populate('user_id', 'username email phone avatar')
                 .populate('job_id', 'title field location salary')
                 .populate('cv_id', 'originalName filePath createdAt');
 
@@ -72,7 +69,7 @@ class DetailApplicantController {
                 layout: 'business',
                 application: formattedApplication,
                 userCVs: formattedCVs,
-                title: `Applicant - ${application.user_id.fullName}`,
+                title: `Applicant - ${application.user_id.username}`,
                 description: `Application details for ${application.job_id.title}`
             });
 
@@ -82,15 +79,138 @@ class DetailApplicantController {
         }
     }
 
+    // API endpoint to get CV data as JSON for modal
+    async getCvData(req, res, next) {
+        try {
+            const { cvId } = req.params;
+            const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+
+            if (!businessId) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Authentication required' 
+                });
+            }
+
+            // Find CV by ID
+            const CV = require('../../../app/models/CV');
+            const cv = await CV.findById(cvId);
+
+            if (!cv) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'CV not found' 
+                });
+            }
+
+            // Verify business has access to this CV (through applications)
+            const hasAccess = await AppliedJobs.findOne({
+                cv_id: cvId,
+                business_id: businessId
+            });
+
+            if (!hasAccess) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Access denied' 
+                });
+            }
+
+            // Return CV data as JSON
+            res.json({ 
+                success: true, 
+                data: {
+                    _id: cv._id,
+                    originalName: cv.filename || 'CV Document',
+                    createdAt: cv.createdAt || cv.uploaded_at,
+                    fileSize: cv.file_path ? 'PDF Document' : 'Unknown',
+                    file_path: cv.file_path,
+                    filename: cv.filename,
+                    processed_text: cv.processed_text,
+                    username: cv.username,
+                    parsed_output: cv.parsed_output
+                }
+            });
+
+        } catch (error) {
+            console.error('Error getting CV data:', error);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Internal server error' 
+            });
+        }
+    }
+
+    // Direct PDF viewing endpoint
+    async viewCvDirect(req, res, next) {
+        try {
+            const { cvId } = req.params;
+            const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+
+            if (!businessId) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Authentication required' 
+                });
+            }
+
+            // Find CV by ID
+            const CV = require('../../../app/models/CV');
+            const cv = await CV.findById(cvId);
+
+            if (!cv) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'CV not found' 
+                });
+            }
+
+            // Verify business has access to this CV (through applications)
+            const hasAccess = await AppliedJobs.findOne({
+                cv_id: cvId,
+                business_id: businessId
+            });
+
+            if (!hasAccess) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Access denied' 
+                });
+            }
+
+            // Check if file exists
+            const fs = require('fs');
+            const path = require('path');
+            const filePath = path.join(__dirname, '../../../public/uploads/cvs', cv.filename);
+            
+            if (!fs.existsSync(filePath)) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'CV file not found' 
+                });
+            }
+
+            // Set headers for inline PDF viewing
+            res.setHeader('Content-Type', 'application/pdf');
+            res.setHeader('Content-Disposition', `inline; filename="${cv.filename}"`);
+            res.setHeader('Access-Control-Allow-Origin', '*');
+
+            // Stream the PDF file
+            const fileStream = fs.createReadStream(filePath);
+            fileStream.pipe(res);
+
+        } catch (error) {
+            console.error('Error viewing CV directly:', error);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Internal server error' 
+            });
+        }
+    }
+
     async detail(req, res, next) {
         try {
-            console.log('=== APPLICANTS LIST REQUEST ===');
-            console.log('Request URL: ' + req.originalUrl);
-            console.log('Request Method: ' + req.method);
-            console.log('Request Query: ' + JSON.stringify(req.query, null, 2));
-            
             const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
-            console.log('Business ID: ' + businessId);
 
             // Pagination settings
             const page = parseInt(req.query.page) || 1;
@@ -108,7 +228,7 @@ class DetailApplicantController {
             if (search) {
                 // Search by applicant name or email
                 query.$or = [
-                    { 'user_id.fullName': { $regex: search, $options: 'i' } },
+                    { 'user_id.username': { $regex: search, $options: 'i' } },
                     { 'user_id.email': { $regex: search, $options: 'i' } },
                     { email: { $regex: search, $options: 'i' } }
                 ];
@@ -123,24 +243,18 @@ class DetailApplicantController {
             }
 
             // Count total documents for pagination
-            console.log('Counting total applications for business...');
-            console.log('Search query:', JSON.stringify(query, null, 2));
             const total = await AppliedJobs.countDocuments(query);
-            console.log('Total applications found:', total);
 
             // Get job applications with user population
-            console.log('Fetching job applications...');
-            console.log(`Pagination - Page: ${page}, Limit: ${limit}, Skip: ${skip}`);
             
             let jobApplieds = await AppliedJobs.find(query)
-                .populate('user_id', 'fullName email phone avatar')
+                .populate('user_id', 'username email phone avatar')
                 .populate('job_id', 'title')
                 .populate('cv_id')
                 .sort({ applied_at: -1 })
                 .skip(skip)
                 .limit(limit);
                 
-            console.log(`Found ${jobApplieds.length} job applications`);
             // If population fails or user_id is not properly populated, try manual user lookup
             const enhancedJobApplieds = await Promise.all(
                 jobApplieds.map(async (jobApplied) => {
@@ -158,15 +272,9 @@ class DetailApplicantController {
                             jobApplied.user_id &&
                             typeof jobApplied.user_id === 'object'
                         ) {
-                            console.log('=== POPULATED USER DATA ===');
-                            console.log('User object:', JSON.stringify(jobApplied.user_id, null, 2));
-                            console.log('Available fields:', Object.keys(jobApplied.user_id));
-                            
                             jobAppliedObj.username = jobApplied.user_id.username || jobApplied.user_id.email || jobApplied.email;
                             jobAppliedObj.userEmail = jobApplied.user_id.email || jobApplied.email;
                             jobAppliedObj.userAvatar = jobApplied.user_id.avatar;
-                            
-                            console.log('Mapped username:', jobAppliedObj.username);
                         }
                         // If user_id exists but might be string ID, try to find user manually
                         else if (jobApplied.user_id) {
@@ -175,15 +283,9 @@ class DetailApplicantController {
                                 jobApplied.user_id,
                             ).select('username email avatar');
                             if (user) {
-                                console.log('=== MANUALLY FETCHED USER ===');
-                                console.log('User object:', JSON.stringify(user, null, 2));
-                                console.log('Available fields:', Object.keys(user));
-                                
                                 jobAppliedObj.username = user.username || user.email || jobApplied.email;
                                 jobAppliedObj.userEmail = user.email || jobApplied.email;
                                 jobAppliedObj.userAvatar = user.avatar;
-                                
-                                console.log('Mapped username:', jobAppliedObj.username);
                             } else {
                                 // Fallback to email if user not found
                                 jobAppliedObj.username = jobApplied.email;
@@ -225,7 +327,6 @@ class DetailApplicantController {
             const hasNextPage = page < totalPages;
             const hasPreviousPage = page > 1;
 
-            console.log('Rendering template with data...');
             if (enhancedJobApplieds.length > 0) {
                 console.log('Job applications data sample: ' + 
                     JSON.stringify(enhancedJobApplieds[0], (key, value) => {
@@ -262,10 +363,6 @@ class DetailApplicantController {
 
     async updateApplicationStatus(req, res, next) {
         try {
-            console.log('=== UPDATE APPLICATION STATUS REQUEST ===');
-            console.log('Application ID:', req.params.id);
-            console.log('New Status:', req.body.status);
-            
             const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
             const applicationId = req.params.id;
             const { status } = req.body;
@@ -299,8 +396,6 @@ class DetailApplicantController {
                 return res.status(400).json({ success: false, message: 'Failed to update application' });
             }
 
-            console.log('Application status updated successfully:', updatedApplication.status);
-
             res.json({ 
                 success: true, 
                 message: 'Application status updated successfully',
@@ -316,6 +411,20 @@ class DetailApplicantController {
                 success: false, 
                 message: 'Internal server error' 
             });
+        }
+    }
+    async viewCv(req, res, next){
+        try {
+         const cv = await CV.findById(req.params.id).select('cv');
+         if(!cv){
+            return res.status(404).json({ success: false, message: 'CV not found' });
+         }
+         if(cv._id != req.user?.id && cv._id != req.user?._id){
+            return res.status(403).json({ success: false, message: 'Access denied' });
+         }
+         res.json({ success: true, data: cv });   
+        } catch (error) {
+            next(error);
         }
     }
 }

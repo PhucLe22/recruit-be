@@ -612,7 +612,6 @@
       <table id="candidateTable">
         <thead>
           <tr>
-            <th><i class="fas fa-user me-2"></i>Tên Ứng Viên</th>
             <th><i class="fas fa-envelope me-2"></i>Email</th>
             <th><i class="fas fa-toggle-on me-2"></i>Trạng Thái</th>
             <th><i class="fas fa-briefcase me-2"></i>Vị Trí</th>
@@ -624,16 +623,6 @@
           {{#if jobApplieds.length}}
             {{#each jobApplieds}}
             <tr>
-              <td>
-                <div class="user-info">
-                  {{#if this.userAvatar}}
-                    <img src="{{this.userAvatar}}" alt="{{this.username}}" class="user-avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'avatar-placeholder\'>{{substring this.username 0 2}}</div>'">
-                  {{else}}
-                    <div class="avatar-placeholder">{{substring this.username 0 2}}</div>
-                  {{/if}}
-                  <div class="email-text">{{this.username}}</div>
-                </div>
-              </td>
               <td>
                 <div class="email-text">{{this.userEmail}}</div>
               </td>
@@ -655,7 +644,7 @@
               </td>
               <td>
                 <div class="d-flex gap-2">
-                  <a href="/business/cv/{{this.cvId}}" class="btn btn-primary" target="_blank">
+                  <a href="/business/cv/view/{{this.cvId}}" class="btn btn-primary" target="_blank">
                     <i class="far fa-eye"></i> Xem CV
                   </a>
                   <button class="btn btn-danger delete-candidate" data-id="{{this._id}}">
@@ -667,7 +656,7 @@
             {{/each}}
           {{else}}
             <tr>
-              <td colspan="6" class="no-data">
+              <td colspan="5" class="no-data">
                 <i class="fas fa-inbox"></i>
                 <p>Chưa có ứng viên nào</p>
               </td>

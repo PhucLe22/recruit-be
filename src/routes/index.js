@@ -18,6 +18,7 @@ const personalityAssessmentsRouter = require('./personality-assessments');
 const frontendPersonalityAssessmentsRouter = require('./frontend/personality-assessments');
 const cvAssistantRouter = require("./cv-assistant");
 const aiServiceRouter = require("./ai-service");
+const pdfConverterRouter = require("./pdf-converter");
 
 // Mount all routes
 router.use('/otp', otpRouter);
@@ -38,6 +39,7 @@ router.use('/api/personality-assessments', personalityAssessmentsRouter);
 router.use('/personality-assessments', frontendPersonalityAssessmentsRouter);
 router.use('/cv-assistant', cvAssistantRouter);
 router.use('/ai-service', aiServiceRouter);
+router.use('/pdf-converter', pdfConverterRouter);
 
 // Home route should be last to avoid catching other routes
 router.use('/', homeRouter);

@@ -1,0 +1,280 @@
+{{#if businessView}}
+{{!< layouts/business}}
+{{else}}
+{{!< layouts/main}}
+{{/if}}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-file-alt me-2"></i>Xem CV
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {{#if cv}}
+                        <!-- Basic Info Section -->
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <h2 class="mb-3">{{cv.username}}</h2>
+                                <p class="text-muted">
+                                    <i class="fas fa-user me-2"></i> {{cv.username}}<br>
+                                    {{#if cv.parsed_output.level}}
+                                        <i class="fas fa-level-up-alt me-2"></i> Cấp độ: {{cv.parsed_output.level}}<br>
+                                    {{/if}}
+                                    {{#if cv.parsed_output.experience_str}}
+                                        <i class="fas fa-clock me-2"></i> Kinh nghiệm: {{cv.parsed_output.experience_str}}<br>
+                                    {{/if}}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Parsed CV Data Section -->
+                        {{#if cv.parsed_output}}
+                            <!-- Technical Skills -->
+                            {{#if cv.parsed_output.technical_skills.length}}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-code me-2"></i>Kỹ năng kỹ thuật</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {{#each cv.parsed_output.technical_skills}}
+                                            <span class="badge bg-primary">{{this}}</span>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                            {{/if}}
+
+                            <!-- Job Titles -->
+                            {{#if cv.parsed_output.job_titles.length}}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-briefcase me-2"></i>Vị trí công việc</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {{#each cv.parsed_output.job_titles}}
+                                            <span class="badge bg-success">{{this}}</span>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                            {{/if}}
+
+                            <!-- Industries -->
+                            {{#if cv.parsed_output.industries.length}}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-industry me-2"></i>Lĩnh vực công nghiệp</h5>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {{#each cv.parsed_output.industries}}
+                                            <span class="badge bg-info">{{this}}</span>
+                                        {{/each}}
+                                    </div>
+                                </div>
+                            {{/if}}
+
+                            <!-- Experience Summary -->
+                            {{#if cv.parsed_output.experience_years}}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2"><i class="fas fa-chart-line me-2"></i>Tóm tắt kinh nghiệm</h5>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <p class="mb-2"><strong>Số năm kinh nghiệm:</strong> {{cv.parsed_output.experience_years}} năm</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <p class="mb-2"><strong>Mô tả kinh nghiệm:</strong> {{cv.parsed_output.experience_str}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {{/if}}
+                        {{/if}}
+
+                        {{!-- <!-- Processed Text (Full CV Content) -->
+                        {{#if cv.processed_text}}
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2"><i class="fas fa-file-alt me-2"></i>Nội dung CV đầy đủ</h5>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        <pre class="mb-0" style="white-space: pre-wrap; font-family: inherit;">{{cv.processed_text}}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        {{/if}} --}}
+
+                        <div class="d-flex justify-content-between mt-4">
+                            <div>
+                                <a href="/profile/edit" class="btn btn-outline-primary me-2">
+                                    <i class="fas fa-edit me-2"></i>Chỉnh sửa CV
+                                </a>
+                                <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#cvModal">
+                                    <i class="fas fa-eye me-2"></i>Xem CV gốc
+                                </button>
+                            </div>
+                            <a href="/cv/export/{{cv._id}}" class="btn btn-primary">
+                                <i class="fas fa-download me-2"></i>Tải xuống PDF
+                            </a>
+                        </div>
+                    {{else}}
+                        <div class="text-center py-5">
+                            <i class="fas fa-file-alt fa-4x text-muted mb-3"></i>
+                            <h4>Bạn chưa có CV nào</h4>
+                            <p class="text-muted">Tạo CV mới để bắt đầu tìm kiếm việc làm</p>
+                            <a href="/cv/create" class="btn btn-primary mt-3">
+                                <i class="fas fa-plus me-2"></i>Tạo CV mới
+                            </a>
+                        </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CV Modal -->
+<div class="modal fade" id="cvModal" tabindex="-1" aria-labelledby="cvModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cvModalLabel">
+                    <i class="fas fa-file-alt me-2"></i>Xem CV gốc
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                {{#if cv.file_path}}
+                    <div class="cv-file-viewer">
+                        <!-- Convert PDF to image and display as image -->
+                        <img src="/pdf-converter/convert-pdf-to-image?file={{cv.file_path}}" 
+                             alt="CV Document" 
+                             class="cv-document-image"
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                        <!-- Fallback to processed text if conversion fails -->
+                        <div class="cv-pdf-viewer" style="display:none;">
+                            <div class="pdf-page">
+                                <div class="pdf-content">
+                                    <pre class="cv-pdf-text">{{cv.processed_text}}</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {{else if cv.processed_text}}
+                    <div class="cv-pdf-viewer">
+                        <div class="pdf-page">
+                            <div class="pdf-content">
+                                <pre class="cv-pdf-text">{{cv.processed_text}}</pre>
+                            </div>
+                        </div>
+                    </div>
+                {{else}}
+                    <div class="text-center py-4">
+                        <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Không có file CV để hiển thị</p>
+                    </div>
+                {{/if}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                {{#if cv._id}}
+                    <a href="/cv/export/{{cv._id}}" class="btn btn-primary">
+                        <i class="fas fa-download me-2"></i>Tải xuống PDF
+                    </a>
+                {{/if}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .card {
+        border: none;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    .card-header {
+        border-radius: 0 !important;
+    }
+    .section-title {
+        color: #2c3e50;
+        font-weight: 600;
+    }
+    .skill-badge {
+        font-size: 0.9rem;
+        padding: 0.35em 0.8em;
+        margin: 0.2em;
+    }
+    
+    /* CV File Viewer Styles */
+    .cv-file-viewer {
+        width: 100%;
+        height: 600px;
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+    }
+    
+    .cv-document-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* PDF Viewer Styles */
+    .cv-pdf-viewer {
+        background-color: #525659;
+        padding: 20px;
+        min-height: 600px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    
+    .pdf-page {
+        background-color: white;
+        width: 100%;
+        max-width: 800px;
+        min-height: 11in;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .pdf-content {
+        padding: 40px 50px;
+        height: 100%;
+    }
+    
+    .cv-pdf-text {
+        white-space: pre-wrap;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #000;
+        margin: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    /* Modal adjustments */
+    .modal-dialog.modal-lg {
+        max-width: 95vw;
+    }
+    
+    @media (max-width: 768px) {
+        .cv-file-viewer {
+            height: 400px;
+        }
+        
+        .pdf-content {
+            padding: 20px 25px;
+        }
+        
+        .cv-pdf-text {
+            font-size: 11px;
+        }
+        
+        .modal-dialog.modal-lg {
+            max-width: 98vw;
+            margin: 10px;
+        }
+    }
+</style>

@@ -6,6 +6,7 @@ const User = require('../../models/User');
 const MBTIAssessment = require('../../models/MBTIAssessment');
 const BigFiveAssessment = require('../../models/BigFiveAssessment');
 const DISCAssessment = require('../../models/DISCAssessment');
+const CV = require('../../models/CV');
 
 class UserController{
     // PUT /user/profile
@@ -322,6 +323,22 @@ class UserController{
                 success: false,
                 message: 'Có lỗi xảy ra khi cập nhật avatar. Vui lòng thử lại.'
             });
+        }
+    }
+    async viewCV(req, res, next) {
+        try {
+            const user = req.user
+            if (!user) {
+                return res.redirect('/login')
+            }
+            const cv = await CV.findOne({username: user.username})
+            // return res.json(cv);
+            return res.render('users/cv-review', {
+                title: 'Xem CV',
+                cv: cv
+            }) 
+        } catch (error) {
+            next(error)
         }
     }
 }

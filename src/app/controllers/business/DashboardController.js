@@ -30,7 +30,7 @@ class DashboardController {
         Job.countDocuments({ businessId, status: 'active', expiryTime: { $gte: new Date() } }),
         AppliedJobs.countDocuments({ business_id: businessId }),
         AppliedJobs.find({ business_id: businessId })
-          .populate('user_id', 'fullName email phone')
+          .populate('user_id', 'username email phone')
           .populate('job_id', 'title field')
           .sort({ applied_at: -1 })
           .limit(5),
@@ -38,6 +38,7 @@ class DashboardController {
           .sort({ createdAt: -1 })
           .limit(5)
       ]);
+      // return res.json(recentApplications)
 
       // Get application stats by status
       const applicationStats = await AppliedJobs.aggregate([
@@ -49,6 +50,7 @@ class DashboardController {
           }
         }
       ]);
+      // return res.json(applicationStats);
 
       // Get job views stats (simplified)
       const jobViews = await Job.aggregate([

@@ -234,7 +234,6 @@ class HomeControllerEnhanced {
                         b.matchScore - a.matchScore,
                 );
             }
-
             // Ensure fieldsWithJobs is defined and has the expected structure
             const safeFieldsWithJobs = Array.isArray(fieldsWithJobs) ? fieldsWithJobs : [];
             

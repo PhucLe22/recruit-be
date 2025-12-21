@@ -145,7 +145,9 @@ class CVUploadController {
                 // Sao chép dữ liệu từ API nếu có
                 ...(fetchData.data.parsed_output && { parsed_output: fetchData.data.parsed_output }),
                 ...(fetchData.data.message && { message: fetchData.data.message }),
-                ...(fetchData.data.processed_text && { processed_text: fetchData.data.processed_text })
+                ...(fetchData.data.processed_text && { processed_text: fetchData.data.processed_text }),
+                ...(response.data.filename && { filename: response.data.filename }),
+                ...(response.data.file_path && { file_path: `/ai-uploads/${response.data.filename}` })
             };
 
             console.log('📝 CV Data to save:', {

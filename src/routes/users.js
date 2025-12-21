@@ -69,4 +69,7 @@ router.delete('/saved-jobs/:jobId', requireUserAuth, userJobController.unsaveJob
 // Avatar upload route
 router.post('/upload-avatar', requireUserAuth, upload.single('avatar'), userController.uploadAvatar.bind(userController));
 
+// View CV
+router.get('/cv', requireUserAuth, userController.viewCV.bind(userController));
+
 module.exports = router;

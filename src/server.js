@@ -200,6 +200,8 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
+// Serve AI agent uploaded files
+app.use('/ai-uploads', express.static(path.join(__dirname, '../../../ai-agent/chatbot_backend/uploads')));
 
 // Session configuration
 const sessionConfig = {

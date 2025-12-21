@@ -182,6 +182,8 @@ class UserProfileController {
             const { cvId } = req.params;
             const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
 
+            return cvId;
+
             if (!businessId) {
                 return res.redirect('/business/login-page');
             }
@@ -228,6 +230,58 @@ class UserProfileController {
 
         } catch (error) {
             console.error('Error viewing CV details:', error);
+            next(error);
+        }
+    }
+
+    // Business CV view function for applicants
+    async viewApplicantCV(req, res, next) {
+        try {
+            const { cvId } = req.params;
+            const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+
+            if (!businessId) {
+                return res.redirect('/business/login-page');
+            }
+
+            // Find CV by ID
+            const cv = await CV.findById(cvId)
+                .populate('user_id', 'fullName email phone avatar');
+
+            if (!cv) {
+                return res.status(404).render('error', {
+                    layout: 'business',
+                    message: 'CV not found',
+                    error: 'The requested CV could not be found'
+                });
+            }
+
+            // Verify business has access to this CV (through applications)
+            const AppliedJobs = require('../../models/AppliedJobs');
+            const hasAccess = await AppliedJobs.findOne({
+                cv_id: cvId,
+                business_id: businessId
+            });
+
+            if (!hasAccess) {
+                return res.status(403).render('error', {
+                    layout: 'business',
+                    message: 'Access denied',
+                    error: 'You do not have permission to view this CV'
+                });
+            }
+
+            // Render CV for business viewing
+            return res.render('users/cv-review', {
+                layout: 'business',
+                title: `CV - ${cv.originalName}`,
+                cv: cv,
+                user: cv.user_id,
+                businessView: true
+            });
+
+        } catch (error) {
+            console.error('Error viewing applicant CV:', error);
             next(error);
         }
     }

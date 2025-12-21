@@ -94,6 +94,7 @@
                                 <th><i class="fas fa-briefcase me-1"></i> Position</th>
                                 <th><i class="fas fa-calendar me-1"></i> Applied</th>
                                 <th><i class="fas fa-info-circle me-1"></i> Status</th>
+                                <th><i class="fas fa-file-pdf me-1"></i> CV</th>
                                 <th><i class="fas fa-envelope me-1"></i> Contact</th>
                                 <th><i class="fas fa-eye me-1"></i> Action</th>
                             </tr>
@@ -104,14 +105,14 @@
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-sm bg-primary text-white rounded-circle me-2 d-flex align-items-center justify-content-center">
-                                            {{#if user_id.fullName}}
-                                                {{firstLetter user_id.fullName}}
+                                            {{#if user_id.username}}
+                                                {{firstLetter user_id.username}}
                                             {{else}}
                                                 U
                                             {{/if}}
                                         </div>
                                         <div>
-                                            <div class="fw-medium">{{user_id.fullName}}</div>
+                                            <div class="fw-medium">{{user_id.username}}</div>
                                             <small class="text-muted"><i class="fas fa-envelope me-1"></i>{{user_id.email}}</small>
                                         </div>
                                     </div>
@@ -136,6 +137,18 @@
                                         <span class="badge bg-success">Hired</span>
                                     {{else}}
                                         <span class="badge bg-secondary">{{status}}</span>
+                                    {{/if}}
+                                </td>
+                                <td>
+                                    {{#if cv_id}}
+                                        <button class="btn btn-sm btn-outline-primary cv-popup-btn" 
+                                                data-cv-id="{{cv_id._id}}" 
+                                                data-applicant-name="{{user_id.username}}"
+                                                title="View CV">
+                                            <i class="fas fa-file-pdf"></i> View CV
+                                        </button>
+                                    {{else}}
+                                        <span class="text-muted small">No CV</span>
                                     {{/if}}
                                 </td>
                                 <td>
@@ -193,6 +206,37 @@
     </div>
 </div>
 
+<!-- CV Modal -->
+<div class="modal fade" id="cvModal" tabindex="-1" aria-labelledby="cvModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cvModalLabel">
+                    <i class="fas fa-file-alt me-2"></i>Xem CV gốc
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="cvLoadingSpinner" class="text-center py-4">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">Loading CV...</p>
+                </div>
+                <div id="cvContent" style="display: none;">
+                    <!-- CV content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" id="downloadCvBtn">
+                    <i class="fas fa-download me-1"></i> Tải xuống PDF
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Real-time Updates Script -->
 <style>
     .avatar-sm {
@@ -200,6 +244,9 @@
         height: 32px;
         font-size: 14px;
         font-weight: 600;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid #fff;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
     }
     
     .fw-medium {
@@ -216,6 +263,12 @@
             transform: translateX(100%);
             opacity: 0;
         }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
     .hover-card {
         transition: all 0.3s ease;
         cursor: pointer;
@@ -294,8 +347,292 @@
         color: #495057;
         background-color: #f8f9fa;
     }
+    
+    /* Enhanced applicant section styles */
+    .table tbody tr {
+        transition: all 0.3s ease;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .table tbody tr:hover {
+        background-color: #f8f9ff;
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+    }
+    
+    .table tbody tr:hover .avatar-sm {
+        background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        transform: scale(1.1);
+    }
+    
+    .table tbody tr:hover .fw-medium {
+        color: #667eea;
+        font-weight: 600;
+    }
+    
+    .table tbody tr:hover .text-muted {
+        color: #6c757d !important;
+    }
+    
+    .badge {
+        font-size: 0.75rem;
+        font-weight: 600;
+        padding: 0.375rem 0.75rem;
+        border-radius: 50px;
+        letter-spacing: 0.5px;
+    }
+    
+    .btn-sm {
+        font-size: 0.875rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .btn-outline-info:hover {
+        background-color: #17a2b8;
+        border-color: #17a2b8;
+    }
+    
+    .btn-outline-success:hover {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+    
+    .btn-primary:hover {
+        background-color: #5a67d8;
+        border-color: #5a67d8;
+    }
+    
+    /* CV File Viewer Styles - Matching cv-review.hbs */
+    .cv-file-viewer {
+        width: 100%;
+        height: 600px;
+        background-color: #f8f9fa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: auto;
+    }
+    
+    .cv-document-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* PDF Viewer Styles */
+    .cv-pdf-viewer {
+        background-color: #525659;
+        padding: 20px;
+        min-height: 600px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+    }
+    
+    .pdf-page {
+        background-color: white;
+        width: 100%;
+        max-width: 800px;
+        min-height: 11in;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .pdf-content {
+        padding: 40px 50px;
+        height: 100%;
+    }
+    
+    .cv-pdf-text {
+        white-space: pre-wrap;
+        font-family: 'Times New Roman', Times, serif;
+        font-size: 12px;
+        line-height: 1.4;
+        color: #000;
+        margin: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+    
+    /* Modal adjustments */
+    .modal-dialog.modal-lg {
+        max-width: 95vw;
+    }
+    
+    @media (max-width: 768px) {
+        .cv-file-viewer {
+            height: 400px;
+        }
+        
+        .pdf-content {
+            padding: 20px 25px;
+        }
+        
+        .cv-pdf-text {
+            font-size: 11px;
+        }
+        
+        .modal-dialog.modal-lg {
+            max-width: 98vw;
+            margin: 10px;
+        }
+    }
 </style>
 <script>
+    // CV Modal functionality
+    let cvModal;
+    let currentCvId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap modal
+        cvModal = new bootstrap.Modal(document.getElementById('cvModal'));
+        
+        // CV popup button click handlers
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.cv-popup-btn')) {
+                const button = e.target.closest('.cv-popup-btn');
+                const cvId = button.getAttribute('data-cv-id');
+                const applicantName = button.getAttribute('data-applicant-name');
+                openCvModal(cvId, applicantName);
+            }
+        });
+
+        // Download CV button click handler
+        document.getElementById('downloadCvBtn').addEventListener('click', function() {
+            if (currentCvId) {
+                window.open(`/business/cv/download/${currentCvId}`, '_blank');
+            }
+        });
+
+        // Reset modal when hidden
+        document.getElementById('cvModal').addEventListener('hidden.bs.modal', function() {
+            resetCvModal();
+        });
+    });
+
+    function openCvModal(cvId, applicantName) {
+        currentCvId = cvId;
+        document.getElementById('cvModalLabel').innerHTML = `
+            <i class="fas fa-file-alt me-2"></i>Xem CV gốc - ${applicantName}
+        `;
+        document.getElementById('cvLoadingSpinner').style.display = 'block';
+        document.getElementById('cvContent').style.display = 'none';
+        
+        cvModal.show();
+        
+        // Load CV content
+        loadCvContent(cvId);
+    }
+
+    function loadCvContent(cvId) {
+        // Fetch CV data from the API
+        fetch(`/business/api/cv/${cvId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to load CV');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    displayCvContent(data.data);
+                } else {
+                    throw new Error(data.message || 'Failed to load CV');
+                }
+            })
+            .catch(error => {
+                console.error('Error loading CV:', error);
+                showCvError('Failed to load CV. Please try again.');
+            });
+    }
+
+    function displayCvContent(cvData) {
+        const cvContent = document.getElementById('cvContent');
+        const loadingSpinner = document.getElementById('cvLoadingSpinner');
+        
+        // Display CV exactly like the "Xem CV gốc" modal
+        let cvHtml = '';
+        
+        if (cvData.file_path) {
+            // Display PDF converted to image (like in cv-review.hbs)
+            cvHtml = `
+                <div class="cv-file-viewer">
+                    <!-- Convert PDF to image and display as image -->
+                    <img src="/pdf-converter/convert-pdf-to-image?file=${cvData.file_path}" 
+                         alt="CV Document" 
+                         class="cv-document-image"
+                         onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+                    <!-- Fallback to processed text if conversion fails -->
+                    <div class="cv-pdf-viewer" style="display:none;">
+                        <div class="pdf-page">
+                            <div class="pdf-content">
+                                <pre class="cv-pdf-text">${cvData.processed_text || 'CV content not available'}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else if (cvData.processed_text) {
+            // Display processed text
+            cvHtml = `
+                <div class="cv-pdf-viewer">
+                    <div class="pdf-page">
+                        <div class="pdf-content">
+                            <pre class="cv-pdf-text">${cvData.processed_text}</pre>
+                        </div>
+                    </div>
+                </div>
+            `;
+        } else {
+            // No CV content available
+            cvHtml = `
+                <div class="text-center py-4">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Không có file CV để hiển thị</p>
+                </div>
+            `;
+        }
+        
+        cvContent.innerHTML = cvHtml;
+        
+        // Hide loading spinner and show content
+        loadingSpinner.style.display = 'none';
+        cvContent.style.display = 'block';
+    }
+
+    function showCvError(message) {
+        const cvContent = document.getElementById('cvContent');
+        const loadingSpinner = document.getElementById('cvLoadingSpinner');
+        
+        cvContent.innerHTML = `
+            <div class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <strong>Error:</strong> ${message}
+            </div>
+        `;
+        
+        loadingSpinner.style.display = 'none';
+        cvContent.style.display = 'block';
+    }
+
+    function resetCvModal() {
+        currentCvId = null;
+        document.getElementById('cvLoadingSpinner').style.display = 'block';
+        document.getElementById('cvContent').style.display = 'none';
+        document.getElementById('cvContent').innerHTML = '';
+    }
+
     // Real-time updates for recent applications
     document.addEventListener('DOMContentLoaded', function() {
         const tbody = document.getElementById('recent-applications-tbody');
@@ -350,7 +687,7 @@
         row.className = 'new-application';
         
         const appliedDate = new Date(application.applied_at).toLocaleString('vi-VN');
-        const firstLetter = application.user_id?.fullName ? application.user_id.fullName.charAt(0).toUpperCase() : 'U';
+        const firstLetter = application.user_id?.username ? application.user_id.username.charAt(0).toUpperCase() : 'U';
         
         row.innerHTML = `
             <td>
@@ -359,8 +696,8 @@
                         ${firstLetter}
                     </div>
                     <div>
-                        <div class="fw-medium">${application.user_id?.fullName || 'Unknown User'}</div>
-                        <small class="text-muted">${application.user_id?.email || 'No email'}</small>
+                        <div class="fw-medium">${application.user_id?.username || 'Unknown User'}</div>
+                        <small class="text-muted">${application.user_id?.username || 'No username'}</small>
                     </div>
                 </div>
             </td>
@@ -375,7 +712,17 @@
                 ${getStatusBadge(application.status)}
             </td>
             <td>
-                <a href="mailto:${application.user_id?.email || ''}" class="btn btn-sm btn-outline-info me-1" title="Email">
+                ${application.cv_id ? `
+                    <button class="btn btn-sm btn-outline-primary cv-popup-btn" 
+                            data-cv-id="${application.cv_id._id}" 
+                            data-applicant-name="${application.user_id?.username || 'Unknown'}"
+                            title="View CV">
+                        <i class="fas fa-file-pdf"></i> View CV
+                    </button>
+                ` : '<span class="text-muted small">No CV</span>'}
+            </td>
+            <td>
+                <a href="mailto:${application.user_id?.email || ''}" class="btn btn-sm btn-outline-info me-1" title="username">
                     <i class="fas fa-envelope"></i>
                 </a>
                 ${application.user_id?.phone ? `

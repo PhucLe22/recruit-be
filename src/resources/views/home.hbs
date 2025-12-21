@@ -390,12 +390,8 @@ function renderRecommendations() {
                     <span>${job.type || 'Full-time'}</span>
                 </div>
                 <div class="job-detail-item">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>${job.experience || 'Không yêu cầu'}</span>
-                </div>
-                <div class="job-detail-item">
                     <i class="fas fa-clock"></i>
-                    <span>${job.createdAt || 'Gần đây'}</span>
+                    <span>${job.createdAt}</span>
                 </div>
             </div>
             <a href="/jobs/${job.slug || job._id}" class="apply-btn">
@@ -460,6 +456,23 @@ function renderRecommendations() {
                     Việc Làm Mới Nhất
                 </h2>
                 <p class="section-subtitle">Khám phá cơ hội nghề nghiệp phù hợp với bạn</p>
+                <div class="job-stats" style="margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px;">
+                    {{#if personalized}}
+                        <div class="personalized-badge" style="padding: 6px 12px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border-radius: 16px; display: inline-block; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-user-check"></i> Đã cá nhân hóa
+                        </div>
+                    {{/if}}
+                    {{#if recommendedCount}}
+                        <div class="recommended-count" style="padding: 6px 12px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; display: inline-block; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-star"></i> {{recommendedCount}} việc làm đề xuất
+                        </div>
+                    {{/if}}
+                    {{#if userProfile}}
+                        <div class="profile-info" style="padding: 6px 12px; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; border-radius: 16px; display: inline-block; font-size: 0.85rem; font-weight: 600;">
+                            <i class="fas fa-chart-line"></i> {{userProfile.interests.length}} sở thích
+                        </div>
+                    {{/if}}
+                </div>
             </div>
             <div class="section-actions">
                 <div class="filter-tabs">
@@ -560,11 +573,11 @@ function renderRecommendations() {
                 <a href="/jobs/{{this.slug}}" class="job-card" style="background: #fff; border-radius: 10px; padding: 1.5rem; transition: all 0.3s ease; border: 1px solid #eee; text-decoration: none; color: inherit; display: block;">
                     <div class="job-card-inner">
                         <div class="job-company-logo" style="width: 50px; height: 50px; border-radius: 10px; background: #f8f9fa; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; overflow: hidden;">
-                            {{#if this.logo}}
-                                <img src="{{this.logo}}" alt="{{this.company}}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {{#if this.logoPath}}
+                                <img src="{{this.logoPath}}" alt="{{this.companyName}}" style="width: 100%; height: 100%; object-fit: cover;">
                             {{else}}
                                 <div class="company-initial" style="font-size: 1.5rem; font-weight: 700; color: #4a6cf7;">
-                                    {{firstLetter this.company}}
+                                    {{firstLetter this.companyName}}
                                 </div>
                             {{/if}}
                         </div>
@@ -1613,10 +1626,6 @@ function renderJobs() {
                 <div class="job-detail-item">
                     <i class="fas fa-briefcase"></i>
                     <span>${job.type || 'Full-time'}</span>
-                </div>
-                <div class="job-detail-item">
-                    <i class="fas fa-user-graduate"></i>
-                    <span>${job.experience || 'Không yêu cầu'}</span>
                 </div>
                 <div class="job-detail-item">
                     <i class="fas fa-clock"></i>
@@ -3063,7 +3072,7 @@ window.loadMoreJobs = async function() {
         const salary = job.salary || 'Thỏa thuận';
         const location = job.location || 'Chưa cập nhật';
         const type = job.type || 'Full-time';
-        const experience = job.experience || 'Không yêu cầu';
+        const experience = job.experience;
         const description = job.description || 'Chưa có mô tả công việc';
         const city = job.city || '';
         const workTime = job.workTime || '8 tiếng/ngày';
@@ -3091,11 +3100,11 @@ window.loadMoreJobs = async function() {
         card.innerHTML = `
             <div class="job-card-header">
                 <div class="job-company-logo">
-                    ${hasLogo ?
-                        `<img src="${hasLogo}" alt="${company}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                    ${job.logoPath ?
+                        `<img src="${job.logoPath}" alt="${company}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
                          style="width: 100%; height: 100%; object-fit: cover; border-radius: 16px;">
-                         <i class="fas ${job.logo || 'fa-building'}" style="display: none;"></i>` :
-                        `<i class="fas ${job.logo || 'fa-building'}"></i>`
+                         <i class="fas ${job.logoPath || 'fa-building'}" style="display: none;"></i>` :
+                        `<i class="fas ${job.logoPath || 'fa-building'}"></i>`
                     }
                 </div>
                 <div class="job-card-body">
@@ -3112,10 +3121,6 @@ window.loadMoreJobs = async function() {
                         <span class="job-tag location">
                             <i class="fas fa-map-marker-alt"></i>
                             ${location}
-                        </span>
-                        <span class="job-tag experience">
-                            <i class="fas fa-user-tie"></i>
-                            ${experience}
                         </span>
                         <span class="job-tag ${isRemote ? 'remote' : 'type'}">
                             <i class="fas ${isRemote ? 'fa-home' : 'fa-clock'}"></i>
