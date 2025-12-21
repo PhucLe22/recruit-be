@@ -499,7 +499,7 @@
             form.append('username', username);
             
             try {
-                const res = await fetch(`${API.base}/upload_resume`, { method: 'POST', body: form });
+                const res = await fetch(`${API.direct}/upload_resume`, { method: 'POST', body: form });
                 if (!res.ok) throw new Error(`HTTP ${res.status}`);
                 const data = await res.json();
                 if (data.error) throw new Error(data.error);
