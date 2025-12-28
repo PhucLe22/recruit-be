@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken');
-const recommendationController = require('../app/controllers/recommendations/RecommendationController');
+const recommendationController = require('../app/controllers/users/recommendations/RecommendationController');
 
 // Get job recommendations for user
 router.get('/jobs/:userId', verifyToken, recommendationController.getJobRecommendations);

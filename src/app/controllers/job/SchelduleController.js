@@ -51,7 +51,23 @@ class SchelduleController {
         }
     }
 
-    // View CV for an applicant
+    // Show applicants scheduled list with layout override
+    async showApplicantsScheduledList(req, res, next) {
+        // Override layout for this specific route
+        const originalRender = res.render;
+        res.render = function(view, options, callback) {
+            options = options || {};
+            options.layout = false;
+            originalRender.call(this, view, options, callback);
+        };
+        next();
+    }
+
+    // View CV for an applicant with logging
+    async viewApplicantCV(req, res, next) {
+        console.log('CV route hit for ID:', req.params.id);
+        return this.viewCV(req, res, next);
+    }
     async viewCV(req, res, next) {
         try {
             if (!req.account || !req.account.id) {
@@ -189,6 +205,104 @@ class SchelduleController {
         } catch (error) {
             console.error('Error viewing CV:', error);
             next(error);
+        }
+    }
+
+    // Handle Server-Sent Events for real-time application updates
+    handleApplicationStream(req, res) {
+        const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+        
+        if (!businessId) {
+            return res.status(401).end();
+        }
+
+        // Set headers for Server-Sent Events
+        res.writeHead(200, {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Headers': 'Cache-Control'
+        });
+
+        // Send initial connection message
+        res.write('data: {"type": "connected", "message": "Connected to applications stream"}\n\n');
+
+        // Store the response to send updates later
+        req.app.locals.applicationStreams = req.app.locals.applicationStreams || new Map();
+        req.app.locals.applicationStreams.set(businessId, res);
+
+        // Handle client disconnect
+        req.on('close', () => {
+            console.log(`Client disconnected from business ${businessId}`);
+            if (req.app.locals.applicationStreams) {
+                req.app.locals.applicationStreams.delete(businessId);
+            }
+        });
+
+        req.on('aborted', () => {
+            console.log(`Client aborted connection for business ${businessId}`);
+            if (req.app.locals.applicationStreams) {
+                req.app.locals.applicationStreams.delete(businessId);
+            }
+        });
+    }
+
+    // Helper method to send updates to connected clients
+    static sendApplicationUpdate(app, businessId, application) {
+        if (!app.locals.applicationStreams) {
+            return;
+        }
+        
+        const clientStream = app.locals.applicationStreams.get(businessId);
+        
+        if (clientStream && !clientStream.destroyed) {
+            const message = {
+                type: 'new_application',
+                application: {
+                    _id: application._id,
+                    user_id: {
+                        fullName: application.user_id?.fullName || 'Unknown User'
+                    },
+                    job_id: {
+                        title: application.job_id?.title || 'Unknown Position'
+                    },
+                    applied_at: application.applied_at,
+                    status: application.status
+                }
+            };
+            
+            clientStream.write(`data: ${JSON.stringify(message)}\n\n`);
+            console.log(`Sent real-time update to business ${businessId}: New application for ${application.job_id?.title}`);
+        }
+    }
+
+    // Static helper method to send updates to connected clients
+    static sendApplicationUpdate(app, businessId, application) {
+        if (!app.locals.applicationStreams) {
+            return;
+        }
+        
+        const clientStream = app.locals.applicationStreams.get(businessId);
+        
+        if (clientStream && !clientStream.destroyed) {
+            const message = {
+                type: 'new_application',
+                application: {
+                    _id: application._id,
+                    user_id: {
+                        fullName: application.user_id?.fullName || 'Unknown User'
+                    },
+                    job_id: {
+                        title: application.job_id?.title || 'Unknown Position'
+                    },
+                    applied_at: application.applied_at,
+                    status: application.status
+                }
+            };
+            
+            clientStream.write(`data: ${JSON.stringify(message)}\n\n`);
+            console.log(`Sent real-time update to business ${businessId}: New application for ${application.job_id?.title}`);
         }
     }
 }

@@ -333,20 +333,264 @@ class UserController{
             });
         }
     }
+    // View CV in browser
     async viewCV(req, res, next) {
         try {
-            const user = req.user
-            if (!user) {
-                return res.redirect('/login')
+            const fs = require('fs').promises;
+            const path = require('path');
+            const CV = require('../../../models/CV');
+            const User = require('../../../models/User');
+            
+            let userId = req.params.userId || (req.user && req.user._id);
+            
+            if (!userId) {
+                req.flash('error', 'Vui lòng đăng nhập để xem CV');
+                return res.redirect('/login');
             }
-            const cv = await CV.findOne({username: user.username})
-            // return res.json(cv);
-            return res.render('users/cv-review', {
-                title: 'Xem CV',
-                cv: cv
-            }) 
+
+            // If we're coming from a redirect with 'back' as userId, redirect to profile
+            if (userId === 'back') {
+                return res.redirect('/profile');
+            }
+
+            console.log(`Attempting to find CV for user: ${userId}`);
+            
+            // First try to find CV in CV collection
+            let cvData = await CV.findOne({ user_id: userId });
+            
+            // If no CV found in CV collection, check user's cvPath
+            if (!cvData || !cvData.file_path) {
+                console.log('No CV found in CV collection, checking user.cvPath');
+                const user = await User.findById(userId);
+                
+                if (!user) {
+                    console.log('User not found');
+                    req.flash('error', 'Người dùng không tồn tại');
+                    return res.redirect('/profile');
+                }
+                
+                if (!user.cvPath) {
+                    console.log('No CV path found for user');
+                    req.flash('error', 'Không tìm thấy CV. Vui lòng tải lên CV của bạn.');
+                    return res.redirect('/profile');
+                }
+                
+                // Create a CV record if it doesn't exist
+                console.log('Creating new CV record from user.cvPath');
+                cvData = await CV.create({
+                    user_id: userId,
+                    file_path: user.cvPath,
+                    filename: path.basename(user.cvPath),
+                    uploaded_at: new Date()
+                });
+            }
+
+            // Handle different path formats
+            let filePath;
+            if (cvData.file_path.startsWith('http') || cvData.file_path.startsWith('/')) {
+                // If it's a full URL or absolute path, use as is
+                filePath = cvData.file_path.startsWith('/') 
+                    ? path.join(__dirname, '../../../public', cvData.file_path)
+                    : cvData.file_path;
+            } else {
+                // Otherwise, assume it's relative to public/uploads
+                filePath = path.join(__dirname, '../../../public/uploads', cvData.file_path);
+            }
+            
+            console.log(`Looking for CV file at: ${filePath}`);
+            
+            try {
+                // If it's a URL, redirect to it
+                if (filePath.startsWith('http')) {
+                    console.log(`Redirecting to external CV URL: ${filePath}`);
+                    return res.redirect(filePath);
+                }
+                
+                // Check if file exists and is accessible
+                await fs.access(filePath);
+                const stats = await fs.stat(filePath);
+                
+                if (!stats.isFile()) {
+                    throw new Error('Đường dẫn CV không hợp lệ');
+                }
+
+                console.log(`Serving CV file: ${filePath}`);
+                
+                // Set the appropriate content type for PDF
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `inline; filename="${cvData.filename || 'CV.pdf'}"`);
+                
+                // Stream the file to the response
+                const fileStream = require('fs').createReadStream(filePath);
+                
+                fileStream.on('error', (error) => {
+                    console.error('Error streaming CV file:', error);
+                    if (!res.headersSent) {
+                        req.flash('error', 'Lỗi khi đọc tệp CV');
+                        res.redirect('/profile');
+                    }
+                });
+                
+                fileStream.pipe(res);
+                
+            } catch (error) {
+                console.error('Error accessing CV file:', error);
+                
+                // If file doesn't exist, try alternative locations
+                if (error.code === 'ENOENT') {
+                    console.log(`CV file not found at primary location: ${filePath}`);
+                    
+                    // Try alternative locations
+                    const possiblePaths = [
+                        path.join(__dirname, '../../../public', cvData.file_path),
+                        path.join(__dirname, '../../../public/uploads', cvData.filename),
+                        path.join(__dirname, '../../../public/uploads', path.basename(cvData.file_path)),
+                        path.join(__dirname, '../../../public', 'ai-uploads', path.basename(cvData.file_path)),
+                        path.join(__dirname, '../../../public', 'ai-uploads', cvData.filename)
+                    ];
+                    
+                    let found = false;
+                    
+                    for (const altPath of possiblePaths) {
+                        try {
+                            await fs.access(altPath);
+                            const stats = await fs.stat(altPath);
+                            
+                            if (stats.isFile()) {
+                                console.log(`Found CV at alternative location: ${altPath}`);
+                                
+                                // Update the CV record with the correct path
+                                await CV.updateOne(
+                                    { _id: cvData._id },
+                                    { 
+                                        $set: { 
+                                            file_path: altPath.replace(/^.*?public\//, '/'),
+                                            filename: path.basename(altPath)
+                                        } 
+                                    }
+                                );
+                                
+                                // Stream the file
+                                res.setHeader('Content-Type', 'application/pdf');
+                                res.setHeader('Content-Disposition', `inline; filename="${path.basename(altPath) || 'CV.pdf'}"`);
+                                require('fs').createReadStream(altPath).pipe(res);
+                                
+                                found = true;
+                                break;
+                            }
+                        } catch (e) {
+                            // Ignore and try next path
+                            console.log(`Not found at alternative location: ${altPath}`);
+                        }
+                    }
+                    
+                    if (!found) {
+                        console.log(`CV file not found in any location, removing CV record: ${cvData._id}`);
+                        await CV.deleteOne({ _id: cvData._id });
+                        req.flash('error', 'Không tìm thấy tệp CV. Vui lòng tải lên lại CV của bạn.');
+                        return res.redirect('/profile');
+                    }
+                } else {
+                    req.flash('error', `Lỗi khi tải CV: ${error.message}`);
+                    return res.redirect('/profile');
+                }
+            }
+            
         } catch (error) {
-            next(error)
+            console.error('Error in viewCV:', error);
+            req.flash('error', `Đã xảy ra lỗi: ${error.message}`);
+            res.redirect('/profile');
+        }
+    }
+
+    // Download CV
+    async downloadCV(req, res, next) {
+        try {
+            const fs = require('fs').promises;
+            const path = require('path');
+            const CV = require('../../../models/CV');
+            
+            let userId = req.params.userId || (req.user && req.user._id);
+            
+            if (!userId) {
+                req.flash('error', 'Vui lòng đăng nhập để tải CV');
+                return res.redirect('/login');
+            }
+
+            console.log(`Attempting to download CV for user: ${userId}`);
+            
+            // First try to find CV in CV collection
+            let cvData = await CV.findOne({ user_id: userId });
+            
+            // If no CV found in CV collection, check user's cvPath
+            if (!cvData || !cvData.file_path) {
+                console.log('No CV found in CV collection, checking user.cvPath');
+                const user = await User.findById(userId);
+                
+                if (!user || !user.cvPath) {
+                    console.log('No CV path found for user');
+                    req.flash('error', 'Không tìm thấy CV. Vui lòng tải lên CV của bạn.');
+                    return res.redirect('/profile');
+                }
+                
+                // Create a CV record if it doesn't exist
+                console.log('Creating new CV record from user.cvPath');
+                cvData = await CV.create({
+                    user_id: userId,
+                    file_path: user.cvPath,
+                    filename: path.basename(user.cvPath),
+                    uploaded_at: new Date()
+                });
+            }
+
+            // Construct the file path
+            const filePath = path.join(__dirname, '../../../public', cvData.file_path);
+            console.log(`Looking for CV file at: ${filePath}`);
+            
+            try {
+                // Check if file exists and is accessible
+                await fs.access(filePath);
+                const stats = await fs.stat(filePath);
+                
+                if (!stats.isFile()) {
+                    throw new Error('Đường dẫn CV không hợp lệ');
+                }
+                
+                console.log(`Downloading CV file: ${filePath}`);
+                
+                // Set the appropriate content type for PDF download
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename="${cvData.filename || 'CV.pdf'}"`);
+
+                // Stream the file to the response for download
+                const fileStream = require('fs').createReadStream(filePath);
+                
+                fileStream.on('error', (error) => {
+                    console.error('Error streaming CV file for download:', error);
+                    if (!res.headersSent) {
+                        req.flash('error', 'Lỗi khi đọc tệp CV để tải xuống');
+                        res.redirect('/profile');
+                    }
+                });
+                
+                fileStream.pipe(res);
+                
+            } catch (error) {
+                console.error('Error accessing CV file for download:', error);
+                // If file doesn't exist, remove the CV record
+                if (error.code === 'ENOENT') {
+                    console.log(`CV file not found for download, removing CV record: ${cvData._id}`);
+                    await CV.deleteOne({ _id: cvData._id });
+                    req.flash('error', 'Tệp CV không tồn tại. Vui lòng tải lên lại CV của bạn.');
+                } else {
+                    req.flash('error', `Lỗi khi tải xuống CV: ${error.message}`);
+                }
+                return res.redirect('/profile');
+            }
+        } catch (error) {
+            console.error('Error in downloadCV:', error);
+            req.flash('error', `Đã xảy ra lỗi: ${error.message}`);
+            res.redirect('/profile');
         }
     }
 }

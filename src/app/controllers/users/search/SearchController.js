@@ -1,5 +1,5 @@
-const Job = require('../../models/Job');
-const JobField = require('../../models/JobField');
+const Job = require('../../../models/Job');
+const JobField = require('../../../models/JobField');
 
 class SearchController {
   // Search results

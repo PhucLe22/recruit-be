@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const pdfConverterController = require('../app/controllers/PDFConverterController');
+const pdfConverterController = require('../app/controllers/users/PDFConverterController');
 
 // Convert PDF to single image (first page)
 router.get('/convert-pdf-to-image', pdfConverterController.convertToImage);

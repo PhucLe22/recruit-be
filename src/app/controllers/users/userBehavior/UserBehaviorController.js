@@ -1,5 +1,5 @@
-const UserBehavior = require('../../models/UserBehavior');
-const Activity = require('../../models/Activity');
+const UserBehavior = require('../../../models/UserBehavior');
+const Activity = require('../../../models/Activity');
 
 class UserBehaviorController {
   // Track user behavior

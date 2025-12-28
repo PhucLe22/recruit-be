@@ -3,6 +3,7 @@ const JobField = require('../../../app/models/JobField');
 const Business = require('../../../app/models/Business');
 const SmartSearchService = require('../../../services/SmartSearchService');
 const AIFilteringService = require('../../../services/AIFilteringService');
+const { formatDate } = require('../../../middlewares/formatDate');
 
 class SearchController {
   // Search jobs with filters
@@ -192,6 +193,213 @@ class SearchController {
       });
     }
   }
+
+  /**
+   * Handle search results page with filters and sorting
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware
+   */
+  async searchResults(req, res, next) {
+    try {
+      const {
+        q = '',                    // search query
+        keyWord = '',              // alternative parameter name
+        cities = [],               // location filters
+        types = [],                // job type filters
+        fields = [],               // industry filters
+        salaryMin = null,
+        salaryMax = null,
+        experienceLevel = '',
+        page = 1,
+        limit = 24,                // 24 jobs per page
+        sortBy = 'relevance',      // relevance, salary, date
+        sortOrder = 'desc',        // desc, asc
+      } = req.query;
+
+      // Use either 'q' or 'keyWord' parameter, clean and trim whitespace
+      const searchQuery = (q || keyWord || '').trim();
+
+      const filters = {
+        cities: Array.isArray(cities)
+          ? cities
+          : cities
+            ? cities.split(',').map(city => city.trim())
+            : [],
+        types: Array.isArray(types)
+          ? types
+          : types
+            ? types.split(',').map(type => type.trim())
+            : [],
+        fields: Array.isArray(fields)
+          ? fields
+          : fields
+            ? fields.split(',').map(field => field.trim())
+            : [],
+        salaryMin: salaryMin ? parseInt(salaryMin) : null,
+        salaryMax: salaryMax ? parseInt(salaryMax) : null,
+        experienceLevel: experienceLevel || '',
+      };
+
+      const searchOptions = {
+        filters,
+        page: parseInt(page) || 1,
+        limit: parseInt(limit) || 24,
+        sortBy: sortBy || 'relevance',
+        sortOrder: sortOrder || 'desc',
+      };
+
+      // Perform smart search
+      const results = await SmartSearchService.searchJobs(
+        searchQuery,
+        searchOptions,
+      );
+
+      // Format jobs with additional properties
+      const formattedJobs = results.jobs ? results.jobs.map(job => ({
+        ...job,
+        formattedDate: formatDate(job.createdAt),
+        logoPath: job.logoPath || job.companyLogo || '/images/default-company.png'
+      })) : [];
+
+      res.render('jobs/results', {
+        sorted: formattedJobs,
+        keyword: searchQuery || '',
+        totalCount: results.totalResults || results.jobs?.length || 0,
+        currentPage: parseInt(results.pagination?.currentPage || results.currentPage || 1),
+        totalPages: parseInt(results.pagination?.totalPages || results.totalPages || 1),
+        hasMore: results.pagination?.hasNextPage || results.hasMore || false,
+        filters,
+        sortBy,
+        sortOrder,
+        pageTitle: searchQuery ? `Kết quả tìm kiếm: "${searchQuery}"` : 'Tất cả việc làm',
+        layout: 'main'
+      });
+
+    } catch (error) {
+      console.error('Search Results Error:', error);
+      next(error);
+    }
+  }
+
+  /**
+   * Handle API search requests
+   * @param {Object} req - Express request object
+   * @param {Object} res - Express response object
+   * @param {Function} next - Express next middleware
+   */
+  async apiSearch(req, res, next) {
+        try {
+            console.log(
+                '🔥 API DEBUG: /api/search called with query:',
+                JSON.stringify(req.query, null, 2),
+            );
+
+            const {
+                q = '', // search query
+                cities = [], // location filters
+                jobTypes = [], // job type filters
+                salaryMin = null,
+                salaryMax = null,
+                experience = '',
+                limit = 24, // Changed from 20 to 24 jobs per page
+                offset = 0,
+                useAI = false, // AI filtering flag
+            } = req.query;
+
+            const filters = {
+                cities: Array.isArray(cities) ? cities : [cities].filter(Boolean),
+                types: Array.isArray(jobTypes) ? jobTypes : [jobTypes].filter(Boolean),
+                salaryMin: salaryMin ? parseInt(salaryMin) : null,
+                salaryMax: salaryMax ? parseInt(salaryMax) : null,
+                experience,
+            };
+
+            console.log('🔥 API DEBUG: filters object:', JSON.stringify(filters, null, 2));
+            console.log('🔥 API DEBUG: useAI flag:', useAI);
+
+            let results;
+
+            if (useAI === 'true') {
+                // Use AI-enhanced filtering
+                console.log('🤖 Using AI-enhanced filtering...');
+                const userPreferences = req.account
+                    ? {
+                          skills: req.account.skills || [],
+                          experience: req.account.experience || '',
+                          preferredCities: req.account.preferredCities || [],
+                          salaryRange: req.account.desiredSalaryRange || null,
+                      }
+                    : {};
+
+                // Get jobs with basic filters first
+                const basicResults = await SmartSearchService.searchJobs(q, filters);
+                const jobsArray = basicResults.jobs || [];
+
+                // Apply AI filtering
+                const aiResults = await AIFilteringService.intelligentFilterJobs(
+                    jobsArray,
+                    q,
+                    userPreferences,
+                );
+
+                results = aiResults;
+            } else {
+                // Use traditional SmartSearchService
+                console.log('🔥 API DEBUG: calling SmartSearchService.searchJobs...');
+                results = await SmartSearchService.searchJobs(q, filters);
+            }
+
+            // Log search behavior if user is logged in
+            if (req.account) {
+                try {
+                    const UserBehaviorService = require('../../../services/UserBehaviorService');
+                    await UserBehaviorService.logSearchBehavior(req.account.id, {
+                        keywords: q,
+                        filters,
+                        resultsCount: results.jobs ? results.jobs.length : 0,
+                    });
+                } catch (error) {
+                    console.error('Error logging search behavior:', error);
+                }
+            }
+
+            const jobsArray = results.jobs || results.filteredJobs || [];
+
+            // Prepare response object
+            const response = {
+                success: true,
+                data: jobsArray.slice(offset, offset + parseInt(limit)),
+                total: jobsArray.length,
+                query: {
+                    keywords: q,
+                    filters,
+                    limit: parseInt(limit),
+                    offset: parseInt(offset),
+                    useAI: useAI === 'true',
+                },
+            };
+
+            // Add AI analysis if AI was used
+            if (useAI === 'true' && results.aiInsights) {
+                response.aiAnalysis = {
+                    insights: results.aiInsights || [],
+                    recommendations: results.aiRecommendations || [],
+                    matchScores: results.matchScores || [],
+                    totalAnalyzed: results.originalJobs ? results.originalJobs.length : jobsArray.length,
+                };
+            }
+
+            res.json(response);
+        } catch (error) {
+            console.error('Smart search API error:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Đã có lỗi xảy ra',
+                error: error.message,
+            });
+        }
+    }
 }
 
 module.exports = new SearchController();

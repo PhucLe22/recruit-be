@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { verifyToken } = require('../middlewares/verifyToken');
-const userBehaviorController = require('../app/controllers/userBehavior/UserBehaviorController');
+const userBehaviorController = require('../app/controllers/users/userBehavior/UserBehaviorController');
 
 // Track user behavior
 router.post('/track', verifyToken, userBehaviorController.trackBehavior);

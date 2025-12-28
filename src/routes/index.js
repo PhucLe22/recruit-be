@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const User = require('../app/models/User');
 
 // Import all route files
 const homeRouter = require('./home');
@@ -15,10 +16,34 @@ const userBehaviorRouter = require('./user-behavior');
 const recommendationRouter = require('./recommendations');
 const aiSearchRouter = require('./ai-search');
 const personalityAssessmentsRouter = require('./personality-assessments');
-const frontendPersonalityAssessmentsRouter = require('./frontend/personality-assessments');
 const cvAssistantRouter = require("./cv-assistant");
 const aiServiceRouter = require("./ai-service");
 const pdfConverterRouter = require("./pdf-converter");
+
+// Debug routes (only in development)
+if (process.env.NODE_ENV !== 'production') {
+    router.get('/debug/users', async (req, res) => {
+        try {
+            const users = await User.find({}, 'username _id email').sort({ username: 1 });
+            res.json({
+                success: true,
+                count: users.length,
+                users: users.map(user => ({
+                    _id: user._id,
+                    username: user.username,
+                    email: user.email
+                }))
+            });
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error fetching users',
+                error: error.message
+            });
+        }
+    });
+}
 
 // Mount all routes
 router.use('/otp', otpRouter);
@@ -32,11 +57,7 @@ router.use('/search', searchRouter);
 router.use('/api/behavior', userBehaviorRouter);
 router.use('/api/recommendations', recommendationRouter);
 router.use('/api/ai', aiSearchRouter);
-// API routes for personality assessments
 router.use('/api/personality-assessments', personalityAssessmentsRouter);
-
-// Frontend routes for personality assessments
-router.use('/personality-assessments', frontendPersonalityAssessmentsRouter);
 router.use('/cv-assistant', cvAssistantRouter);
 router.use('/ai-service', aiServiceRouter);
 router.use('/pdf-converter', pdfConverterRouter);

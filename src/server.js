@@ -207,16 +207,16 @@ app.engine(
                 const diffInSeconds = Math.floor((now - date) / 1000);
                 
                 if (diffInSeconds < 60) {
-                    return 'Just now';
+                    return 'Vừa xong';
                 } else if (diffInSeconds < 3600) {
                     const minutes = Math.floor(diffInSeconds / 60);
-                    return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                    return `${minutes} phút trước`;
                 } else if (diffInSeconds < 86400) {
                     const hours = Math.floor(diffInSeconds / 3600);
-                    return `${hours} hour${hours > 1 ? 's' : ''} ago`;
+                    return `${hours} giờ trước`;
                 } else if (diffInSeconds < 604800) {
                     const days = Math.floor(diffInSeconds / 86400);
-                    return `${days} day${days > 1 ? 's' : ''} ago`;
+                    return `${days} ngày trước`;
                 } else {
                     // For older dates, show the actual date
                     return date.toLocaleDateString('vi-VN', {
@@ -225,6 +225,30 @@ app.engine(
                         day: 'numeric'
                     });
                 }
+            },
+            formatDate: (date, format) => {
+                if (!date) return '';
+                
+                const d = new Date(date);
+                if (isNaN(d.getTime())) return '';
+                
+                // Ensure format is a string
+                const formatStr = typeof format === 'string' ? format : 'DD/MM/YYYY';
+                
+                const day = d.getDate().toString().padStart(2, '0');
+                const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                const year = d.getFullYear();
+                const hours = d.getHours().toString().padStart(2, '0');
+                const minutes = d.getMinutes().toString().padStart(2, '0');
+                const seconds = d.getSeconds().toString().padStart(2, '0');
+                
+                return formatStr
+                    .replace('DD', day)
+                    .replace('MM', month)
+                    .replace('YYYY', year)
+                    .replace('HH', hours)
+                    .replace('mm', minutes)
+                    .replace('ss', seconds);
             },
         },
     }),

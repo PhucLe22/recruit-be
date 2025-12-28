@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const { formatDate } = require('../../middlewares/formatDate');
+const formatDateUtil = require('../../../middlewares/formatDate');
 
 // Import Assessment Models
-const MBTIAssessment = require('../models/MBTIAssessment');
-const BigFiveAssessment = require('../models/BigFiveAssessment');
-const DISCAssessment = require('../models/DISCAssessment');
+const MBTIAssessment = require('../../models/MBTIAssessment');
+const BigFiveAssessment = require('../../models/BigFiveAssessment');
+const DISCAssessment = require('../../models/DISCAssessment');
 
 // AI Service Configuration
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';

@@ -1,6 +1,6 @@
-const Job = require('../../../app/models/Job');
-const UserBehavior = require('../../../app/models/UserBehavior');
-const RecommendationEngine = require('../../../services/RecommendationEngine');
+const Job = require('../../../models/Job');
+const UserBehavior = require('../../../models/UserBehavior');
+const RecommendationEngine = require('../../../../services/RecommendationEngine');
 
 class RecommendationController {
   // Get job recommendations for user

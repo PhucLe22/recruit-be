@@ -19,7 +19,7 @@ class DetailApplicantController {
             const application = await AppliedJobs.findById(applicationId)
                 .populate('user_id', 'username email phone avatar')
                 .populate('job_id', 'title field location salary')
-                .populate('cv_id', 'originalName filePath createdAt');
+                .populate('cv_id', 'originalName file_path filename createdAt');
 
             if (!application) {
                 return res.status(404).render('error', {
@@ -63,7 +63,7 @@ class DetailApplicantController {
                 ...cv.toObject(),
                 createdAt: cv.createdAt.toLocaleDateString('vi-VN'),
                 fileSize: cv.fileSize ? `${(cv.fileSize / 1024).toFixed(1)} KB` : 'Unknown',
-                fileUrl: cv.filePath ? `/uploads/cvs/${cv.filePath.split('/').pop()}` : null
+                fileUrl: cv.file_path ? `/uploads/cvs/${cv.file_path.split('/').pop()}` : null
             }));
 
             res.render('business/applicant-detail', {
