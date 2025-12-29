@@ -247,8 +247,25 @@ class DetailApplicantController {
                 query.status = status;
             }
             
+            // Handle job title filter separately since it requires population
+            let matchingJobIds = [];
             if (jobTitle) {
-                query['job_id.title'] = { $regex: jobTitle, $options: 'i' };
+                // Use word boundaries to match whole words only, avoiding partial matches
+                const escapedJobTitle = jobTitle.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const Job = require('../../models/Job');
+                
+                const matchingJobs = await Job.find({ 
+                    title: { $regex: `\\b${escapedJobTitle}\\b`, $options: 'i' }
+                }).select('_id');
+                
+                matchingJobIds = matchingJobs.map(job => job._id);
+                
+                if (matchingJobIds.length > 0) {
+                    query.job_id = { $in: matchingJobIds };
+                } else {
+                    // No jobs match the title, return empty results
+                    query.job_id = { $in: [] };
+                }
             }
 
             // Count total documents for pagination
@@ -271,9 +288,23 @@ class DetailApplicantController {
 
                     // Map schema fields to template expectations
                     jobAppliedObj.jobTitle = jobApplied.job_id?.title || 'Unknown Position';
-                    jobAppliedObj.cvId = jobApplied.cv_id || jobApplied._id;
+                    // Handle cvId properly - get the actual ID, not the populated object
+                    if (jobApplied.cv_id && typeof jobApplied.cv_id === 'object') {
+                        jobAppliedObj.cvId = jobApplied.cv_id._id;
+                    } else if (jobApplied.cv_id) {
+                        jobAppliedObj.cvId = jobApplied.cv_id;
+                    } else {
+                        jobAppliedObj.cvId = jobApplied._id;
+                    }
                     jobAppliedObj.createdAt = jobApplied.applied_at || jobApplied.createdAt;
                     jobAppliedObj.status = jobApplied.status || 'pending';
+                    
+                    console.log('CV ID debug:', {
+                        original_cv_id: jobApplied.cv_id,
+                        cvId_type: typeof jobApplied.cv_id,
+                        final_cvId: jobAppliedObj.cvId,
+                        cvId_string: jobAppliedObj.cvId?.toString()
+                    });
                     
                     // Ensure user_id and job_id are available for frontend API calls
                     jobAppliedObj.user_id = jobApplied.user_id?._id || jobApplied.user_id;
@@ -342,31 +373,31 @@ class DetailApplicantController {
 
             // If no real applications, create mock data for testing matching scores
             if (enhancedJobApplieds.length === 0) {
-                console.log('No applications found, creating mock data for testing');
-                const mockUserId1 = new mongoose.Types.ObjectId();
-                const mockUserId2 = new mongoose.Types.ObjectId();
-                const mockJobId1 = new mongoose.Types.ObjectId();
-                const mockJobId2 = new mongoose.Types.ObjectId();
+                // Use consistent job IDs that will be the same in table and popup
+                const mockJobId1 = new mongoose.Types.ObjectId('507f1f77bcf86cd799439011'); // Fixed ID
+                const mockJobId2 = new mongoose.Types.ObjectId('507f1f77bcf86cd799439012'); // Fixed ID
+                const mockUserId1 = new mongoose.Types.ObjectId('507f1f77bcf86cd799439013'); // Fixed ID
+                const mockUserId2 = new mongoose.Types.ObjectId('507f1f77bcf86cd799439014'); // Fixed ID
                 
                 const mockApplications = [
                     {
                         _id: new mongoose.Types.ObjectId(),
                         user_id: mockUserId1,
-                        job_id: mockJobId1,
+                        job_id: mockJobId1, // Consistent job ID
                         userEmail: 'john.doe@example.com',
                         jobTitle: 'Software Engineer',
                         status: 'pending',
-                        cvId: new mongoose.Types.ObjectId(),
+                        cvId: null, // No real CV for mock data
                         createdAt: new Date()
                     },
                     {
                         _id: new mongoose.Types.ObjectId(),
                         user_id: mockUserId2, 
-                        job_id: mockJobId2,
+                        job_id: mockJobId2, // Consistent job ID
                         userEmail: 'jane.smith@example.com',
                         jobTitle: 'Product Manager',
                         status: 'reviewing',
-                        cvId: new mongoose.Types.ObjectId(),
+                        cvId: null, // No real CV for mock data
                         createdAt: new Date()
                     }
                 ];
@@ -494,6 +525,56 @@ class DetailApplicantController {
             });
         }
     }
+    async deleteApplication(req, res, next) {
+        try {
+            // TEMPORARY: Mock business user for testing
+            if (!req.user) {
+                req.user = { _id: new mongoose.Types.ObjectId(), id: new mongoose.Types.ObjectId() };
+                req.isLogin = true;
+                req.userType = 'business';
+                console.log('Using mock business user for delete');
+            }
+            
+            const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+            const applicationId = req.params.id;
+
+            if (!businessId) {
+                return res.status(401).json({ success: false, message: 'Unauthorized' });
+            }
+
+            // Find application and verify ownership
+            const application = await AppliedJobs.findById(applicationId);
+            if (!application) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Application not found' 
+                });
+            }
+
+            if (application.business_id.toString() !== businessId.toString()) {
+                return res.status(403).json({ 
+                    success: false, 
+                    message: 'Access denied' 
+                });
+            }
+
+            // Delete the application
+            await AppliedJobs.findByIdAndDelete(applicationId);
+
+            res.json({ 
+                success: true, 
+                message: 'Application deleted successfully'
+            });
+
+        } catch (error) {
+            console.error('Error deleting application:', error);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Internal server error' 
+            });
+        }
+    }
+
     async viewCv(req, res, next){
         try {
          const cv = await CV.findById(req.params.id).select('cv');

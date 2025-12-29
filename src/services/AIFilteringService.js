@@ -56,40 +56,56 @@ class AIFilteringService {
     }
   }
 
-  // Apply smart search with AI
+  // Apply smart search with priority-based approach
   static applySmartSearch(query, searchTerm) {
     const keywords = this.extractSearchKeywords(searchTerm);
     
     if (keywords.length === 0) return query;
 
-    const searchConditions = [];
-
+    // Priority 1: Exact keyword matching (highest priority)
+    const exactMatchConditions = [];
+    
     // Title matching (highest priority)
-    searchConditions.push({
+    exactMatchConditions.push({
       title: { $regex: keywords.join('|'), $options: 'i' }
     });
 
     // Description matching
-    searchConditions.push({
+    exactMatchConditions.push({
       description: { $regex: keywords.join('|'), $options: 'i' }
     });
 
     // Requirements matching
-    searchConditions.push({
+    exactMatchConditions.push({
       requirements: { $regex: keywords.join('|'), $options: 'i' }
     });
 
     // Field/industry matching
-    searchConditions.push({
+    exactMatchConditions.push({
       field: { $regex: keywords.join('|'), $options: 'i' }
     });
 
+    // Priority 2: AI-powered semantic matching (fallback)
+    const aiConditions = [];
+    
     // Skills matching
-    searchConditions.push({
+    aiConditions.push({
       skills: { $in: keywords.map(k => new RegExp(k, 'i')) }
     });
 
-    query.$or = searchConditions;
+    // Company name matching
+    aiConditions.push({
+      'businessId.companyName': { $regex: keywords.join('|'), $options: 'i' }
+    });
+
+    // Combine conditions with exact matches having higher weight
+    query.$or = [
+      // Exact matches (higher priority)
+      ...exactMatchConditions,
+      // AI matches (lower priority)
+      ...aiConditions
+    ];
+    
     return query;
   }
 
@@ -123,31 +139,35 @@ class AIFilteringService {
     }
   }
 
-  // Apply AI sorting
+  // Apply AI sorting with priority for exact matches
   static applyAISorting(jobs, filters) {
     return jobs.sort((a, b) => {
       let scoreA = 0;
       let scoreB = 0;
 
-      // Recency factor
+      // Priority 1: Exact match bonus
+      if (a.matchType === 'exact') scoreA += 200;
+      if (b.matchType === 'exact') scoreB += 200;
+
+      // Priority 2: Recency factor
       const daysA = Math.floor((new Date() - a.createdAt) / (1000 * 60 * 60 * 24));
       const daysB = Math.floor((new Date() - b.createdAt) / (1000 * 60 * 60 * 24));
       
       scoreA += Math.max(0, 30 - daysA);
       scoreB += Math.max(0, 30 - daysB);
 
-      // Personalization factor (if available)
+      // Priority 3: Personalization factor (if available)
       if (a.personalizationScore) scoreA += a.personalizationScore * 0.5;
       if (b.personalizationScore) scoreB += b.personalizationScore * 0.5;
 
-      // Quality factors
+      // Priority 4: Quality factors
       if (a.description && a.description.length > 200) scoreA += 10;
       if (b.description && b.description.length > 200) scoreB += 10;
 
       if (a.requirements && a.requirements.length > 50) scoreA += 5;
       if (b.requirements && b.requirements.length > 50) scoreB += 5;
 
-      // Business verification
+      // Priority 5: Business verification
       if (a.businessId && a.businessId.isVerified) scoreA += 15;
       if (b.businessId && b.businessId.isVerified) scoreB += 15;
 

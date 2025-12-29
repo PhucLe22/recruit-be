@@ -57,18 +57,22 @@ router.post('/schedule/meeting', businessController.scheduleMeeting);
 router.get('/applications/stream', SchelduleController.handleApplicationStream.bind(SchelduleController));
 router.get('/user-profile/:userId', userProfileController.viewUserProfile);
 router.get('/cv/download/:cvId', userProfileController.downloadCV);
-router.get('/cv/view/:identifier', userProfileController.viewApplicantCV);
+router.get('/cv/view/:cvId', userProfileController.viewApplicantCV);
 router.get('/api/cv/:cvId', detailApplicantController.getCvData);
 router.get('/api/cv-view/:cvId', detailApplicantController.viewCvDirect);   
 router.get('/applicants/:id', detailApplicantController.viewApplicant);
 router.get('/profile-views', profileViewsController.viewProfileViews);
 router.get('/jobs', jobsController.viewJobs);
+router.get('/api/job/:id', jobDetailController.getJobDetailApi);
 router.get('/job/:id', jobDetailController.viewJobDetail);
 router.get('/api/job/:jobId/matching-applicants', isBusinessOrApiKey, applicantMatchingController.getMatchingApplicants);
 router.get('/api/matching-applicants/all', isBusinessOrApiKey, applicantMatchingController.getAllJobsApplicantRecommendations);
 router.get('/api/applicant/:userId/profile', applicantMatchingController.getApplicantProfile);
+router.get('/api/applicant/:userId/:jobId/analysis', applicantMatchingController.getDetailedMatchingAnalysis);
+router.get('/api/jobs', applicantMatchingController.getBusinessJobs);
 router.post('/api/matching-preferences', isBusinessOrApiKey, applicantMatchingController.updateMatchingPreferences);
 router.put('/:id/update', detailApplicantController.updateApplicationStatus);
+router.delete('/jobApplied/:id', detailApplicantController.deleteApplication);
 
 
 module.exports = router;

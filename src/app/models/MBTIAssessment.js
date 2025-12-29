@@ -16,14 +16,14 @@ const MBTIAssessmentSchema = new Schema(
       required: true
     },
     scores: {
-      E: { type: Number, min: 0, max: 4 },
-      I: { type: Number, min: 0, max: 4 },
-      S: { type: Number, min: 0, max: 4 },
-      N: { type: Number, min: 0, max: 4 },
-      T: { type: Number, min: 0, max: 4 },
-      F: { type: Number, min: 0, max: 4 },
-      J: { type: Number, min: 0, max: 4 },
-      P: { type: Number, min: 0, max: 4 }
+      E: { type: Number, min: 0, max: 10 },
+      I: { type: Number, min: 0, max: 10 },
+      S: { type: Number, min: 0, max: 10 },
+      N: { type: Number, min: 0, max: 10 },
+      T: { type: Number, min: 0, max: 10 },
+      F: { type: Number, min: 0, max: 10 },
+      J: { type: Number, min: 0, max: 10 },
+      P: { type: Number, min: 0, max: 10 }
     },
     answers: [String],
     description: String,

@@ -33,26 +33,27 @@
         }
 
         .container {
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 2rem;
+            padding: 2rem 1.5rem;
         }
 
         .header {
             text-align: center;
             color: white;
-            margin-bottom: 3rem;
+            margin-bottom: 4rem;
             position: relative;
+            padding: 2rem 0;
         }
 
         .header::after {
             content: '';
             position: absolute;
-            bottom: -1rem;
+            bottom: 0;
             left: 50%;
             transform: translateX(-50%);
-            width: 100px;
-            height: 3px;
+            width: 120px;
+            height: 4px;
             background: linear-gradient(90deg, var(--accent-color), var(--secondary-color));
             border-radius: 2px;
         }
@@ -66,12 +67,16 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
         }
 
         .header p {
             font-size: 1.3rem;
             opacity: 0.9;
-            max-width: 700px;
+            max-width: 600px;
             margin: 0 auto;
             font-weight: 400;
             line-height: 1.8;
@@ -79,22 +84,24 @@
 
         .assessment-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-            margin-bottom: 3rem;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 4rem;
+            align-items: stretch;
         }
 
         .assessment-card {
             background: white;
             border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 3rem 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
             height: 100%;
             display: flex;
             flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .assessment-card::before {
@@ -124,19 +131,25 @@
         }
 
         .assessment-icon {
-            width: 90px;
-            height: 90px;
-            border-radius: 20px;
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 2rem;
-            font-size: 2.2rem;
+            margin-bottom: 2.5rem;
+            font-size: 2.5rem;
             color: white;
-            box-shadow: 0 15px 30px rgba(30, 64, 175, 0.2);
+            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.15);
             position: relative;
             z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .assessment-card:hover .assessment-icon {
+            transform: scale(1.1);
+            box-shadow: 0 25px 50px rgba(30, 64, 175, 0.25);
         }
 
         .assessment-icon::before {
@@ -154,17 +167,18 @@
         }
 
         .assessment-title {
-            font-size: 2rem;
+            font-size: 2.2rem;
             color: #1a202c;
             margin-bottom: 0.5rem;
             font-weight: 700;
             letter-spacing: -0.5px;
+            line-height: 1.2;
         }
 
         .assessment-subtitle {
             color: var(--gray-color);
             font-size: 1.1rem;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
             font-weight: 500;
             opacity: 0.8;
         }
@@ -172,25 +186,24 @@
         .assessment-description {
             color: #4a5568;
             line-height: 1.7;
-            margin-bottom: 2rem;
-            font-size: 1rem;
+            margin-bottom: 2.5rem;
+            font-size: 1.05rem;
         }
 
         .assessment-features {
             list-style: none;
-            margin-bottom: 2.5rem;
+            margin-bottom: 3rem;
             flex-grow: 1;
         }
 
         .assessment-features li {
-            padding: 0.8rem 0;
+            padding: 1rem 0;
             color: #4a5568;
             position: relative;
-            padding-left: 2rem;
-            font-size: 0.95rem;
+            padding-left: 2.5rem;
+            font-size: 1rem;
             transition: all 0.3s ease;
             border-radius: 8px;
-            min-height: 2rem;
         }
 
         .assessment-features li:hover {
@@ -216,15 +229,15 @@
             gap: 0.75rem;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
             color: white;
-            padding: 1.2rem 2.5rem;
+            padding: 1.4rem 2.8rem;
             border-radius: 60px;
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             border: none;
             cursor: pointer;
-            font-size: 1.05rem;
-            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+            font-size: 1.1rem;
+            box-shadow: 0 15px 30px rgba(30, 64, 175, 0.2);
             position: relative;
             overflow: hidden;
             margin-top: auto;
@@ -246,15 +259,15 @@
         }
 
         .assessment-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 20px 40px rgba(30, 64, 175, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 25px 50px rgba(30, 64, 175, 0.3);
         }
 
         .info-section {
             background: white;
             border-radius: 24px;
-            padding: 2.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            padding: 3rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.06);
             margin-bottom: 2rem;
             position: relative;
             overflow: hidden;
@@ -349,41 +362,49 @@
         @media (max-width: 1200px) {
             .container {
                 max-width: 1200px;
+                padding: 2rem 1rem;
             }
 
             .assessment-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1.5rem;
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 2rem;
             }
 
             .assessment-card {
-                padding: 2rem;
+                padding: 2.5rem 2rem;
+            }
+
+            .header h1 {
+                font-size: 3rem;
             }
         }
 
         @media (max-width: 992px) {
             .container {
-                max-width: 100%;
                 padding: 1.5rem;
             }
 
             .assessment-grid {
-                grid-template-columns: repeat(3, 1fr);
-                gap: 1.2rem;
+                grid-template-columns: 1fr;
+                gap: 2rem;
             }
 
             .assessment-card {
-                padding: 1.8rem;
+                padding: 2.5rem;
             }
 
             .assessment-icon {
-                width: 80px;
-                height: 80px;
-                font-size: 2rem;
+                width: 90px;
+                height: 90px;
+                font-size: 2.2rem;
             }
 
             .assessment-title {
-                font-size: 1.8rem;
+                font-size: 2rem;
+            }
+
+            .header h1 {
+                font-size: 2.8rem;
             }
         }
 
@@ -392,8 +413,15 @@
                 padding: 1rem;
             }
 
+            .header {
+                margin-bottom: 3rem;
+                padding: 1.5rem 0;
+            }
+
             .header h1 {
                 font-size: 2.5rem;
+                flex-direction: column;
+                gap: 0.5rem;
             }
 
             .header p {
@@ -410,17 +438,22 @@
             }
 
             .assessment-icon {
-                width: 70px;
-                height: 70px;
-                font-size: 1.8rem;
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
             }
 
             .assessment-title {
-                font-size: 1.6rem;
+                font-size: 1.8rem;
+            }
+
+            .assessment-button {
+                padding: 1.2rem 2.2rem;
+                font-size: 1rem;
             }
 
             .info-section {
-                padding: 1.5rem;
+                padding: 2rem;
             }
 
             .user-info {
@@ -546,7 +579,7 @@
                     <li>Dự đoán hiệu suất công việc</li>
                     <li>Thời gian: 15-20 phút</li>
                 </ul>
-                <a href="/api/personality-assessments/big-five" class="assessment-button">
+                <a href="/personality-assessments/big-five" class="assessment-button">
                     <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
                 </a>
             </div>
@@ -568,7 +601,7 @@
                     <li>Dự báo phong cách lãnh đạo</li>
                     <li>Thời gian: 10-15 phút</li>
                 </ul>
-                <a href="/api/personality-assessments/disc" class="assessment-button">
+                <a href="/personality-assessments/disc" class="assessment-button">
                     <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
                 </a>
             </div>

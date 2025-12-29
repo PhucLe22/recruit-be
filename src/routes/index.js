@@ -57,6 +57,7 @@ router.use('/search', searchRouter);
 router.use('/api/behavior', userBehaviorRouter);
 router.use('/api/recommendations', recommendationRouter);
 router.use('/api/ai', aiSearchRouter);
+router.use('/personality-assessments', personalityAssessmentsRouter);
 router.use('/api/personality-assessments', personalityAssessmentsRouter);
 router.use('/cv-assistant', cvAssistantRouter);
 router.use('/ai-service', aiServiceRouter);

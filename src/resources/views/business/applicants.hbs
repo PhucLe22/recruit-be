@@ -225,6 +225,26 @@
     .score-low { background: linear-gradient(135deg, #ef4444, #dc2626); color: white; }
     .score-none { background: #e2e8f0; color: #718096; }
 
+    .clickable-score {
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .clickable-score:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .clickable-job-title {
+      transition: all 0.3s ease;
+    }
+
+    .clickable-job-title:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      background-color: #0d6efd !important;
+    }
+
     /* Toast */
     .toast-notification {
       position: fixed;
@@ -377,18 +397,24 @@
                     <option value="rejected" {{#if (eq this.status 'rejected')}}selected{{/if}}>❌ Từ chối</option>
                   </select>
                 </td>
-                <td><span class="badge bg-info">{{this.jobTitle}}</span></td>
+                <td><span class="badge bg-info clickable-job-title" data-job-id="{{this.job_id}}" style="cursor: pointer;">{{this.jobTitle}}</span></td>
                 <td>
                   <div class="matching-score" data-user-id="{{this.user_id}}" data-job-id="{{this.job_id}}">
-                    <span class="score-placeholder">-</span>
+                    <span class="score-placeholder clickable-score" data-bs-toggle="modal" data-bs-target="#analysisModal">-</span>
                   </div>
                 </td>
                 <td><small class="text-muted">{{formatDate this.createdAt}}</small></td>
                 <td>
                   <div class="btn-group btn-group-sm">
+                    {{#if this.cvId}}
                     <a href="/business/cv/view/{{this.cvId}}" class="btn btn-outline-primary" target="_blank">
                       <i class="fas fa-eye"></i>
                     </a>
+                    {{else}}
+                    <button class="btn btn-outline-secondary" disabled title="Không có CV">
+                      <i class="fas fa-eye-slash"></i>
+                    </button>
+                    {{/if}}
                     <button class="btn btn-outline-danger delete-btn" data-id="{{this._id}}">
                       <i class="fas fa-trash"></i>
                     </button>
@@ -462,6 +488,49 @@
     </div>
   </div>
 
+  <!-- Job Detail Modal -->
+  <div class="modal fade" id="jobDetailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-briefcase me-2"></i>Chi Tiết Công Việc</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="jobDetailContent">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang tải thông tin công việc...</p>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analysis Modal -->
+  <div class="modal fade" id="analysisModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title"><i class="fas fa-chart-line me-2"></i>Phân Tích Phù Hợp</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="analysisContent">
+          <div class="text-center py-4">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Đang phân tích...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script>
     const $ = id => document.getElementById(id);
@@ -505,9 +574,12 @@
           deleteModal.hide();
           toast('Xóa thành công');
           updateStats();
+        } else {
+          toast(data.message || 'Lỗi xóa', 'error');
         }
       } catch (err) {
-        toast('Lỗi xóa', 'error');
+        console.error('Delete error:', err);
+        toast('Lỗi kết nối', 'error');
       }
     };
 
@@ -550,15 +622,476 @@
           
           if (score) {
             const cls = score >= 70 ? 'score-high' : score >= 40 ? 'score-medium' : 'score-low';
-            el.innerHTML = `<span class="score-badge ${cls}">${score}%</span>`;
+            el.innerHTML = `<span class="score-badge ${cls} clickable-score" data-user-id="${userId}" data-job-id="${jobId}" data-bs-toggle="modal" data-bs-target="#analysisModal">${score}%</span>`;
           } else {
-            el.innerHTML = '<span class="score-badge score-none">null</span>';
+            el.innerHTML = '<span class="score-badge score-none">-</span>';
           }
         } catch {
           el.innerHTML = '<span class="score-badge score-none">-</span>';
         }
       }
+
+      // Add click handlers for clickable scores
+      $$('.clickable-score').forEach(scoreEl => {
+        scoreEl.onclick = async function() {
+          const userId = this.dataset.userId;
+          const jobId = this.dataset.jobId;
+          if (!userId || !jobId) return;
+          
+          await showDetailedAnalysis(userId, jobId);
+        };
+      });
     }
+
+    // Show detailed matching analysis
+    async function showDetailedAnalysis(userId, jobId) {
+      const analysisContent = $('analysisContent');
+      
+      // Show loading state
+      analysisContent.innerHTML = `
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Đang phân tích...</p>
+        </div>
+      `;
+
+      try {
+        const url = `/business/api/applicant/${userId}/${jobId}/analysis`;
+        
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if (data.success) {
+          analysisContent.innerHTML = renderDetailedAnalysis(data.data);
+        } else {
+          analysisContent.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>Lỗi:</strong> ${data.message || 'Không thể tải phân tích'}
+              <div class="mt-2">
+                <small class="text-muted">
+                  Vui lòng kiểm tra lại thông tin hoặc thử lại sau.
+                </small>
+              </div>
+            </div>
+          `;
+        }
+      } catch (err) {
+        analysisContent.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lỗi kết nối:</strong> ${err.message}
+            <div class="mt-2">
+              <small class="text-muted">
+                Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.
+              </small>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-outline-primary btn-sm" onclick="showDetailedAnalysis('${userId}', '${jobId}')">
+                <i class="fas fa-redo me-1"></i>Thử lại
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Render detailed analysis content
+    function renderDetailedAnalysis(data) {
+      const analysis = data.analysis;
+      const job = data.job;
+      const applicant = data.applicant;
+      
+      // Handle undefined applicant data
+      const safeApplicant = applicant || { user: { username: 'Unknown User', email: 'unknown@example.com' } };
+      const safeUser = safeApplicant.user || { username: 'Unknown User', email: 'unknown@example.com' };
+      
+      return `
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-briefcase me-2"></i>Công việc: ${job.title || 'Unknown Position'}</h6>
+            <p class="text-muted">${job.field || 'N/A'} • ${job.experience || 'N/A'} • ${job.type || 'N/A'}</p>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="fas fa-user me-2"></i>Ứng viên: ${safeUser.username || 'Unknown User'}</h6>
+            <p class="text-muted">${safeUser.email || 'unknown@example.com'}</p>
+          </div>
+        </div>
+        
+        <div class="text-center my-4">
+          <div class="d-inline-block">
+            <h2 class="mb-2">${analysis.overallScore || 0}%</h2>
+            <div class="progress" style="width: 200px; height: 10px;">
+              <div class="progress-bar ${(analysis.overallScore || 0) >= 70 ? 'bg-success' : (analysis.overallScore || 0) >= 40 ? 'bg-warning' : 'bg-danger'}" 
+                   style="width: ${analysis.overallScore || 0}%"></div>
+            </div>
+            <p class="mt-2">${(analysis.overallScore || 0) >= 80 ? 'Rất phù hợp' : (analysis.overallScore || 0) >= 60 ? 'Khá phù hợp' : (analysis.overallScore || 0) >= 40 ? 'Có tiềm năng' : 'Chưa phù hợp'}</p>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-chart-pie me-2"></i>Chi Tiết Điểm</h6>
+            ${analysis.breakdown ? `
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>Kỹ năng (${analysis.breakdown.skills?.weight || 40}%)</span>
+                  <span class="badge bg-primary">${analysis.breakdown.skills?.score || 0}%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-primary" style="width: ${analysis.breakdown.skills?.score || 0}%"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>Kinh nghiệm (${analysis.breakdown.experience?.weight || 20}%)</span>
+                  <span class="badge bg-info">${analysis.breakdown.experience?.score || 0}%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-info" style="width: ${analysis.breakdown.experience?.score || 0}%"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>Học vấn (${analysis.breakdown.education?.weight || 15}%)</span>
+                  <span class="badge bg-success">${analysis.breakdown.education?.score || 0}%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-success" style="width: ${analysis.breakdown.education?.score || 0}%"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>Lĩnh vực (${analysis.breakdown.field?.weight || 15}%)</span>
+                  <span class="badge bg-warning">${analysis.breakdown.field?.score || 0}%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-warning" style="width: ${analysis.breakdown.field?.score || 0}%"></div>
+                </div>
+              </div>
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                  <span>Vị trí (${analysis.breakdown.title?.weight || 10}%)</span>
+                  <span class="badge bg-secondary">${analysis.breakdown.title?.score || 0}%</span>
+                </div>
+                <div class="progress" style="height: 6px;">
+                  <div class="progress-bar bg-secondary" style="width: ${analysis.breakdown.title?.score || 0}%"></div>
+                </div>
+              </div>
+            ` : '<p class="text-muted">Không có dữ liệu phân tích chi tiết</p>'}
+          </div>
+          
+          <div class="col-md-6">
+            <h6><i class="fas fa-lightbulb me-2"></i>Điểm Mạnh</h6>
+            <ul class="list-unstyled mb-4">
+              ${(analysis.strengths || []).map(strength => `<li class="mb-2"><i class="fas fa-check text-success me-2"></i>${strength}</li>`).join('')}
+            </ul>
+            
+            <h6><i class="fas fa-exclamation-triangle me-2"></i>Cần Cải Thiện</h6>
+            <ul class="list-unstyled mb-4">
+              ${(analysis.gaps || []).map(gap => `<li class="mb-2"><i class="fas fa-times text-danger me-2"></i>${gap}</li>`).join('')}
+            </ul>
+            
+            <h6><i class="fas fa-comments me-2"></i>Khuyến Nghị</h6>
+            <ul class="list-unstyled">
+              ${(analysis.recommendations || []).map(rec => `<li class="mb-2"><i class="fas fa-arrow-right text-primary me-2"></i>${rec}</li>`).join('')}
+            </ul>
+          </div>
+        </div>
+        
+        <div class="row mt-4">
+          <div class="col-md-6">
+            <h6><i class="fas fa-cogs me-2"></i>Kỹ Năng Phù Hợp</h6>
+            <div>
+              ${(analysis.breakdown?.skills?.matchingSkills || []).map(skill => `<span class="badge bg-success me-1 mb-1">${skill}</span>`).join('')}
+            </div>
+            ${(analysis.breakdown?.skills?.missingSkills?.length || 0) > 0 ? `
+              <h6 class="mt-3"><i class="fas fa-times-circle me-2"></i>Kỹ Năng Thiếu</h6>
+              <div>
+                ${(analysis.breakdown?.skills?.missingSkills || []).map(skill => `<span class="badge bg-danger me-1 mb-1">${skill}</span>`).join('')}
+              </div>
+            ` : ''}
+          </div>
+          
+          <div class="col-md-6">
+            <h6><i class="fas fa-briefcase me-2"></i>Kinh Nghiệm</h6>
+            <p class="mb-2"><strong>Tổng kinh nghiệm:</strong> ${analysis.breakdown?.experience?.applicantTotal || 'Unknown'} năm</p>
+            <p class="mb-2"><strong>Yêu cầu:</strong> ${analysis.breakdown?.experience?.required || 'Not specified'}</p>
+            ${(analysis.breakdown?.experience?.details?.length || 0) > 0 ? `
+              <div class="mt-2">
+                ${(analysis.breakdown?.experience?.details || []).slice(0, 2).map(exp => 
+                  `<div class="small text-muted mb-1">
+                    <strong>${exp.title || 'Unknown'}</strong> tại ${exp.company || 'Unknown'} (${exp.duration || 'N/A'})
+                  </div>`
+                ).join('')}
+              </div>
+            ` : ''}
+          </div>
+        </div>
+      `;
+    }
+
+    // AI Matching functionality
+    async function loadJobs() {
+      try {
+        const res = await fetch('/business/api/jobs');
+        const data = await res.json();
+        const jobSelect = $('jobSelect');
+        
+        if (data.success && data.jobs) {
+          jobSelect.innerHTML = '<option value="">-- Chọn --</option>';
+          data.jobs.forEach(job => {
+            jobSelect.innerHTML += `<option value="${job._id}">${job.title}</option>`;
+          });
+        }
+      } catch (err) {
+        console.error('Error loading jobs:', err);
+        toast('Lỗi tải danh sách công việc', 'error');
+      }
+    }
+
+    // Find matching applicants
+    $('findBtn').onclick = async function() {
+      const jobId = $('jobSelect').value;
+      const limit = $('limitSelect').value;
+      
+      if (!jobId) {
+        toast('Vui lòng chọn công việc', 'error');
+        return;
+      }
+
+      this.disabled = true;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang tìm...';
+
+      try {
+        const res = await fetch(`/business/api/job/${jobId}/matching-applicants?limit=${limit}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          displayResults(data.data);
+        } else {
+          toast(data.message || 'Lỗi tìm ứng viên', 'error');
+        }
+      } catch (err) {
+        console.error('Error finding applicants:', err);
+        toast('Lỗi kết nối', 'error');
+      } finally {
+        this.disabled = false;
+        this.innerHTML = '<i class="fas fa-search me-2"></i>Tìm ứng viên';
+      }
+    };
+
+    // Display matching results
+    function displayResults(data) {
+      const resultsDiv = $('results');
+      
+      if (!data.applicants || data.applicants.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i>
+            Không tìm thấy ứng viên phù hợp
+          </div>
+        `;
+        return;
+      }
+
+      let html = `
+        <div class="alert alert-success">
+          <i class="fas fa-check-circle me-2"></i>
+          Tìm thấy ${data.totalFound} ứng viên phù hợp với "${data.job.title}"
+        </div>
+        <div class="list-group">
+      `;
+
+      data.applicants.forEach(applicant => {
+        const score = applicant.matchingScore;
+        const scoreClass = score >= 70 ? 'score-high' : score >= 40 ? 'score-medium' : 'score-low';
+        const reasons = applicant.matchingReasons.slice(0, 2).join(', ');
+        
+        html += `
+          <div class="list-group-item">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h6 class="mb-1">${applicant.user.username}</h6>
+                <p class="mb-1 text-muted">${applicant.user.email}</p>
+                <small class="text-muted">${reasons}</small>
+              </div>
+              <span class="score-badge ${scoreClass}">${score}%</span>
+            </div>
+          </div>
+        `;
+      });
+
+      html += '</div>';
+      resultsDiv.innerHTML = html;
+    }
+
+    // Job Detail functionality
+    async function showJobDetail(jobId) {
+      const jobDetailContent = $('jobDetailContent');
+      
+      // Show loading state
+      jobDetailContent.innerHTML = `
+        <div class="text-center py-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Đang tải thông tin công việc...</p>
+        </div>
+      `;
+
+      try {
+        const res = await fetch(`/business/api/job/${jobId}`);
+        const data = await res.json();
+        
+        if (data.success) {
+          jobDetailContent.innerHTML = renderJobDetail(data.data);
+        } else {
+          jobDetailContent.innerHTML = `
+            <div class="alert alert-danger">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              <strong>Lỗi:</strong> ${data.message || 'Không thể tải thông tin công việc'}
+            </div>
+          `;
+        }
+      } catch (err) {
+        console.error('Error loading job details:', err);
+        jobDetailContent.innerHTML = `
+          <div class="alert alert-danger">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <strong>Lỗi kết nối:</strong> Không thể tải thông tin công việc
+            <div class="mt-2">
+              <small class="text-muted">
+                Vui lòng kiểm tra kết nối mạng và thử lại.
+              </small>
+            </div>
+            <div class="mt-3">
+              <button class="btn btn-outline-primary btn-sm" onclick="showJobDetail('${jobId}')">
+                <i class="fas fa-redo me-1"></i>Thử lại
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // Render job detail content
+    function renderJobDetail(job) {
+      const statusBadge = {
+        'active': '<span class="badge bg-success">Đang tuyển</span>',
+        'urgent': '<span class="badge bg-danger">Gấp</span>',
+        'closed': '<span class="badge bg-secondary">Đã đóng</span>'
+      }[job.status] || '<span class="badge bg-secondary">Không xác định</span>';
+
+      const createdDate = new Date(job.createdAt).toLocaleDateString('vi-VN');
+      const expiryDate = job.expiryTime ? new Date(job.expiryTime).toLocaleDateString('vi-VN') : 'Không giới hạn';
+
+      return `
+        <div class="row">
+          <div class="col-md-8">
+            <h4 class="mb-3">${job.title}</h4>
+            <div class="mb-3">
+              <span class="me-3">${statusBadge}</span>
+              <small class="text-muted">ID: ${job._id}</small>
+            </div>
+            
+            <div class="mb-4">
+              <h6><i class="fas fa-building me-2"></i>Thông tin công ty</h6>
+              <p class="mb-1"><strong>Công ty:</strong> ${job.companyName}</p>
+              <p class="mb-1"><strong>Email:</strong> ${job.email}</p>
+              <p class="mb-1"><strong>Liên hệ:</strong> ${job.contact || job.email}</p>
+            </div>
+
+            <div class="mb-4">
+              <h6><i class="fas fa-info-circle me-2"></i>Mô tả công việc</h6>
+              <p>${job.description || 'Không có mô tả chi tiết'}</p>
+            </div>
+
+            <div class="mb-4">
+              <h6><i class="fas fa-cogs me-2"></i>Yêu cầu kỹ thuật</h6>
+              <p>${job.technique || 'Không có yêu cầu cụ thể'}</p>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="card">
+              <div class="card-body">
+                <h6><i class="fas fa-list me-2"></i>Thông tin chung</h6>
+                
+                <div class="mb-3">
+                  <small class="text-muted d-block">Lĩnh vực</small>
+                  <strong>${job.field || 'N/A'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Kinh nghiệm</small>
+                  <strong>${job.experience || 'Không yêu cầu'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Loại hình</small>
+                  <strong>${job.type || 'N/A'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Thời gian làm việc</small>
+                  <strong>${job.workTime || 'N/A'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Bằng cấp</small>
+                  <strong>${job.degree || 'Không yêu cầu'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Địa điểm</small>
+                  <strong>${job.city}, ${job.location}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Mức lương</small>
+                  <strong class="text-success">${job.salary || 'Thỏa thuận'}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Hạn nộp</small>
+                  <strong>${expiryDate}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Số lượng ứng viên</small>
+                  <strong>${job.applicationCount || 0}</strong>
+                </div>
+
+                <div class="mb-3">
+                  <small class="text-muted d-block">Ngày đăng</small>
+                  <strong>${createdDate}</strong>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Add click handlers for job titles
+    $$('.clickable-job-title').forEach(jobTitleEl => {
+      jobTitleEl.onclick = function() {
+        const jobId = this.dataset.jobId;
+        if (jobId) {
+          showJobDetail(jobId);
+          // Show the modal
+          const jobDetailModal = new bootstrap.Modal($('jobDetailModal'));
+          jobDetailModal.show();
+        }
+      };
+    });
+
+    // Load jobs when modal is shown
+    const aiModal = new bootstrap.Modal($('aiModal'));
+    $('aiModal').addEventListener('shown.bs.modal', loadJobs);
 
     // Init
     updateStats();

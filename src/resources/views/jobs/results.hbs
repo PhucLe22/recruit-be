@@ -713,7 +713,6 @@
             <div class="search-input-group">
               <input type="text" name="q" id="searchInput" class="search-input"
                 placeholder="Nhập từ khóa tìm kiếm (vị trí, công ty, kỹ năng...)" value="{{keyword}}">
-              <i class="fas fa-search search-icon"></i>
             </div>
           </div>
           <div class="col-md-2">
@@ -937,10 +936,10 @@
           {{/if}}
 
           {{#each (paginationRange currentPage totalPages)}}
-          {{#if (eq this ../currentPage)}}
-          <span class="page-link active">{{this}}</span>
+          {{#if this.isCurrent}}
+          <span class="page-link active">{{this.page}}</span>
           {{else}}
-          <a href="?page={{this}}&q={{../keyword}}&sortBy={{../sortBy}}&sortOrder={{../sortOrder}}" class="page-link">{{this}}</a>
+          <a href="?page={{this.page}}&q={{../keyword}}&sortBy={{../sortBy}}&sortOrder={{../sortOrder}}" class="page-link">{{this.page}}</a>
           {{/if}}
           {{/each}}
 
@@ -1014,6 +1013,7 @@
     // Event Listeners
     document.addEventListener('DOMContentLoaded', function() {
       initializeFilters();
+      restoreFiltersFromURL();
       updateActiveFiltersDisplay();
       focusSearchInput();
     });
@@ -1124,8 +1124,103 @@
       params.append('sortBy', currentFilters.sortBy);
       params.append('sortOrder', currentFilters.sortOrder);
 
-      // Navigate to new URL
-      window.location.href = '/jobs/search-results?' + params.toString();
+      // Update URL without full page reload
+      const newUrl = '/jobs/search-results?' + params.toString();
+      window.history.pushState({filters: currentFilters}, '', newUrl);
+      
+      // Perform AJAX search instead of full navigation
+      performAjaxSearch(params);
+    }
+
+    function performAjaxSearch(params) {
+      fetch(`/jobs/api/search?${params.toString()}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            updateJobResults(data);
+            hideLoading();
+          } else {
+            // Fallback to full page reload if AJAX fails
+            window.location.href = '/jobs/search-results?' + params.toString();
+          }
+        })
+        .catch(error => {
+          console.error('Search error:', error);
+          // Fallback to full page reload if AJAX fails
+          window.location.href = '/jobs/search-results?' + params.toString();
+        });
+    }
+
+    function updateJobResults(data) {
+      const jobResultsContainer = document.getElementById('jobResults');
+      
+      if (data.data && data.data.length > 0) {
+        const jobsHTML = data.data.map(job => `
+          <div class="job-card">
+            <div class="status-badge status-${job.status || 'active'}">
+              ${job.status === 'urgent' ? 'Gấp' : job.status === 'active' ? 'Đang tuyển' : job.status === 'closed' ? 'Đã đóng' : ''}
+            </div>
+            <div class="job-header">
+              <img src="${job.logoPath || '/images/default-company.png'}" alt="${job.companyName}" class="company-logo" onerror="this.src='/images/default-company.png'">
+              <div class="job-title">
+                <h3>${job.title}</h3>
+                <div class="company-name">${job.companyName}</div>
+              </div>
+            </div>
+            <div class="job-details">
+              <div class="detail-item">
+                <i class="fas fa-briefcase"></i>
+                <span>${job.type || 'Full-time'}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-clock"></i>
+                <span>${job.workTime || 'Full-time'}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>${job.city || 'Địa điểm'}</span>
+              </div>
+              <div class="detail-item">
+                <i class="fas fa-tags"></i>
+                <span>${job.field || 'Ngành nghề'}</span>
+              </div>
+            </div>
+            <div class="salary">
+              <i class="fas fa-dollar-sign"></i>
+              ${job.salary || 'Thỏa thuận'}
+            </div>
+            <div class="job-footer">
+              <div class="posted-date">
+                <i class="fas fa-calendar-alt"></i>
+                ${job.formattedDate || 'Vừa mới'}
+              </div>
+              <a href="/jobs/${job.slug}" class="job-apply-btn">
+                <i class="fas fa-eye"></i>
+                Xem chi tiết
+              </a>
+            </div>
+          </div>
+        `).join('');
+        
+        jobResultsContainer.innerHTML = `<div class="job-grid">${jobsHTML}</div>`;
+      } else {
+        jobResultsContainer.innerHTML = `
+          <div class="no-results">
+            <i class="fas fa-search"></i>
+            <h2>Không tìm thấy công việc nào</h2>
+            <p>Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc của bạn</p>
+            <button type="button" class="btn-primary-custom mt-3" onclick="clearAllFiltersAndSearch()">
+              <i class="fas fa-redo"></i>
+              Tìm lại từ đầu
+            </button>
+          </div>
+        `;
+      }
+    }
+
+    function hideLoading() {
+      loadingSpinner.classList.remove('show');
+      jobResults.style.display = 'block';
     }
 
     function clearAllFilters() {
@@ -1249,7 +1344,12 @@
     // Handle back/forward browser navigation
     window.addEventListener('popstate', function(event) {
       if (event.state) {
-        location.reload();
+        // Restore filters from URL instead of reloading
+        restoreFiltersFromURL();
+        updateActiveFiltersDisplay();
+        // Perform search without adding to history again
+        const params = new URLSearchParams(window.location.search);
+        performAjaxSearch(params);
       }
     });
 
@@ -1268,10 +1368,40 @@
     // Initialize page
     document.addEventListener('DOMContentLoaded', function() {
       preserveSearchKeyword();
-      focusSearchInput();
-      restoreFiltersFromURL();
-      updateActiveFiltersDisplay();
     });
+
+    function restoreFiltersFromURL() {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      // Restore search query
+      if (urlParams.get('q')) {
+        currentFilters.q = urlParams.get('q');
+        document.getElementById('searchInput').value = currentFilters.q;
+      }
+      
+      // Restore array filters
+      ['cities', 'types', 'fields'].forEach(param => {
+        if (urlParams.getAll(param)) {
+          currentFilters[param] = urlParams.getAll(param);
+        }
+      });
+      
+      // Restore single value filters
+      ['experienceLevel', 'salaryMin', 'salaryMax', 'sortBy', 'sortOrder'].forEach(param => {
+        if (urlParams.get(param)) {
+          currentFilters[param] = param === 'salaryMin' || param === 'salaryMax' 
+            ? parseInt(urlParams.get(param)) 
+            : urlParams.get(param);
+        }
+      });
+      
+      // Update UI elements
+      document.getElementById('sortBy').value = currentFilters.sortBy;
+      document.getElementById('sortOrder').value = currentFilters.sortOrder;
+      
+      if (currentFilters.salaryMin) document.getElementById('salaryMin').value = currentFilters.salaryMin;
+      if (currentFilters.salaryMax) document.getElementById('salaryMax').value = currentFilters.salaryMax;
+    }
 
     // Utility functions (these would normally be handlebars helpers)
     function sub(a, b) { return a - b; }

@@ -457,7 +457,9 @@ class SmartSearchService {
     }
 
     /**
-     * Main search function
+     * Main search function with priority-based approach
+     * 1. First: Exact keyword matching (highest priority)
+     * 2. Second: AI-powered related word matching (fallback)
      */
     async searchJobs(query = '', options = {}) {
         try {
@@ -474,142 +476,280 @@ class SmartSearchService {
                 .split(' ')
                 .filter(Boolean);
 
-            // Calculate minimum relevance threshold based on search terms
-            // If no search terms, show all jobs (no filtering)
-            const hasSearchTerms = searchTerms.length > 0;
-            const minRelevanceThreshold = hasSearchTerms ? 40 : 0; // Balanced threshold for better results
+            // Tier 1: Exact keyword matching (highest priority)
+            const exactMatches = await this.performExactMatchSearch(searchTerms, filters, limit);
 
-            // Build flexible MongoDB query - lấy tất cả jobs còn hoạt động
+            // If we have enough exact matches, return them
+            if (exactMatches.length >= limit) {
+                return this.formatSearchResults(exactMatches, page, limit, filters, searchTerms, 'exact');
+            }
+
+            // Tier 2: AI-powered related word matching (fallback)
+            const aiMatches = await this.performAISearch(searchTerms, filters, limit, exactMatches);
+
+            // Combine exact matches and AI matches
+            const allJobs = [...exactMatches, ...aiMatches];
+
+            return this.formatSearchResults(allJobs, page, limit, filters, searchTerms, 'hybrid');
+        } catch (error) {
+            console.error('Smart Search Error:', error);
+            throw new Error('Search failed. Please try again.');
+        }
+    }
+
+    /**
+     * Perform exact keyword matching search
+     */
+    async performExactMatchSearch(searchTerms, filters, limit) {
+        try {
+            // Build MongoDB query for exact matching
             let mongoQuery = {
                 expiryTime: { $gte: new Date() },
                 status: 'active',
             };
 
-            // Add basic filters để giảm scope
+            // Add basic filters
             if (filters.cities && filters.cities.length > 0) {
                 mongoQuery.city = { $in: filters.cities };
             }
-
             if (filters.types && filters.types.length > 0) {
                 mongoQuery.type = { $in: filters.types };
             }
-
             if (filters.fields && filters.fields.length > 0) {
                 mongoQuery.field = { $in: filters.fields };
             }
 
-            // Get jobs from database - lấy nhiều jobs hơn để tính relevance
-            let jobs = await Job.find(mongoQuery)
-                .populate('businessId')
-                .sort({ createdAt: -1 }) // Get recent jobs first
-                .limit(limit * 4); // Get more for better relevance calculation and filtering
-
-            // Apply advanced filters
-            jobs = this.applyFilters(jobs, filters);
-
-            // Nếu không có jobs sau filter, chỉ fallback khi có search term
-            if (jobs.length === 0 && searchTerms.length > 0) {
-                console.log(
-                    'No jobs found with strict search, trying broader search...',
-                );
-                jobs = await Job.find({
-                    expiryTime: { $gte: new Date() },
-                    status: 'active',
-                })
+            // If no search terms, return filtered jobs
+            if (searchTerms.length === 0) {
+                const jobs = await Job.find(mongoQuery)
                     .populate('businessId')
                     .sort({ createdAt: -1 })
-                    .limit(limit * 4);
+                    .limit(limit * 2);
+                return this.applyFilters(jobs, filters);
             }
 
-            // Calculate relevance scores cho mỗi job
-            jobs = jobs.map((job) => ({
-                ...job.toObject(),
-                relevanceScore: this.calculateRelevanceScore(
-                    job,
-                    searchTerms,
-                    filters,
-                ),
-            }));
+            // Build exact match conditions - simpler approach
+            const searchConditions = [];
+            
+            searchTerms.forEach(term => {
+                const termRegex = new RegExp(term, 'i');
 
-            // Filter out jobs with low relevance scores (only if search terms exist)
-            if (hasSearchTerms) {
-                const originalJobs = [...jobs]; // Store original jobs before filtering
-                const originalLength = jobs.length;
-                jobs = jobs.filter(
-                    (job) => job.relevanceScore >= minRelevanceThreshold,
-                );
-                console.log(
-                    `Filtered ${originalLength - jobs.length} low-relevance jobs (threshold: ${minRelevanceThreshold})`,
-                );
-
-                // If no jobs meet the threshold, show the best matching jobs anyway (but only if some relevance exists)
-                if (jobs.length === 0 && originalLength > 0) {
-                    console.log('No jobs met threshold, checking for partial matches');
-                    // Check if any jobs have at least minimal relevance (10%)
-                    const partialMatches = originalJobs.filter(job => (job.relevanceScore || 0) >= 10);
-
-                    if (partialMatches.length > 0) {
-                        console.log('Found partial matches, showing best results');
-                        jobs = partialMatches
-                            .sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0))
-                            .slice(0, limit * 2);
-                    }
-                    // If no partial matches, keep jobs as empty array to show "no results"
-                }
-            }
-
-            // Sort results - luôn sort theo relevance rồi createdAt
-            jobs.sort((a, b) => {
-                // Ưu tiên relevance score cao
-                const relevanceDiff =
-                    (b.relevanceScore || 0) - (a.relevanceScore || 0);
-                if (relevanceDiff !== 0) return relevanceDiff;
-
-                // Nếu relevance bằng nhau, sort theo ngày mới nhất
-                return new Date(b.createdAt) - new Date(a.createdAt);
+                // Title matching (highest weight)
+                searchConditions.push({ title: termRegex });
+                // Description matching
+                searchConditions.push({ description: termRegex });
+                // Requirements matching
+                searchConditions.push({ requirements: termRegex });
+                // Field matching
+                searchConditions.push({ field: termRegex });
             });
 
-            // Pagination
-            const startIndex = (page - 1) * limit;
-            const paginatedJobs = jobs.slice(startIndex, startIndex + limit);
+            // Add exact match conditions to query
+            if (searchConditions.length > 0) {
+                mongoQuery.$or = searchConditions;
+            }
 
-            // Transform results
-            const transformedJobs = paginatedJobs.map((job) => ({
-                _id: job._id,
-                title: job.title,
-                description: job.description
-                    ? job.description.length > 200
-                        ? job.description.substring(0, 200) + '...'
-                        : job.description
-                    : 'Không có mô tả',
-                salary: job.salary || 'Thỏa thuận',
-                city: job.city || 'Không xác định',
-                type: job.type || 'Full-time',
-                field: job.field || 'Công nghệ thông tin',
-                companyName: job.businessId?.companyName || 'Công ty',
-                companyLogo: job.businessId?.logo || null,
-                relevanceScore: job.relevanceScore || 0,
-                createdAt: job.createdAt,
-                expiryTime: job.expiryTime,
+            // Get exact matches
+            let jobs = await Job.find(mongoQuery)
+                .populate('businessId')
+                .sort({ createdAt: -1 })
+                .limit(limit * 3);
+
+            // Apply additional filters
+            jobs = this.applyFilters(jobs, filters);
+
+            // Calculate relevance scores for exact matches (with bonus for exact matching)
+            jobs = jobs.map((job) => ({
+                ...job.toObject(),
+                relevanceScore: this.calculateRelevanceScore(job, searchTerms, filters) + 100, // Bonus for exact matches
+                matchType: 'exact'
             }));
 
-            return {
-                jobs: transformedJobs,
-                pagination: {
-                    currentPage: page,
-                    totalPages: Math.ceil(jobs.length / limit),
-                    totalJobs: jobs.length,
-                    hasNextPage: startIndex + limit < jobs.length,
-                    hasPrevPage: page > 1,
-                },
-                filters: filters,
-                searchTerms: searchTerms,
-                totalResults: jobs.length,
-            };
+            // Sort by relevance
+            jobs.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+
+            return jobs;
         } catch (error) {
-            console.error('Smart Search Error:', error);
-            throw new Error('Search failed. Please try again.');
+            console.error('Exact match search error:', error);
+            return [];
         }
+    }
+
+    /**
+     * Perform AI-powered search for related words
+     */
+    async performAISearch(searchTerms, filters, limit, excludeJobs = []) {
+        try {
+            // Get excluded job IDs
+            const excludedIds = excludeJobs.map(job => job._id);
+
+            // Build broader query for AI search
+            let mongoQuery = {
+                expiryTime: { $gte: new Date() },
+                status: 'active',
+                _id: { $nin: excludedIds }
+            };
+
+            // Add basic filters
+            if (filters.cities && filters.cities.length > 0) {
+                mongoQuery.city = { $in: filters.cities };
+            }
+            if (filters.types && filters.types.length > 0) {
+                mongoQuery.type = { $in: filters.types };
+            }
+            if (filters.fields && filters.fields.length > 0) {
+                mongoQuery.field = { $in: filters.fields };
+            }
+
+            // Get broader set of jobs for AI analysis
+            let jobs = await Job.find(mongoQuery)
+                .populate('businessId')
+                .sort({ createdAt: -1 })
+                .limit(limit * 4);
+
+            // Apply filters
+            jobs = this.applyFilters(jobs, filters);
+
+            // Calculate AI relevance scores
+            jobs = jobs.map((job) => ({
+                ...job.toObject(),
+                relevanceScore: this.calculateAIRelevanceScore(job, searchTerms, filters),
+                matchType: 'ai'
+            }));
+
+            // Filter by AI relevance threshold (lower threshold for AI matches)
+            jobs = jobs.filter(job => job.relevanceScore >= 20);
+
+            // Sort by AI relevance
+            jobs.sort((a, b) => (b.relevanceScore || 0) - (a.relevanceScore || 0));
+
+            return jobs.slice(0, limit * 2);
+        } catch (error) {
+            console.error('AI search error:', error);
+            return [];
+        }
+    }
+
+    /**
+     * Calculate AI relevance score for related word matching
+     */
+    calculateAIRelevanceScore(job, searchTerms, filters = {}) {
+        let score = 0;
+
+        // Process job content
+        const title = this.preprocessText(job.title || '');
+        const description = this.preprocessText(job.description || '');
+        const requirements = this.preprocessText(job.requirements || '');
+        const city = this.preprocessText(job.city || '');
+        const type = this.preprocessText(job.type || '');
+        const field = this.preprocessText(job.field || '');
+
+        const jobContent = `${title} ${description} ${requirements} ${city} ${type} ${field}`;
+
+        // AI-powered semantic matching
+        searchTerms.forEach((term) => {
+            const termNoAccent = this.removeAccents(term);
+
+            // Partial word matching (lower weight)
+            if (jobContent.includes(term)) score += 5;
+            if (this.removeAccents(jobContent).includes(termNoAccent)) score += 4;
+
+            // Skill/technology matching
+            const jobSkills = this.extractSkills(job);
+            jobSkills.forEach(skill => {
+                if (skill.toLowerCase().includes(term.toLowerCase()) || 
+                    term.toLowerCase().includes(skill.toLowerCase())) {
+                    score += 8;
+                }
+            });
+
+            // Experience level matching
+            const expLevel = this.detectExperienceLevel(job);
+            if (expLevel.toLowerCase().includes(term.toLowerCase())) {
+                score += 6;
+            }
+
+            // Remote work matching
+            const remoteType = this.detectRemoteWork(job);
+            if (term.toLowerCase().includes('remote') && remoteType === 'remote') {
+                score += 10;
+            }
+            if (term.toLowerCase().includes('hybrid') && remoteType === 'hybrid') {
+                score += 10;
+            }
+        });
+
+        // Content quality bonus
+        if (job.description && job.description.length > 200) score += 5;
+        if (job.requirements && job.requirements.length > 50) score += 3;
+
+        // Recency bonus (smaller for AI matches)
+        const daysSinceCreated = (Date.now() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24);
+        if (daysSinceCreated < 7) score += 10;
+        else if (daysSinceCreated < 30) score += 5;
+
+        return score;
+    }
+
+    /**
+     * Format search results
+     */
+    formatSearchResults(jobs, page, limit, filters, searchTerms, searchType) {
+        // Sort results - exact matches first, then by relevance
+        jobs.sort((a, b) => {
+            // Exact matches first
+            if (a.matchType === 'exact' && b.matchType !== 'exact') return -1;
+            if (b.matchType === 'exact' && a.matchType !== 'exact') return 1;
+            
+            // Then by relevance score
+            const relevanceDiff = (b.relevanceScore || 0) - (a.relevanceScore || 0);
+            if (relevanceDiff !== 0) return relevanceDiff;
+
+            // Finally by creation date
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        // Pagination
+        const startIndex = (page - 1) * limit;
+        const paginatedJobs = jobs.slice(startIndex, startIndex + limit);
+
+        // Transform results
+        const transformedJobs = paginatedJobs.map((job) => ({
+            _id: job._id,
+            title: job.title,
+            description: job.description
+                ? job.description.length > 200
+                    ? job.description.substring(0, 200) + '...'
+                    : job.description
+                : 'Không có mô tả',
+            salary: job.salary || 'Thỏa thuận',
+            city: job.city || 'Không xác định',
+            type: job.type || 'Full-time',
+            field: job.field || 'Công nghệ thông tin',
+            companyName: job.businessId?.companyName || 'Công ty',
+            companyLogo: job.businessId?.logo || null,
+            relevanceScore: job.relevanceScore || 0,
+            matchType: job.matchType || 'unknown',
+            createdAt: job.createdAt,
+            expiryTime: job.expiryTime,
+        }));
+
+        return {
+            jobs: transformedJobs,
+            pagination: {
+                currentPage: page,
+                totalPages: Math.ceil(jobs.length / limit),
+                totalJobs: jobs.length,
+                hasNextPage: startIndex + limit < jobs.length,
+                hasPrevPage: page > 1,
+            },
+            filters: filters,
+            searchTerms: searchTerms,
+            totalResults: jobs.length,
+            searchType: searchType,
+            exactMatchesCount: jobs.filter(job => job.matchType === 'exact').length,
+            aiMatchesCount: jobs.filter(job => job.matchType === 'ai').length,
+        };
     }
 
     /**

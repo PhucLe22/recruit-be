@@ -14,7 +14,7 @@ class JobDetailController {
             }
 
             // Find job with business verification
-            const job = await Job.findOne({ _id: id, business_id: businessId });
+            const job = await Job.findOne({ _id: id, businessId: businessId });
             if (!job) {
                 return res.status(404).render('error', {
                     message: 'Job not found',
@@ -65,6 +65,69 @@ class JobDetailController {
         } catch (error) {
             console.error('Error viewing job detail:', error);
             next(error);
+        }
+    }
+
+    // API endpoint to get job details as JSON
+    async getJobDetailApi(req, res, next) {
+        try {
+            const { id } = req.params;
+            const businessId = req.user?.id || req.user?._id || req.account?.id || req.account?._id;
+
+            if (!businessId) {
+                return res.status(401).json({ 
+                    success: false, 
+                    message: 'Authentication required' 
+                });
+            }
+
+            // Find job with business verification
+            const job = await Job.findOne({ _id: id, businessId: businessId });
+            if (!job) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: 'Job not found or access denied' 
+                });
+            }
+
+            // Get application count for this job
+            const applicationCount = await AppliedJobs.countDocuments({ job_id: id });
+
+            // Format job details for API response
+            const jobDetails = {
+                _id: job._id,
+                title: job.title,
+                companyName: job.companyName,
+                field: job.field,
+                experience: job.experience,
+                type: job.type,
+                workTime: job.workTime,
+                technique: job.technique,
+                description: job.description,
+                degree: job.degree,
+                city: job.city,
+                location: job.location,
+                salary: job.salary,
+                contact: job.contact,
+                email: job.email,
+                status: job.status,
+                expiryTime: job.expiryTime,
+                createdAt: job.createdAt,
+                updatedAt: job.updatedAt,
+                applicationCount: applicationCount
+            };
+
+            res.json({ 
+                success: true, 
+                data: jobDetails 
+            });
+
+        } catch (error) {
+            console.error('Error getting job detail API:', error);
+            res.status(500).json({ 
+                success: false, 
+                message: 'Internal server error' 
+            });
         }
     }
 

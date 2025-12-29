@@ -19,8 +19,8 @@ class PersonalityAssessmentController {
             res.render('personality-assessments/mbti-assessment', {
                 layout: false,
                 questions: mbtiQuestions,
-                user: req.account || null,
-                isLogin: !!req.account,
+                user: req.session.users || null,
+                isLogin: !!req.session.users,
                 assessmentType: 'MBTI',
                 title: 'Bài kiểm tra tính cách MBTI'
             });
@@ -57,7 +57,7 @@ class PersonalityAssessmentController {
             };
 
             // Save result to cache
-            const savedResult = await this.saveMBTIResult(req.account?.id, result);
+            const savedResult = await this.saveMBTIResult(req.user._id, result);
 
             res.json({
                 success: true,
@@ -142,7 +142,7 @@ class PersonalityAssessmentController {
 
     async getUserMBTIResults(req, res) {
         try {
-            const results = await this.getUserMBTIResults(req.account.id);
+            const results = await this.getUserMBTIResults(req.user._id);
             res.json({ results });
         } catch (error) {
             console.error('Error loading user MBTI results:', error);
@@ -159,8 +159,8 @@ class PersonalityAssessmentController {
             res.render('personality-assessments/big-five-assessment', {
                 layout: false,
                 questions: bigFiveQuestions,
-                user: req.account || null,
-                isLogin: !!req.account,
+                user: req.session.users || null,
+                isLogin: !!req.session.users,
                 assessmentType: 'Big Five',
                 title: 'Bài kiểm tra tính cách Big Five (OCEAN)'
             });
@@ -178,30 +178,28 @@ class PersonalityAssessmentController {
                 return res.status(400).json({ error: 'Invalid answers format' });
             }
 
-            // Prepare data for AI service
-            const assessmentData = {
-                assessment_type: 'big_five',
-                responses: answers.map((answer, index) => ({
-                    question_id: index + 1,
-                    answer: answer
-                })),
-                questions: this.generateBigFiveQuestions(),
-                user_info: req.account ? {
-                    id: req.account.id,
-                    username: req.account.username
-                } : null,
-                completed_at: new Date().toISOString()
+            // Calculate Big Five scores from answers
+            const formattedResponses = answers.map((answer, index) => ({
+                question_id: index + 1,
+                answer: answer
+            }));
+
+            // Use fallback calculation since AI service is not available
+            const result = this.fallbackBigFiveCalculation(formattedResponses);
+
+            // Create result object in the format expected by saveBigFiveResult
+            const resultData = {
+                scores: result.result.scores,
+                answers: formattedResponses.map(r => r.answer), // Extract numeric answers
+                analysis: result.result.insights.description
             };
 
-            // Call AI service for personality analysis
-            const aiResponse = await this.callAIService(assessmentData);
-
-            // Save result to database (you'll need to create the model)
-            const savedResult = await this.saveBigFiveResult(req.account?.id, aiResponse.result);
+            // Save result to cache
+            const savedResult = await this.saveBigFiveResult(req.user._id, resultData);
 
             res.json({
                 success: true,
-                result: aiResponse.result,
+                result: result.result,
                 redirectTo: `/personality-assessments/big-five/results/${savedResult._id}`
             });
         } catch (error) {
@@ -369,7 +367,7 @@ class PersonalityAssessmentController {
 
     async getUserBigFiveResults(req, res) {
         try {
-            const results = await this.getUserBigFiveResults(req.account.id);
+            const results = await this.getUserBigFiveResults(req.user._id);
             res.json({ results });
         } catch (error) {
             console.error('Error loading user Big Five results:', error);
@@ -386,8 +384,8 @@ class PersonalityAssessmentController {
             res.render('personality-assessments/disc-assessment', {
                 layout: false,
                 questions: discQuestions,
-                user: req.account || null,
-                isLogin: !!req.account,
+                user: req.session.users || null,
+                isLogin: !!req.session.users,
                 assessmentType: 'DISC',
                 title: 'Bài kiểm tra hành vi DISC'
             });
@@ -399,36 +397,36 @@ class PersonalityAssessmentController {
 
     async submitDISCAssessment(req, res) {
         try {
-            const { answers } = req.body;
+            const { answers, discType, scores, percentages } = req.body;
 
             if (!answers || !Array.isArray(answers)) {
                 return res.status(400).json({ error: 'Invalid answers format' });
             }
 
-            // Prepare data for AI service
-            const assessmentData = {
-                assessment_type: 'disc',
-                responses: answers.map((answer, index) => ({
-                    question_id: index + 1,
-                    answer: answer
-                })),
-                questions: this.generateDISCQuestions(),
-                user_info: req.account ? {
-                    id: req.account.id,
-                    username: req.account.username
-                } : null,
-                completed_at: new Date().toISOString()
+            // Use client-calculated DISC type or calculate on server
+            let finalDISCType = discType;
+            let finalScores = scores || percentages;
+
+            if (!finalDISCType) {
+                // Fallback: calculate on server if not provided by client
+                const discResult = this.calculateDISC(answers.map(a => ({ value: a })));
+                finalDISCType = discResult.primaryTrait;
+                finalScores = discResult.scores;
+            }
+
+            // Create result object
+            const result = {
+                primaryTrait: finalDISCType,
+                scores: finalScores,
+                answers: answers
             };
 
-            // Call AI service for personality analysis
-            const aiResponse = await this.callAIService(assessmentData);
-
-            // Save result to database (you'll need to create the model)
-            const savedResult = await this.saveDISCResult(req.account?.id, aiResponse.result);
+            // Save result to cache
+            const savedResult = await this.saveDISCResult(req.user._id, result);
 
             res.json({
                 success: true,
-                result: aiResponse.result,
+                result: result,
                 redirectTo: `/personality-assessments/disc/results/${savedResult._id}`
             });
         } catch (error) {
@@ -473,10 +471,10 @@ class PersonalityAssessmentController {
                 } catch (e) {
                     console.log('AI service failed for DISC, using fallback data');
                     // Fallback to sample data if AI service fails
-                    scores = { "D": 35, "I": 45, "S": 70, "C": 80 };
-                    primaryTrait = "C";
-                    analysis = "You excel at analyzing data and maintaining quality standards. You prioritize accuracy and systematic approaches.";
-                    recommendations = ["Quality Assurance", "Data Analyst", "Financial Controller"];
+                    scores = { "D": 30, "I": 25, "S": 25, "C": 20 }; // These should add up to 100
+                    primaryTrait = "D"; // Set to the highest score
+                    analysis = "You demonstrate a balanced personality profile with strong leadership qualities and analytical thinking.";
+                    recommendations = ["Project Manager", "Business Analyst", "Team Lead"];
                 }
             }
 
@@ -486,38 +484,38 @@ class PersonalityAssessmentController {
                     name: "Thống trị (Dominance)",
                     score: scores.D,
                     description: "Mức độ quyết đoán, trực tiếp và tập trung vào kết quả.",
-                    level: scores.D >= 70 ? "Cao" : scores.D >= 40 ? "Trung bình" : "Thấp",
-                    levelClass: scores.D >= 70 ? "high" : scores.D >= 40 ? "medium" : "low",
+                    level: scores.D >= 40 ? "Cao" : scores.D >= 25 ? "Trung bình" : "Thấp",
+                    levelClass: scores.D >= 40 ? "high" : scores.D >= 25 ? "medium" : "low",
                     recommendation: "Bạn phù hợp với các vai trò lãnh đạo và quản lý."
                 },
                 {
                     name: "Ảnh hưởng (Influence)",
                     score: scores.I,
                     description: "Khả năng truyền cảm hứng, lạc quan và giao tiếp tốt.",
-                    level: scores.I >= 70 ? "Cao" : scores.I >= 40 ? "Trung bình" : "Thấp",
-                    levelClass: scores.I >= 70 ? "high" : scores.I >= 40 ? "medium" : "low",
+                    level: scores.I >= 40 ? "Cao" : scores.I >= 25 ? "Trung bình" : "Thấp",
+                    levelClass: scores.I >= 40 ? "high" : scores.I >= 25 ? "medium" : "low",
                     recommendation: "Bạn phù hợp với các công việc trong lĩnh vực truyền thông, bán hàng."
                 },
                 {
                     name: "Kiên định (Steadiness)",
                     score: scores.S,
                     description: "Sự ổn định, đáng tin cậy và ủng hộ đội nhóm.",
-                    level: scores.S >= 70 ? "Cao" : scores.S >= 40 ? "Trung bình" : "Thấp",
-                    levelClass: scores.S >= 70 ? "high" : scores.S >= 40 ? "medium" : "low",
+                    level: scores.S >= 40 ? "Cao" : scores.S >= 25 ? "Trung bình" : "Thấp",
+                    levelClass: scores.S >= 40 ? "high" : scores.S >= 25 ? "medium" : "low",
                     recommendation: "Bạn phù hợp với các vai trò hỗ trợ, huấn luyện."
                 },
                 {
                     name: "Tuân thủ (Conscientiousness)",
                     score: scores.C,
                     description: "Sự cẩn thận, chính xác và tuân thủ quy trình.",
-                    level: scores.C >= 70 ? "Cao" : scores.C >= 40 ? "Trung bình" : "Thấp",
-                    levelClass: scores.C >= 70 ? "high" : scores.C >= 40 ? "medium" : "low",
+                    level: scores.C >= 40 ? "Cao" : scores.C >= 25 ? "Trung bình" : "Thấp",
+                    levelClass: scores.C >= 40 ? "high" : scores.C >= 25 ? "medium" : "low",
                     recommendation: "Bạn phù hợp với các công việc đòi hỏi sự chính xác và phân tích."
                 }
             ];
 
             // Get DISC profile information
-            const discProfile = this.getDISCProfile({ primaryTrait });
+            const discProfile = this.getDISCProfile(primaryTrait);
 
             // Transform scores to array format for template
             const scoresArray = [
@@ -570,7 +568,7 @@ class PersonalityAssessmentController {
 
     async getUserDISCResults(req, res) {
         try {
-            const results = await this.getUserDISCResults(req.account.id);
+            const results = await this.getUserDISCResults(req.user._id);
             res.json({ results });
         } catch (error) {
             console.error('Error loading user DISC results:', error);
@@ -945,11 +943,27 @@ class PersonalityAssessmentController {
             }
         });
 
-        // Normalize scores to 0-100 scale
-        const questionsPerDimension = 3;
+        // Calculate actual questions per dimension from the data
+        const questionCounts = {
+            Extraversion: 0,
+            Openness: 0,
+            Conscientiousness: 0,
+            Agreeableness: 0,
+            Neuroticism: 0
+        };
+        
+        answers.forEach(answer => {
+            if (questionCounts.hasOwnProperty(answer.dimension)) {
+                questionCounts[answer.dimension]++;
+            }
+        });
+
+        // Normalize scores to 0-100 scale based on actual question count
         const scores = {};
         Object.keys(dimensions).forEach(dim => {
-            scores[dim.toLowerCase()] = Math.round((dimensions[dim] / (questionsPerDimension * 5)) * 100);
+            const questionCount = questionCounts[dim] || 1; // Avoid division by zero
+            const maxScore = questionCount * 5; // 5 points per question max
+            scores[dim.toLowerCase()] = Math.round((dimensions[dim] / maxScore) * 100);
         });
 
         return {
@@ -1031,9 +1045,29 @@ class PersonalityAssessmentController {
         });
 
         const total = Object.values(scores).reduce((sum, score) => sum + score, 0);
+        
+        if (total === 0) {
+            // If no valid answers, return equal distribution
+            return {
+                scores: { D: 25, I: 25, S: 25, C: 25 },
+                primaryTrait: 'C',
+                timestamp: new Date()
+            };
+        }
+
         const percentages = {};
-        Object.keys(scores).forEach(key => {
-            percentages[key] = Math.round((scores[key] / total) * 100);
+        let remainingPercentage = 100;
+        const traits = ['D', 'I', 'S', 'C'];
+        
+        // Calculate percentages and handle rounding
+        traits.forEach((key, index) => {
+            if (index === traits.length - 1) {
+                // Last trait gets the remaining percentage to ensure total = 100
+                percentages[key] = remainingPercentage;
+            } else {
+                percentages[key] = Math.round((scores[key] / total) * 100);
+                remainingPercentage -= percentages[key];
+            }
         });
 
         return {
@@ -1069,7 +1103,7 @@ class PersonalityAssessmentController {
         };
     }
 
-    getDISCProfile(scores) {
+    getDISCProfile(trait) {
         const profiles = {
             'D': {
                 name: 'Dominance (Thống trị)',
@@ -1109,7 +1143,7 @@ class PersonalityAssessmentController {
             }
         };
 
-        return profiles[scores.primaryTrait] || profiles['C'];
+        return profiles[trait] || profiles['C'];
     }
 
     // ===== AI SERVICE INTEGRATION =====
@@ -1336,7 +1370,7 @@ class PersonalityAssessmentController {
         }));
 
         const result = this.calculateDISC(answers);
-        const profile = this.getDISCProfile(result.scores);
+        const profile = this.getDISCProfile(result.primaryTrait);
 
         return {
             status: 'success',
@@ -1395,9 +1429,8 @@ class PersonalityAssessmentController {
             // Get profile data
             const profile = this.getMBTIProfile(result.type);
             
-            // Create and save to database
-            const mbtiAssessment = new MBTIAssessment({
-                userId,
+            // Create result object
+            const resultData = {
                 type: result.type,
                 scores: result.scores,
                 answers: result.answers || [],
@@ -1408,17 +1441,38 @@ class PersonalityAssessmentController {
                 quote: profile.quote,
                 workStyle: profile.workStyle,
                 completedAt: new Date()
-            });
+            };
             
-            const savedResult = await mbtiAssessment.save();
-            
-            // Also cache for immediate access
-            if (!global.mbtiResultsCache) {
-                global.mbtiResultsCache = {};
+            // If user is logged in, save to database
+            if (userId) {
+                const mbtiAssessment = new MBTIAssessment({
+                    userId,
+                    ...resultData
+                });
+                
+                const savedResult = await mbtiAssessment.save();
+                
+                // Also cache for immediate access
+                if (!global.mbtiResultsCache) {
+                    global.mbtiResultsCache = {};
+                }
+                global.mbtiResultsCache[savedResult._id.toString()] = savedResult.toObject();
+                
+                return savedResult;
+            } else {
+                // For non-logged in users, create a temporary ID and cache only
+                const tempId = new mongoose.Types.ObjectId();
+                resultData._id = tempId;
+                
+                // Cache for immediate access
+                if (!global.mbtiResultsCache) {
+                    global.mbtiResultsCache = {};
+                }
+                global.mbtiResultsCache[tempId.toString()] = resultData;
+                
+                // Return an object with _id for redirect
+                return { _id: tempId };
             }
-            global.mbtiResultsCache[savedResult._id.toString()] = savedResult.toObject();
-            
-            return savedResult;
         } catch (error) {
             console.error('Error saving MBTI result:', error);
             throw error;
@@ -1463,9 +1517,8 @@ class PersonalityAssessmentController {
             const dominantTrait = this.getDominantBigFiveTrait(result.scores);
             const profile = this.getBigFiveProfile(result.scores);
             
-            // Create and save to database
-            const bigFiveAssessment = new BigFiveAssessment({
-                userId,
+            // Create result object
+            const resultData = {
                 scores: result.scores,
                 dominantTrait,
                 answers: result.answers || [],
@@ -1476,17 +1529,38 @@ class PersonalityAssessmentController {
                 quote: profile.quote,
                 analysis: result.analysis || '',
                 completedAt: new Date()
-            });
+            };
             
-            const savedResult = await bigFiveAssessment.save();
-            
-            // Also cache for immediate access
-            if (!global.bigFiveResultsCache) {
-                global.bigFiveResultsCache = {};
+            // If user is logged in, save to database
+            if (userId) {
+                const bigFiveAssessment = new BigFiveAssessment({
+                    userId,
+                    ...resultData
+                });
+                
+                const savedResult = await bigFiveAssessment.save();
+                
+                // Also cache for immediate access
+                if (!global.bigFiveResultsCache) {
+                    global.bigFiveResultsCache = {};
+                }
+                global.bigFiveResultsCache[savedResult._id.toString()] = savedResult.toObject();
+                
+                return savedResult;
+            } else {
+                // For non-logged in users, create a temporary ID and cache only
+                const tempId = new mongoose.Types.ObjectId();
+                resultData._id = tempId;
+                
+                // Cache for immediate access
+                if (!global.bigFiveResultsCache) {
+                    global.bigFiveResultsCache = {};
+                }
+                global.bigFiveResultsCache[tempId.toString()] = resultData;
+                
+                // Return an object with _id for redirect
+                return { _id: tempId };
             }
-            global.bigFiveResultsCache[savedResult._id.toString()] = savedResult.toObject();
-            
-            return savedResult;
         } catch (error) {
             console.error('Error saving Big Five result:', error);
             throw error;
@@ -1530,9 +1604,8 @@ class PersonalityAssessmentController {
             // Get profile data
             const profile = this.getDISCProfile(result.primaryTrait);
             
-            // Create and save to database
-            const discAssessment = new DISCAssessment({
-                userId,
+            // Create result object
+            const resultData = {
                 primaryTrait: result.primaryTrait,
                 scores: result.scores,
                 answers: result.answers || [],
@@ -1544,17 +1617,38 @@ class PersonalityAssessmentController {
                 workStyle: profile.workStyle,
                 analysis: result.analysis || '',
                 completedAt: new Date()
-            });
+            };
             
-            const savedResult = await discAssessment.save();
-            
-            // Also cache for immediate access
-            if (!global.discResultsCache) {
-                global.discResultsCache = {};
+            // If user is logged in, save to database
+            if (userId) {
+                const discAssessment = new DISCAssessment({
+                    userId,
+                    ...resultData
+                });
+                
+                const savedResult = await discAssessment.save();
+                
+                // Also cache for immediate access
+                if (!global.discResultsCache) {
+                    global.discResultsCache = {};
+                }
+                global.discResultsCache[savedResult._id.toString()] = savedResult.toObject();
+                
+                return savedResult;
+            } else {
+                // For non-logged in users, create a temporary ID and cache only
+                const tempId = new mongoose.Types.ObjectId();
+                resultData._id = tempId;
+                
+                // Cache for immediate access
+                if (!global.discResultsCache) {
+                    global.discResultsCache = {};
+                }
+                global.discResultsCache[tempId.toString()] = resultData;
+                
+                // Return an object with _id for redirect
+                return { _id: tempId };
             }
-            global.discResultsCache[savedResult._id.toString()] = savedResult.toObject();
-            
-            return savedResult;
         } catch (error) {
             console.error('Error saving DISC result:', error);
             throw error;

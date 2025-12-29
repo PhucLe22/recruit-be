@@ -35,13 +35,13 @@ class UserController{
             // Get latest assessment results and CV data
             const [mbtiResult, bigFiveResult, discResult, cvData] = await Promise.all([
                 MBTIAssessment.findOne({ userId })
-                    .sort({ createdAt: -1 })
+                    .sort({ completedAt: -1 })
                     .lean(),
                 BigFiveAssessment.findOne({ userId })
-                    .sort({ createdAt: -1 })
+                    .sort({ completedAt: -1 })
                     .lean(),
                 DISCAssessment.findOne({ userId })
-                    .sort({ createdAt: -1 })
+                    .sort({ completedAt: -1 })
                     .lean(),
                 require('../../models/CV').findOne({ user_id: userId })
                     .sort({ uploaded_at: -1 })
@@ -116,11 +116,14 @@ class UserController{
     formatMBTIResult(result) {
         if (!result) return null;
         return {
-            type: result.personalityType,
+            type: result.type,
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: this.formatDate(result.updatedAt || result.createdAt),
-            rawDate: result.updatedAt || result.createdAt
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: this.formatDate(result.completedAt),
+            rawDate: result.completedAt
         };
     }
 
@@ -129,9 +132,13 @@ class UserController{
         if (!result) return null;
         return {
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: this.formatDate(result.updatedAt || result.createdAt),
-            rawDate: result.updatedAt || result.createdAt
+            dominantTrait: result.dominantTrait,
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: this.formatDate(result.completedAt),
+            rawDate: result.completedAt
         };
     }
 
@@ -139,11 +146,14 @@ class UserController{
     formatDISResult(result) {
         if (!result) return null;
         return {
-            type: result.dominantTrait,
+            type: result.primaryTrait,
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: this.formatDate(result.updatedAt || result.createdAt),
-            rawDate: result.updatedAt || result.createdAt
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: this.formatDate(result.completedAt),
+            rawDate: result.completedAt
         };
     }
 

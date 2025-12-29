@@ -83,10 +83,13 @@ class ProfileController {
     // Format MBTI result for display
     formatMBTIResult(result) {
         return {
-            type: result.personalityType,
+            type: result.type,
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: result.updatedAt || result.createdAt
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: result.completedAt
         };
     }
 
@@ -94,18 +97,25 @@ class ProfileController {
     formatBigFiveResult(result) {
         return {
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: result.updatedAt || result.createdAt
+            dominantTrait: result.dominantTrait,
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: result.completedAt
         };
     }
 
     // Format DISC result for display
     formatDISResult(result) {
         return {
-            type: result.dominantTrait,
+            type: result.primaryTrait,
             scores: result.scores,
-            description: result.analysis,
-            lastUpdated: result.updatedAt || result.createdAt
+            description: result.description,
+            strengths: result.strengths,
+            weaknesses: result.weaknesses,
+            careers: result.careers,
+            lastUpdated: result.completedAt
         };
     }
 

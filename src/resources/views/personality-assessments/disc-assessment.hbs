@@ -1293,15 +1293,28 @@
                 }
             }
 
+            // Calculate total valid answers
+            const totalValidAnswers = Object.values(scores).reduce((sum, score) => sum + score, 0);
+            
+            // Calculate percentages with proper rounding to ensure total = 100
+            const percentages = {};
+            let remainingPercentage = 100;
+            const traits = ['D', 'I', 'S', 'C'];
+            
+            traits.forEach((trait, index) => {
+                if (index === traits.length - 1) {
+                    // Last trait gets remaining percentage
+                    percentages[trait] = remainingPercentage;
+                } else {
+                    percentages[trait] = Math.round((scores[trait] / totalValidAnswers) * 100);
+                    remainingPercentage -= percentages[trait];
+                }
+            });
+
             return {
                 type: primaryTrait,
                 scores: scores,
-                percentages: {
-                    D: Math.round((scores.D / answers.length) * 100),
-                    I: Math.round((scores.I / answers.length) * 100),
-                    S: Math.round((scores.S / answers.length) * 100),
-                    C: Math.round((scores.C / answers.length) * 100)
-                }
+                percentages: percentages
             };
         }
 

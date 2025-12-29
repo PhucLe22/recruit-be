@@ -249,7 +249,7 @@ class SearchController {
         sortOrder: sortOrder || 'desc',
       };
 
-      // Perform smart search
+      // Perform smart search with priority-based approach
       const results = await SmartSearchService.searchJobs(
         searchQuery,
         searchOptions,
@@ -290,11 +290,6 @@ class SearchController {
    */
   async apiSearch(req, res, next) {
         try {
-            console.log(
-                '🔥 API DEBUG: /api/search called with query:',
-                JSON.stringify(req.query, null, 2),
-            );
-
             const {
                 q = '', // search query
                 cities = [], // location filters
@@ -315,14 +310,10 @@ class SearchController {
                 experience,
             };
 
-            console.log('🔥 API DEBUG: filters object:', JSON.stringify(filters, null, 2));
-            console.log('🔥 API DEBUG: useAI flag:', useAI);
-
             let results;
 
             if (useAI === 'true') {
                 // Use AI-enhanced filtering
-                console.log('🤖 Using AI-enhanced filtering...');
                 const userPreferences = req.account
                     ? {
                           skills: req.account.skills || [],
@@ -345,9 +336,14 @@ class SearchController {
 
                 results = aiResults;
             } else {
-                // Use traditional SmartSearchService
-                console.log('🔥 API DEBUG: calling SmartSearchService.searchJobs...');
-                results = await SmartSearchService.searchJobs(q, filters);
+                // Use traditional SmartSearchService with priority-based search
+                results = await SmartSearchService.searchJobs(q, {
+                    filters,
+                    page: Math.floor(offset / parseInt(limit)) + 1,
+                    limit: parseInt(limit),
+                    sortBy: 'relevance',
+                    sortOrder: 'desc'
+                });
             }
 
             // Log search behavior if user is logged in
@@ -379,6 +375,11 @@ class SearchController {
                     useAI: useAI === 'true',
                 },
             };
+
+            // Add search metadata from SmartSearchService
+            response.searchType = results.searchType || 'hybrid';
+            response.exactMatchesCount = results.exactMatchesCount || 0;
+            response.aiMatchesCount = results.aiMatchesCount || 0;
 
             // Add AI analysis if AI was used
             if (useAI === 'true' && results.aiInsights) {
