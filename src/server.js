@@ -27,6 +27,10 @@ app.engine(
         },
         helpers: {
             json: (context) => JSON.stringify(context),
+            uppercase: (str) => {
+                if (!str || typeof str !== 'string') return '';
+                return str.toUpperCase();
+            },
             sum: (a, b) => a + b,
             add: (a, b) => a + b,
             subtract: (a, b) => a - b,
@@ -331,6 +335,22 @@ app.use((req, res, next) => {
     next();
 });
 
+// Passport serialize/deserialize
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const User = require('./app/models/User');
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
+
+// Google OAuth Strategy
 passport.use(
     new GoogleStrategy(
         {
@@ -338,8 +358,36 @@ passport.use(
             clientSecret: process.env.GG_CLIENT_SECRET,
             callbackURL: process.env.GG_CALLBACK_URL,
         },
-        (accessToken, refreshToken, profile, done) => {
-            done(null, profile);
+        async (accessToken, refreshToken, profile, done) => {
+            try {
+                const User = require('./app/models/User');
+                // Find user by googleId or email
+                let user = await User.findOne({ googleId: profile.id });
+                if (!user) {
+                    user = await User.findOne({ email: profile.emails[0].value });
+                    if (user) {
+                        // Link Google account to existing user
+                        user.googleId = profile.id;
+                        if (!user.avatar && profile.photos && profile.photos[0]) {
+                            user.avatar = profile.photos[0].value;
+                        }
+                        await user.save();
+                    } else {
+                        // Create new user
+                        user = await User.create({
+                            googleId: profile.id,
+                            username: profile.displayName,
+                            email: profile.emails[0].value,
+                            avatar: profile.photos && profile.photos[0] ? profile.photos[0].value : '',
+                            role: 1,
+                            status: 'active',
+                        });
+                    }
+                }
+                done(null, user);
+            } catch (err) {
+                done(err, null);
+            }
         },
     ),
 );

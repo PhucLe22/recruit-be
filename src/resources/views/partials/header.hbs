@@ -1,369 +1,170 @@
-<!-- Header CSS -->
 <link href="/css/header.css" rel="stylesheet">
 
-<!-- Debug info - remove in production -->
-{{!-- <div style="display: block; background: yellow; padding: 10px; margin: 10px; border: 1px solid red;">
-  <h3>DEBUG INFO</h3>
-  <strong>isLogin:</strong> {{isLogin}}<br>
-  <strong>user:</strong> {{#if user}}{{user.name}} ({{user.email}}){{else}}No user{{/if}}<br>
-  <strong>userType:</strong> {{userType}}<br>
-  <strong>headerData.isAuthenticated:</strong> {{headerData.isAuthenticated}}<br>
-  <strong>session user:</strong> {{#if req.session.user}}Exists{{else}}None{{/if}}<br>
-  <strong>session business:</strong> {{#if req.session.business}}Exists{{else}}None{{/if}}<br>
-  <strong>cookies:</strong> {{#if req.cookies.accessToken}}Token exists{{else}}No token{{/if}}<br>
-  <strong>isLogin:</strong> {{isLogin}}<br> 
-</div> --}}
-
-<!-- Your existing header content -->
-<header class="header">
-  <div class="header-container">
-    <a href="/" class="logo">
-      <div class="logo-icon">
-        <i class="fas fa-rocket"></i>
+<header class="header" id="siteHeader">
+  <div class="header__inner">
+    <!-- Logo -->
+    <a href="/" class="header__logo">
+      <div class="header__logo-icon">
+        <i class="fas fa-briefcase"></i>
       </div>
-      <div class="logo-text">
-        <span class="logo-main">JobLife</span>
-        <span class="logo-tagline">Việc làm cho mọi người</span>
+      <div class="header__logo-text">
+        <span class="header__logo-name">JobLife</span>
+        <span class="header__logo-tagline">Tim viec nhanh</span>
       </div>
     </a>
-    <nav class="main-nav">
-      <ul class="nav-menu">
-        <!-- Jobs Mega Dropdown -->
-        <li class="nav-item mega-dropdown">
-          <button class="dropdown-toggle" type="button">
-            <i class="fas fa-briefcase"></i>
-            <span>Việc Làm</span>
-            <i class="fas fa-chevron-down dropdown-indicator"></i>
-          </button>
-          <div class="mega-menu">
-            <div class="mega-menu-content">
-              <div class="mega-menu-section">
-                <h4 class="mega-menu-title">
-                  <i class="fas fa-search"></i>
-                  Tìm kiếm việc làm
-                </h4>
-                <div class="mega-menu-links">
-                  <a href="/jobs/search-results" class="mega-menu-link">
-                    <span class="link-icon">🔍</span>
-                    <div class="link-content">
-                      <span class="link-title">Tìm kiếm việc làm</span>
-                      <span class="link-desc">Khám phá hàng ngàn cơ hội</span>
-                    </div>
-                  </a>
-                  <a href="/jobs/search-results?sortBy=date&sortOrder=desc" class="mega-menu-link">
-                    <span class="link-icon">🆕</span>
-                    <div class="link-content">
-                      <span class="link-title">Việc làm mới nhất</span>
-                      <span class="link-desc">Cập nhật trong 24h</span>
-                    </div>
-                  </a>
-                  <a href="/jobs/search-results?featured=true" class="mega-menu-link featured">
-                    <span class="link-icon">🔥</span>
-                    <div class="link-content">
-                      <span class="link-title">Việc làm nổi bật</span>
-                      <span class="link-desc">Top công việc hot nhất</span>
-                    </div>
-                    <span class="link-badge">Hot</span>
-                  </a>
-                  <a href="/jobs/search-results?types=remote" class="mega-menu-link">
-                    <span class="link-icon">🏠</span>
-                    <div class="link-content">
-                      <span class="link-title">Làm việc từ xa</span>
-                      <span class="link-desc">Remote & Hybrid</span>
-                    </div>
-                  </a>
-                </div>
-              </div>
 
-              <div class="mega-menu-section">
-                <h4 class="mega-menu-title">
-                  <i class="fas fa-filter"></i>
-                  Theo ngành nghề
-                </h4>
-                <div class="category-grid">
-                  <a href="/jobs/it" class="category-item">
-                    <span class="category-icon">💻</span>
-                    <span class="category-name">IT & Software</span>
-                  </a>
-                  <a href="/jobs/marketing" class="category-item">
-                    <span class="category-icon">📱</span>
-                    <span class="category-name">Marketing</span>
-                  </a>
-                  <a href="/jobs/design" class="category-item">
-                    <span class="category-icon">🎨</span>
-                    <span class="category-name">Design</span>
-                  </a>
-                  <a href="/jobs/sales" class="category-item">
-                    <span class="category-icon">💼</span>
-                    <span class="category-name">Sales</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <!-- Companies Dropdown -->
-        <li class="nav-item dropdown">
-          <button class="dropdown-toggle" type="button">
-            <i class="fas fa-building"></i>
-            <span>Công Ty</span>
-            <i class="fas fa-chevron-down dropdown-indicator"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="/business/list" class="dropdown-item">
-              <span class="item-icon">📋</span>
-              <span class="item-title">Danh sách công ty</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/business/register" class="dropdown-item featured">
-              <span class="item-icon">⭐</span>
-              <span class="item-title">Đăng ký nhà tuyển dụng</span>
-              <span class="item-badge">For Business</span>
-            </a>
-            <a href="/business/login" class="dropdown-item">
-              <span class="item-icon">🚀</span>
-              <span class="item-title">Đăng nhập tuyển dụng</span>
-              <span class="item-arrow">→</span>
-            </a>
-          </div>
-        </li>
-
-        <!-- Career Tools Dropdown -->
-        <li class="nav-item dropdown">
-          <button class="dropdown-toggle" type="button">
-            <i class="fas fa-tools"></i>
-            <span>Công cụ nghề nghiệp</span>
-            <i class="fas fa-chevron-down dropdown-indicator"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="/cv/uploadCV" class="dropdown-item">
-              <span class="item-icon">📄</span>
-              <span class="item-title">Tải CV & Gợi ý việc làm</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/users/profile" class="dropdown-item">
-              <span class="item-icon">🎨</span>
-              <span class="item-title">Quản lý hồ sơ cá nhân</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/users/upload-avatar" class="dropdown-item featured">
-              <span class="item-icon">📸</span>
-              <span class="item-title">Cập nhật ảnh đại diện</span>
-              <span class="item-badge">Profile</span>
-            </a>
-            <a href="/personality-assessments" class="dropdown-item featured">
-              <span class="item-icon">🧠</span>
-              <span class="item-title">Bài kiểm tra tính cách</span>
-              <span class="item-badge">MBTI, Big Five, DISC</span>
-            </a>
-            <a href="/jobs/search-results" class="dropdown-item">
-              <span class="item-icon">💰</span>
-              <span class="item-title">Tìm việc lương cao</span>
-              <span class="item-arrow">→</span>
-            </a>
-          </div>
-        </li>
-
-        <!-- Resources Dropdown -->
-        <li class="nav-item dropdown">
-          <button class="dropdown-toggle" type="button">
-            <i class="fas fa-graduation-cap"></i>
-            <span>Tài nguyên</span>
-            <i class="fas fa-chevron-down dropdown-indicator"></i>
-          </button>
-          <div class="dropdown-menu">
-            <a href="/" class="dropdown-item">
-              <span class="item-icon">📖</span>
-              <span class="item-title">Trang chủ & Blog</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/auth/register" class="dropdown-item">
-              <span class="item-icon">💡</span>
-              <span class="item-title">Hướng dẫn đăng ký</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/cv-assistant" class="dropdown-item">
-              <span class="item-icon">🤖</span>
-              <span class="item-title">CV AI Assistant</span>
-              <span class="item-arrow">→</span>
-            </a>
-          </div>
-        </li>
-      </ul>
+    <!-- Navigation -->
+    <nav class="header__nav" id="headerNav">
+      <a href="/jobs/search-results" class="header__nav-link">
+        <i class="fas fa-search"></i>
+        <span>Viec Lam</span>
+      </a>
+      <a href="/business/list" class="header__nav-link">
+        <i class="fas fa-building"></i>
+        <span>Cong Ty</span>
+      </a>
+      <a href="/cv/uploadCV" class="header__nav-link">
+        <i class="fas fa-file-alt"></i>
+        <span>Tai CV</span>
+      </a>
+      <a href="/personality-assessments" class="header__nav-link">
+        <i class="fas fa-brain"></i>
+        <span>Trac Nghiem</span>
+      </a>
+      <a href="/cv-assistant" class="header__nav-link">
+        <i class="fas fa-robot"></i>
+        <span>CV AI</span>
+      </a>
     </nav>
 
-    <!-- Auth Actions -->
-    <div class="auth-actions">
+    <!-- Right Actions -->
+    <div class="header__actions">
       {{#if isLogin}}
         {{#if (eq userType 'user')}}
-          <!-- User dropdown -->
-          <div class="user-dropdown">
-            <button class="user-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="User menu">
-              <div class="avatar-container">
+          <div class="header__user" id="userDropdown">
+            <button class="header__user-btn" type="button">
+              <div class="header__avatar">
                 {{#if user.avatar}}
-                  <img src="{{user.avatar}}" alt="{{user.name}}" class="user-avatar" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\'avatar-placeholder\' style=\'background-color: {{randomColor user._id}}\'><i class=\'fas fa-user\'></i></div>'">
+                  <img src="{{user.avatar}}" alt="{{user.name}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <span class="header__avatar-fallback" style="display:none;">
+                    {{#if user.name}}{{substring (uppercase user.name) 0 1}}{{else}}<i class="fas fa-user"></i>{{/if}}
+                  </span>
                 {{else}}
-                  <div class="avatar-placeholder" style="background-color: {{randomColor user._id}};">
-                    {{#if user.name}}
-                      {{substring (uppercase user.name) 0 1}}
-                    {{else}}
-                      <i class="fas fa-user"></i>
-                    {{/if}}
-                  </div>
-                {{/if}}
-                {{#if user.isOnline}}
-                  <span class="online-status" title="Online"></span>
+                  <span class="header__avatar-fallback">
+                    {{#if user.name}}{{substring (uppercase user.name) 0 1}}{{else}}<i class="fas fa-user"></i>{{/if}}
+                  </span>
                 {{/if}}
               </div>
-              <span class="user-name">{{user.name}}</span>
-              <i class="fas fa-chevron-down dropdown-arrow"></i>
+              <span class="header__user-name">{{user.name}}</span>
+              <i class="fas fa-chevron-down header__chevron"></i>
             </button>
-          <div class="dropdown-menu user-menu" aria-label="User menu">
-            <div class="user-menu-header">
-              {{#if user.avatar}}
-                <img src="{{user.avatar}}" alt="" class="user-menu-avatar" onerror="console.error('Error loading avatar in menu:', this.src); this.onerror=null; this.src='/images/default-avatar.png';">
-              {{else}}
-                <div class="avatar-placeholder user-menu-avatar" style="background-color: {{randomColor user._id}};">
-                  {{#if user.name}}
-                    {{substring (uppercase user.name) 0 1}}
-                  {{else}}
-                    <i class="fas fa-user"></i>
-                  {{/if}}
-                </div>
-              {{/if}}
-              <div class="user-menu-info">
-                <h4 class="truncate">{{user.name}}</h4>
-                <p class="truncate">{{user.email}}</p>
+            <div class="header__dropdown">
+              <div class="header__dropdown-info">
+                <strong>{{user.name}}</strong>
+                <small>{{user.email}}</small>
               </div>
+              <div class="header__dropdown-divider"></div>
+              <a href="/users/profile" class="header__dropdown-item">
+                <i class="fas fa-user"></i> Ho so ca nhan
+              </a>
+              <a href="/users/applied-jobs" class="header__dropdown-item">
+                <i class="fas fa-clipboard-list"></i> Viec da ung tuyen
+              </a>
+              <a href="/users/saved-jobs" class="header__dropdown-item">
+                <i class="fas fa-heart"></i> Viec da luu
+              </a>
+              <a href="/users/upload-avatar" class="header__dropdown-item">
+                <i class="fas fa-camera"></i> Doi anh dai dien
+              </a>
+              <div class="header__dropdown-divider"></div>
+              <a href="/auth/logout" class="header__dropdown-item header__dropdown-item--danger">
+                <i class="fas fa-sign-out-alt"></i> Dang xuat
+              </a>
             </div>
-            <div class="dropdown-divider"></div>
-            <a href="/users/profile" class="dropdown-item">
-              <span class="item-icon">👤</span>
-              <span class="item-title">Hồ sơ cá nhân</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/users/applied-jobs" class="dropdown-item">
-              <span class="item-icon">📋</span>
-              <span class="item-title">Việc làm đã ứng tuyển</span>
-              <span class="item-count">{{user.applicationsCount}}</span>
-            </a>
-            <a href="/users/saved-jobs" class="dropdown-item">
-              <span class="item-icon">❤️</span>
-              <span class="item-title">Việc làm đã lưu</span>
-              <span class="item-count">{{user.savedJobsCount}}</span>
-            </a>
-            <a href="/users/recommendations" class="dropdown-item featured">
-              <span class="item-icon">🎯</span>
-              <span class="item-title">Gợi ý cho bạn</span>
-              <span class="item-badge">AI</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/users/settings" class="dropdown-item">
-              <span class="item-icon">⚙️</span>
-              <span class="item-title">Cài đặt</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/auth/logout" class="dropdown-item logout">
-              <span class="item-icon">🚪</span>
-              <span class="item-title">Đăng xuất</span>
-              <span class="item-arrow">→</span>
-            </a>
-      </div>
-    </div>
-  {{else if (eq userType 'business')}}
-          <!-- Business dropdown -->
-          <div class="user-dropdown">
-          <button class="user-menu-toggle" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Business menu">
-            <div class="avatar-container">
-              {{#if business.logoPath}}
-                <img src="{{business.logoPath}}" alt="{{business.companyName}}" class="user-avatar" onerror="this.onerror=null; this.src='/images/default-company.png';">
-              {{else}}
-                <div class="avatar-placeholder" style="background-color: {{randomColor business._id}};">
-                  {{#if business.companyName}}
-                    {{substring (uppercase business.companyName) 0 1}}
-                  {{else}}
-                    <i class="fas fa-building"></i>
-                  {{/if}}
-                </div>
-              {{/if}}
-            </div>
-            <span class="user-name">{{business.companyName}}</span>
-            <i class="fas fa-chevron-down dropdown-arrow"></i>
-          </button>
-          <div class="dropdown-menu user-menu" aria-label="Business menu">
-            <div class="user-menu-header">
-              {{#if business.logoPath}}
-                <img src="{{business.logoPath}}" alt="" class="user-menu-avatar">
-              {{else}}
-                <div class="avatar-placeholder user-menu-avatar" style="background-color: {{randomColor business._id}};">
-                  {{#if business.companyName}}
-                    {{substring (uppercase business.companyName) 0 1}}
-                  {{else}}
-                    <i class="fas fa-building"></i>
-                  {{/if}}
-                </div>
-              {{/if}}
-              <div class="user-menu-info">
-                <h4 class="truncate">{{business.companyName}}</h4>
-                <p class="truncate">{{business.email}}</p>
-              </div>
-            </div>
-            <div class="dropdown-divider"></div>
-            <a href="/business/dashboard" class="dropdown-item">
-              <span class="item-icon">📊</span>
-              <span class="item-title">Bảng điều khiển</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/business/jobs" class="dropdown-item">
-              <span class="item-icon">💼</span>
-              <span class="item-title">Quản lý tin tuyển dụng</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/business/applications" class="dropdown-item">
-              <span class="item-icon">📄</span>
-              <span class="item-title">Hồ sơ ứng tuyển</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <div class="dropdown-divider"></div>
-            <a href="/business/settings" class="dropdown-item">
-              <span class="item-icon">⚙️</span>
-              <span class="item-title">Cài đặt</span>
-              <span class="item-arrow">→</span>
-            </a>
-            <a href="/auth/logout" class="dropdown-item logout">
-              <span class="item-icon">🚪</span>
-              <span class="item-title">Đăng xuất</span>
-              <span class="item-arrow">→</span>
-            </a>
           </div>
+        {{else if (eq userType 'business')}}
+          <div class="header__user" id="userDropdown">
+            <button class="header__user-btn" type="button">
+              <div class="header__avatar">
+                {{#if business.logoPath}}
+                  <img src="{{business.logoPath}}" alt="{{business.companyName}}" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                  <span class="header__avatar-fallback" style="display:none;">
+                    {{#if business.companyName}}{{substring (uppercase business.companyName) 0 1}}{{else}}<i class="fas fa-building"></i>{{/if}}
+                  </span>
+                {{else}}
+                  <span class="header__avatar-fallback">
+                    {{#if business.companyName}}{{substring (uppercase business.companyName) 0 1}}{{else}}<i class="fas fa-building"></i>{{/if}}
+                  </span>
+                {{/if}}
+              </div>
+              <span class="header__user-name">{{business.companyName}}</span>
+              <i class="fas fa-chevron-down header__chevron"></i>
+            </button>
+            <div class="header__dropdown">
+              <div class="header__dropdown-info">
+                <strong>{{business.companyName}}</strong>
+                <small>{{business.email}}</small>
+              </div>
+              <div class="header__dropdown-divider"></div>
+              <a href="/business/dashboard" class="header__dropdown-item">
+                <i class="fas fa-chart-bar"></i> Bang dieu khien
+              </a>
+              <a href="/business/jobs" class="header__dropdown-item">
+                <i class="fas fa-briefcase"></i> Quan ly tuyen dung
+              </a>
+              <a href="/business/applications" class="header__dropdown-item">
+                <i class="fas fa-file-alt"></i> Ho so ung tuyen
+              </a>
+              <div class="header__dropdown-divider"></div>
+              <a href="/auth/logout" class="header__dropdown-item header__dropdown-item--danger">
+                <i class="fas fa-sign-out-alt"></i> Dang xuat
+              </a>
+            </div>
+          </div>
+        {{/if}}
+      {{else}}
+        <div class="header__auth">
+          <a href="/auth/login" class="header__btn header__btn--outline">Dang nhap</a>
+          <a href="/auth/register" class="header__btn header__btn--primary">Dang ky</a>
         </div>
       {{/if}}
-    {{else}}
-          <!-- Login/Register buttons -->
-          <div class="auth-buttons">
-          <a href="/auth/login" class="btn btn-login">
-            <i class="fas fa-sign-in-alt"></i>
-            Đăng nhập
-          </a>
-          <a href="/auth/register" class="btn btn-signup">
-            <i class="fas fa-user-plus"></i>
-            Đăng ký
-          </a>
-        </div>
-      {{/if}}
-    </div>
 
-    <!-- Mobile Menu Toggle -->
-    <button class="mobile-menu-toggle">
-      <div class="hamburger">
+      <!-- Mobile Toggle -->
+      <button class="header__mobile-toggle" id="mobileToggle" type="button" aria-label="Menu">
         <span></span>
         <span></span>
         <span></span>
-      </div>
-    </button>
+      </button>
+    </div>
   </div>
 </header>
+<div class="header__spacer"></div>
 
-<!-- Header Spacer -->
-<div class="header-spacer"></div> 
+<script>
+  // Mobile menu toggle
+  document.getElementById('mobileToggle')?.addEventListener('click', function () {
+    document.getElementById('headerNav')?.classList.toggle('is-open');
+    this.classList.toggle('is-active');
+  });
+
+  // User dropdown toggle
+  document.getElementById('userDropdown')?.addEventListener('click', function (e) {
+    e.stopPropagation();
+    this.classList.toggle('is-open');
+  });
+
+  // Close dropdown on outside click
+  document.addEventListener('click', function () {
+    document.getElementById('userDropdown')?.classList.remove('is-open');
+  });
+
+  // Scroll effect
+  window.addEventListener('scroll', function () {
+    const header = document.getElementById('siteHeader');
+    if (window.scrollY > 20) {
+      header?.classList.add('is-scrolled');
+    } else {
+      header?.classList.remove('is-scrolled');
+    }
+  });
+</script>

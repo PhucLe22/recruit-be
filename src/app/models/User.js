@@ -16,7 +16,8 @@ const User = new Schema(
           required: true,
           index: { unique: true }
         },
-        password: { type: String, required: true },
+        password: { type: String },
+        googleId: { type: String },
 
         // Từ Step 2
         avatar: { type: String }, // ảnh đại diện
