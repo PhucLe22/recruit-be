@@ -259,7 +259,7 @@ const setToken = async (req, res, { accessToken, refreshToken }) => {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 2 * 60 * 60 * 1000, // 2 hours
-      sameSite: 'strict'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict'
     });
     
     // Set in session
@@ -273,7 +273,7 @@ const setToken = async (req, res, { accessToken, refreshToken }) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
       maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
     });
   }
