@@ -1,31 +1,28 @@
 const path = require('path');
 const fs = require('fs');
-const poppler = require('pdf-poppler');
+const { execSync } = require('child_process');
 
 class PDFConverterController {
     /**
-     * Convert PDF to PNG image
+     * Convert PDF first page to PNG image using pdftoppm (poppler-utils)
      * GET /convert-pdf-to-image?file=/ai-uploads/filename.pdf
      */
     async convertToImage(req, res) {
         try {
             const { file } = req.query;
-            
+
             console.log('PDF conversion request:', { file });
-            
+
             if (!file) {
                 return res.status(400).json({ error: 'File parameter is required' });
             }
 
-            // Extract filename from the file path
             const filename = path.basename(file);
             console.log('Extracted filename:', filename);
-            
-            // Construct the full path to the PDF file
+
             const pdfPath = path.join(__dirname, '../../../ai-agent/chatbot_backend/uploads', filename);
             console.log('PDF path:', pdfPath);
-            
-            // Check if file exists
+
             if (!fs.existsSync(pdfPath)) {
                 console.log('PDF file not found at:', pdfPath);
                 return res.status(404).json({ error: 'PDF file not found', path: pdfPath });
@@ -33,57 +30,42 @@ class PDFConverterController {
 
             console.log('PDF file exists, proceeding with conversion');
 
-            // Create cache directory if it doesn't exist
             const cacheDir = path.join(__dirname, '../../public/cache/pdf-images');
             if (!fs.existsSync(cacheDir)) {
                 fs.mkdirSync(cacheDir, { recursive: true });
             }
 
-            // Generate cache filename
-            const cacheFilename = `${path.parse(filename).name}.png`;
+            const baseName = path.parse(filename).name;
+            const cacheFilename = `${baseName}.png`;
             const cachePath = path.join(cacheDir, cacheFilename);
 
             // Check if cached image exists and is newer than PDF
             if (fs.existsSync(cachePath)) {
                 const pdfStat = fs.statSync(pdfPath);
                 const cacheStat = fs.statSync(cachePath);
-                
+
                 if (cacheStat.mtime > pdfStat.mtime) {
-                    // Serve cached image
                     return res.sendFile(cachePath);
                 }
             }
 
-            // Convert PDF to PNG
-            const options = {
-                format: 'png',
-                out_dir: cacheDir,
-                out_prefix: path.parse(filename).name,
-                page: null // Convert all pages
-            };
-
             try {
-                console.log('Starting PDF conversion with options:', options);
-                // Convert PDF to images
-                const convertResults = await poppler.convert(pdfPath, options);
-                console.log('Conversion results:', convertResults);
-                
-                if (convertResults && convertResults.length > 0) {
-                    // Get the first page image
-                    const firstPageImage = convertResults[0];
-                    console.log('First page image:', firstPageImage);
-                    
-                    // Rename to our standard cache filename
-                    if (firstPageImage !== cachePath) {
-                        fs.renameSync(firstPageImage, cachePath);
-                    }
-                    
-                    console.log('Serving cached image:', cachePath);
-                    // Serve the converted image
+                console.log('Starting PDF conversion with pdftoppm');
+                const outputPrefix = path.join(cacheDir, baseName);
+                execSync(`pdftoppm -png -f 1 -l 1 -r 200 "${pdfPath}" "${outputPrefix}"`);
+
+                // pdftoppm outputs as prefix-1.png
+                const generatedFile = `${outputPrefix}-1.png`;
+                if (fs.existsSync(generatedFile)) {
+                    fs.renameSync(generatedFile, cachePath);
+                }
+
+                if (fs.existsSync(cachePath)) {
+                    console.log('Serving converted image:', cachePath);
                     res.sendFile(cachePath);
                 } else {
-                    console.error('No conversion results');
-                    res.status(500).json({ error: 'Failed to convert PDF to image - no results' });
+                    console.error('No conversion output found');
+                    res.status(500).json({ error: 'Failed to convert PDF to image - no output' });
                 }
             } catch (convertError) {
                 console.error('PDF conversion error:', convertError);
@@ -97,20 +79,20 @@ class PDFConverterController {
     }
 
     /**
-     * Convert PDF to PNG image (all pages as separate images)
+     * Convert PDF to PNG images (all pages) using pdftoppm (poppler-utils)
      * GET /convert-pdf-to-images?file=/ai-uploads/filename.pdf
      */
     async convertToImages(req, res) {
         try {
             const { file } = req.query;
-            
+
             if (!file) {
                 return res.status(400).json({ error: 'File parameter is required' });
             }
 
             const filename = path.basename(file);
             const pdfPath = path.join(__dirname, '../../../ai-agent/chatbot_backend/uploads', filename);
-            
+
             if (!fs.existsSync(pdfPath)) {
                 return res.status(404).json({ error: 'PDF file not found' });
             }
@@ -121,33 +103,22 @@ class PDFConverterController {
             }
 
             const baseName = path.parse(filename).name;
-            const options = {
-                format: 'png',
-                out_dir: cacheDir,
-                out_prefix: baseName,
-                page: null
-            };
 
             try {
-                const convertResults = await poppler.convert(pdfPath, options);
-                
-                if (convertResults && convertResults.length > 0) {
-                    const imageUrls = convertResults.map((imagePath, index) => {
-                        const imageName = `${baseName}_page_${index + 1}.png`;
-                        const newPath = path.join(cacheDir, imageName);
-                        
-                        // Rename the file to our standard naming
-                        if (imagePath !== newPath) {
-                            fs.renameSync(imagePath, newPath);
-                        }
-                        
-                        return `/cache/pdf-images/${imageName}`;
-                    });
-                    
-                    res.json({ 
-                        success: true, 
+                const outputPrefix = path.join(cacheDir, `${baseName}_page`);
+                execSync(`pdftoppm -png -r 200 "${pdfPath}" "${outputPrefix}"`);
+
+                // Find all generated page images (prefix-1.png, prefix-2.png, ...)
+                const generatedFiles = fs.readdirSync(cacheDir)
+                    .filter(f => f.startsWith(`${baseName}_page-`) && f.endsWith('.png'))
+                    .sort();
+
+                if (generatedFiles.length > 0) {
+                    const imageUrls = generatedFiles.map(f => `/cache/pdf-images/${f}`);
+                    res.json({
+                        success: true,
                         images: imageUrls,
-                        totalPages: convertResults.length 
+                        totalPages: generatedFiles.length,
                     });
                 } else {
                     res.status(500).json({ error: 'Failed to convert PDF to images' });
