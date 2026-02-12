@@ -16,6 +16,9 @@ const flash = require('connect-flash');
 
 require('dotenv').config();
 
+// Trust proxy for secure cookies behind Render's reverse proxy
+app.set('trust proxy', 1);
+
 mongoose.connect(process.env.MONGODB_URI);
 app.engine(
     'hbs',
@@ -273,6 +276,7 @@ const sessionConfig = {
     cookie: {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 3 * 60 * 60 * 1000 // 3 hours
     },
     store: new (require('connect-mongodb-session')(session))({
