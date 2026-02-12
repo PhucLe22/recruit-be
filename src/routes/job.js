@@ -7,9 +7,10 @@ const applyController = require('../app/controllers/job/ApplyController');
 const saveJobController = require('../app/controllers/job/SaveJobController');
 const jobCategoryController = require('../app/controllers/job/JobCategoryController');
 const {isLogin} = require('../middlewares/isLogin');
+const { upload } = require('../config/multer');
 
 // Add smart search API endpoint
-router.post('/apply/:slug', isLogin, applyController.apply);
+router.post('/apply/:slug', isLogin, upload.single('cvFile'), applyController.apply);
 router.post('/save/:jobId', isLogin, saveJobController.saveJob);
 router.delete('/save/:jobId', isLogin, saveJobController.unsaveJob);
 router.get('/saved/:jobId', isLogin, saveJobController.checkJobSaved);

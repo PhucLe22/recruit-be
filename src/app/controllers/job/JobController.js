@@ -3,6 +3,7 @@ const Business = require('../../../app/models/Business');
 const JobField = require('../../../app/models/JobField');
 const JobApplied = require('../../../app/models/AppliedJobs');
 const SavedJob = require('../../../app/models/SavedJobs');
+const CV = require('../../../app/models/CV');
 const { formatRelativeTime } = require('../../../helpers/dateHelper');
 const { getCacheKey, getFromCache, setCache } = require('../../../helpers/cacheHelper');
 
@@ -89,11 +90,12 @@ class JobController {
 
             let jobApplied = null;
             let savedJob = null;
-            
+            let userCV = null;
+
             // Use session-based authentication like ApplyController
             if (req.session && req.session.user) {
                 const userId = req.session.user._id;
-                
+
                 jobApplied = await JobApplied.findOne({
                     user_id: userId,
                     job_id: job._id,
@@ -103,6 +105,8 @@ class JobController {
                     user_id: userId,
                     job_id: job._id,
                 });
+
+                userCV = await CV.findOne({ username: req.session.user.username });
             }
 
             // Check if request expects JSON (API request)
@@ -127,6 +131,8 @@ class JobController {
                     business: mongooseToObject(business),
                     isStatus: job.status,
                     isSaved: !!savedJob,
+                    hasExistingCV: !!userCV,
+                    existingCVName: userCV?.filename || null,
                 });
             }
 
@@ -137,6 +143,8 @@ class JobController {
                     business: mongooseToObject(business),
                     isStatus: null,
                     isSaved: !!savedJob,
+                    hasExistingCV: !!userCV,
+                    existingCVName: userCV?.filename || null,
                 });
             }
 
@@ -146,6 +154,8 @@ class JobController {
                 business: mongooseToObject(business),
                 isStatus: jobApplied.status,
                 isSaved: !!savedJob,
+                hasExistingCV: !!userCV,
+                existingCVName: userCV?.filename || null,
             });
         } catch (error) {
             next(error);

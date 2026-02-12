@@ -563,6 +563,74 @@
             box-shadow: none;
         }
 
+        /* CV Upload in Apply Section */
+        .cv-status-info {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px 20px;
+            margin-bottom: 12px;
+            color: white;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cv-status-info i {
+            color: #86efac;
+        }
+
+        .cv-upload-hint {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cv-upload-hint.cv-required {
+            color: #fde68a;
+            font-weight: 600;
+        }
+
+        .cv-upload-area {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cv-file-hidden {
+            display: none;
+        }
+
+        .cv-file-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 14px 24px;
+            color: white;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .cv-file-label:hover {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .cv-file-label.has-file {
+            border-color: #86efac;
+            background: rgba(134, 239, 172, 0.15);
+        }
+
         /* Sidebar */
         .sidebar {
             display: flex;
@@ -1085,7 +1153,26 @@
                             Vị trí đã đóng
                         </button>
                         {{else}}
-                        <form action="/jobs/apply/{{job.slug}}" method="post">
+                        <form action="/jobs/apply/{{job.slug}}" method="post" enctype="multipart/form-data">
+                            {{#if hasExistingCV}}
+                            <div class="cv-status-info">
+                                <i class="fas fa-check-circle"></i>
+                                <span>CV hiện tại: <strong>{{existingCVName}}</strong></span>
+                            </div>
+                            <p class="cv-upload-hint">Hoặc tải lên CV mới để thay thế</p>
+                            {{else}}
+                            <p class="cv-upload-hint cv-required">Vui lòng tải lên CV để ứng tuyển</p>
+                            {{/if}}
+
+                            <div class="cv-upload-area">
+                                <input type="file" id="cv-file-input" name="cvFile"
+                                       accept=".pdf,.doc,.docx" class="cv-file-hidden">
+                                <label for="cv-file-input" class="cv-file-label">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <span id="cv-file-name">Chọn file CV (PDF, DOCX - tối đa 5MB)</span>
+                                </label>
+                            </div>
+
                             <button type="submit" class="apply-btn">
                                 <i class="fas fa-paper-plane"></i>
                                 Ứng tuyển ngay
@@ -1383,11 +1470,49 @@
             return notification;
         }
 
+        // CV file input display handler
+        const cvFileInput = document.getElementById('cv-file-input');
+        const cvFileNameSpan = document.getElementById('cv-file-name');
+        const cvFileLabel = document.querySelector('.cv-file-label');
+
+        if (cvFileInput) {
+            cvFileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+
+                    if (file.size > maxSize) {
+                        showNotification('error', 'File quá lớn', 'Kích thước file tối đa là 5MB.');
+                        this.value = '';
+                        cvFileNameSpan.textContent = 'Chọn file CV (PDF, DOCX - tối đa 5MB)';
+                        if (cvFileLabel) cvFileLabel.classList.remove('has-file');
+                        return;
+                    }
+
+                    cvFileNameSpan.textContent = file.name;
+                    if (cvFileLabel) cvFileLabel.classList.add('has-file');
+                } else {
+                    cvFileNameSpan.textContent = 'Chọn file CV (PDF, DOCX - tối đa 5MB)';
+                    if (cvFileLabel) cvFileLabel.classList.remove('has-file');
+                }
+            });
+        }
+
         // Handle form submission with loading state and notifications
         const applyForm = document.querySelector('form[action*="/jobs/apply/"]');
         if (applyForm) {
             applyForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
+
+                // Client-side validation: check if user has existing CV or uploaded a new one
+                const hasExistingCV = document.querySelector('.cv-status-info') !== null;
+                const fileInput = document.getElementById('cv-file-input');
+                const hasNewFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+                if (!hasExistingCV && !hasNewFile) {
+                    showNotification('error', 'Thiếu CV', 'Vui lòng tải lên CV để ứng tuyển.');
+                    return;
+                }
 
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalContent = submitBtn.innerHTML;

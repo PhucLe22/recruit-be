@@ -55,12 +55,42 @@ class ApplyController {
         });
       }
 
-      // Check CV
-      const cv = await CV.findOne({ username: user.username });
-      if (!cv) {
+      // Handle CV: check existing or process uploaded file
+      let cv = await CV.findOne({ username: user.username });
+
+      if (req.file) {
+        // User uploaded a new CV file during application
+        if (cv) {
+          // Delete old file from disk if replacing
+          if (cv.file_path) {
+            try {
+              if (fs.existsSync(cv.file_path)) {
+                fs.unlinkSync(cv.file_path);
+              }
+            } catch (err) {
+              console.error('Failed to delete old CV file:', err);
+            }
+          }
+          cv.file_path = req.file.path;
+          cv.filename = req.file.originalname;
+          cv.uploaded_at = new Date();
+          await cv.save();
+        } else {
+          // Create new CV record
+          cv = await CV.create({
+            user_id: userId,
+            username: user.username,
+            file_path: req.file.path,
+            filename: req.file.originalname,
+            uploaded_at: new Date(),
+          });
+        }
+        // Update user.cvPath for consistency
+        await User.findByIdAndUpdate(userId, { cvPath: req.file.path });
+      } else if (!cv) {
         return res.status(400).json({
           success: false,
-          message: "Invalid CV, you need to update resume again!"
+          message: "Vui lòng tải lên CV để ứng tuyển."
         });
       }
 
@@ -169,6 +199,14 @@ class ApplyController {
       });
 
     } catch (error) {
+      // Clean up uploaded file if something went wrong
+      if (req.file && req.file.path) {
+        try {
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        } catch (cleanupErr) {
+          console.error('Failed to clean up uploaded file:', cleanupErr);
+        }
+      }
       console.error("Apply error:", error);
       return res.status(500).json({
         success: false,
