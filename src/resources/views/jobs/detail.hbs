@@ -5,16 +5,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{job.title}} - Chi Tiết Công Việc | Job Portal</title>
-    <meta name="description" content="{{job.title}} tại {{job.companyName}}. {{job.field}} với mức lương {{job.salary}} tại {{job.city}}.">
+    <meta name="description"
+        content="{{job.title}} tại {{job.companyName}}. {{job.field}} với mức lương {{job.salary}} tại {{job.city}}.">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-        
+
         /* Notification Cart Styles */
         .notification-cart {
             position: fixed;
-            top: 100px; /* Increased from 20px to be below header */
+            top: 100px;
+            /* Increased from 20px to be below header */
             right: 20px;
             z-index: 9999;
             max-width: 350px;
@@ -22,7 +24,7 @@
             font-family: 'Inter', sans-serif;
             pointer-events: none;
         }
-        
+
         /* Make room for notifications when header is fixed */
         @media (max-width: 768px) {
             .notification-cart {
@@ -441,7 +443,8 @@
             margin-bottom: 15px;
         }
 
-        .description-content ul, .description-content ol {
+        .description-content ul,
+        .description-content ol {
             margin: 15px 0 20px 25px;
         }
 
@@ -479,8 +482,17 @@
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.1); opacity: 0.7; }
+
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.1);
+                opacity: 0.7;
+            }
         }
 
         .apply-title {
@@ -682,6 +694,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -844,8 +857,13 @@
         }
 
         @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         /* Focus states for accessibility */
@@ -1007,7 +1025,8 @@
                                 <div class="info-content">
                                     <div class="info-label">Số điện thoại</div>
                                     <div class="info-value">
-                                        <span id="contact-display" data-contact="{{business.phone}}" data-email="{{job.email}}"></span>
+                                        <span id="contact-display" data-contact="{{business.phone}}"
+                                            data-email="{{job.email}}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -1025,18 +1044,19 @@
 
                         <div class="description-content">
                             {{#if job.description}}
-                                {{job.description}}
+                            {{job.description}}
                             {{else}}
-                                <p>Chúng tôi đang tìm kiếm một ứng viên tài năng và nhiệt huyết với vị trí <strong>{{job.title}}</strong> tại công ty <strong>{{job.companyName}}</strong>.</p>
+                            <p>Chúng tôi đang tìm kiếm một ứng viên tài năng và nhiệt huyết với vị trí
+                                <strong>{{job.title}}</strong> tại công ty <strong>{{job.companyName}}</strong>.</p>
 
-                                <h3>Vị trí này phù hợp với bạn nếu bạn có:</h3>
-                                <ul>
-                                    <li>Kinh nghiệm phù hợp: {{job.experience}}</li>
-                                    <li>Kỹ năng công nghệ: {{job.technique}}</li>
-                                    <li>Sẵn sàng làm việc với loại hình: {{job.type}}</li>
-                                </ul>
+                            <h3>Vị trí này phù hợp với bạn nếu bạn có:</h3>
+                            <ul>
+                                <li>Kinh nghiệm phù hợp: {{job.experience}}</li>
+                                <li>Kỹ năng công nghệ: {{job.technique}}</li>
+                                <li>Sẵn sàng làm việc với loại hình: {{job.type}}</li>
+                            </ul>
 
-                                <p>Hãy ứng tuyển ngay để trở thành một phần của đội ngũ của chúng tôi!</p>
+                            <p>Hãy ứng tuyển ngay để trở thành một phần của đội ngũ của chúng tôi!</p>
                             {{/if}}
                         </div>
                     </div>
@@ -1048,9 +1068,9 @@
                         </h2>
                         <p class="apply-subtitle">
                             {{#if job.salary}}
-                                Mức lương hấp dẫn: {{job.salary}}
+                            Mức lương hấp dẫn: {{job.salary}}
                             {{else}}
-                                Cơ hội phát triển sự nghiệp tuyệt vời
+                            Cơ hội phát triển sự nghiệp tuyệt vời
                             {{/if}}
                         </p>
 
@@ -1086,7 +1106,8 @@
                         {{#if business.logoPath}}
                         <img src="{{business.logoPath}}" alt="{{job.companyName}}" class="company-logo">
                         {{else}}
-                        <div class="company-logo" style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
+                        <div class="company-logo"
+                            style="background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem; font-weight: bold;">
                             {{job.companyName.charAt 0}}
                         </div>
                         {{/if}}
@@ -1110,7 +1131,7 @@
                         </button>
                         {{/if}}
                         {{else}}
-                        <form action="/auth/login-page" method="get">
+                        <form action="/auth/login" method="get">
                             <button type="submit" class="save-job-btn">
                                 <i class="fas fa-bookmark"></i>
                                 Đăng nhập để lưu
@@ -1158,7 +1179,7 @@
             if (contactDisplay) {
                 const phone = contactDisplay.dataset.contact;
                 const email = contactDisplay.dataset.email;
-                
+
                 if (phone && phone.trim()) {
                     // Use business phone number
                     contactDisplay.innerHTML = `<a href="tel:${phone}">${phone}</a>`;
@@ -1173,7 +1194,7 @@
             // Save job functionality
             const saveJobBtn = document.getElementById('saveJobBtn');
             if (saveJobBtn) {
-                saveJobBtn.addEventListener('click', async function(e) {
+                saveJobBtn.addEventListener('click', async function (e) {
                     e.preventDefault();
 
                     const jobId = this.dataset.jobId;
@@ -1325,9 +1346,9 @@
             const notificationCart = document.getElementById('notificationCart');
             const notification = document.createElement('div');
             notification.className = `notification-item ${type}`;
-            
+
             const icon = type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-circle';
-            
+
             notification.innerHTML = `
                 <div class="notification-icon ${type}">
                     <i class="fas fa-${icon}"></i>
@@ -1338,13 +1359,13 @@
                 </div>
                 <button class="notification-close" aria-label="Đóng thông báo">&times;</button>
             `;
-            
+
             notificationCart.appendChild(notification);
-            
+
             // Trigger reflow to enable animation
             void notification.offsetWidth;
             notification.classList.add('show');
-            
+
             // Close button handler
             const closeBtn = notification.querySelector('.notification-close');
             const closeNotification = () => {
@@ -1353,29 +1374,29 @@
                     notification.remove();
                 }, 300);
             };
-            
+
             closeBtn.addEventListener('click', closeNotification);
-            
+
             // Auto-remove after duration
             setTimeout(closeNotification, duration);
-            
+
             return notification;
         }
-        
+
         // Handle form submission with loading state and notifications
         const applyForm = document.querySelector('form[action*="/jobs/apply/"]');
         if (applyForm) {
             applyForm.addEventListener('submit', async function (e) {
                 e.preventDefault();
-                
+
                 const submitBtn = this.querySelector('button[type="submit"]');
                 const originalContent = submitBtn.innerHTML;
                 const formAction = this.action;
                 const formData = new FormData(this);
-                
+
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-                
+
                 try {
                     const response = await fetch(formAction, {
                         method: 'POST',
@@ -1384,13 +1405,13 @@
                             'Accept': 'application/json'
                         }
                     });
-                    
+
                     const result = await response.json();
-                    
+
                     if (result.success) {
                         showNotification(
-                            'success', 
-                            'Thành công!', 
+                            'success',
+                            'Thành công!',
                             result.message || 'Đơn ứng tuyển của bạn đã được gửi thành công.'
                         );
                         // Reset form on success
@@ -1399,14 +1420,14 @@
                         // Check if it's an "already applied" message
                         if (result.message && result.message.includes('already applied')) {
                             showNotification(
-                                'warning', 
-                                'Đã ứng tuyển!', 
+                                'warning',
+                                'Đã ứng tuyển!',
                                 'Bạn đã ứng tuyển cho công việc này rồi. Hãy kiểm tra các công việc khác!'
                             );
                         } else {
                             showNotification(
-                                'error', 
-                                'Có lỗi xảy ra', 
+                                'error',
+                                'Có lỗi xảy ra',
                                 result.message || 'Đã xảy ra lỗi khi gửi đơn ứng tuyển. Vui lòng thử lại.'
                             );
                         }
@@ -1414,14 +1435,14 @@
                 } catch (error) {
                     console.error('Error:', error);
                     showNotification(
-                        'error', 
-                        'Lỗi kết nối', 
+                        'error',
+                        'Lỗi kết nối',
                         'Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng và thử lại.'
                     );
                 } finally {
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalContent;
-                    
+
                     // Re-enable after 5 seconds (fallback)
                     setTimeout(() => {
                         submitBtn.disabled = false;
@@ -1432,7 +1453,7 @@
         }
 
         // Enhance accessibility
-        document.addEventListener('keydown', function(e) {
+        document.addEventListener('keydown', function (e) {
             // Press '/' to focus on job search
             if (e.key === '/' && !e.target.matches('input, textarea, button')) {
                 e.preventDefault();
