@@ -5,6 +5,8 @@ const path = require('path');
 const CV = require('../../models/CV');
 const mongoose = require('mongoose');
 
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
 class CVUploadController {
     async upload(req, res) {
         try {
@@ -50,7 +52,7 @@ class CVUploadController {
             // 🔹 Call Python API
             let response;
             try {
-                const aiServiceUrl = 'http://localhost:8000/upload_resume';
+                const aiServiceUrl = `${AI_SERVICE_URL}/upload_resume`;
                 console.log('🔗 Calling AI service at:', aiServiceUrl);
                 
                 response = await axios.post(
@@ -103,7 +105,7 @@ class CVUploadController {
             // 🔹 Get processed data from Python API
             let fetchData;
             try {
-                const resumeUrl = `http://localhost:8000/api/resume/${username}`;
+                const resumeUrl = `${AI_SERVICE_URL}/api/resume/${username}`;
                 console.log('🔍 Fetching processed resume data from:', resumeUrl);
                 
                 fetchData = await axios.get(resumeUrl, {
@@ -233,7 +235,7 @@ class CVUploadController {
                 });
             }
 
-            const jobSuggestionUrl = `http://localhost:8000/api/jobs-suggestion/${username}`;
+            const jobSuggestionUrl = `${AI_SERVICE_URL}/api/jobs-suggestion/${username}`;
             console.log(`🔍 Gọi job suggestion API: ${jobSuggestionUrl}`);
 
             const response = await axios.get(jobSuggestionUrl, {

@@ -717,6 +717,8 @@ class SmartSearchService {
         const transformedJobs = paginatedJobs.map((job) => ({
             _id: job._id,
             title: job.title,
+            slug: job.slug,
+            status: job.status || 'active',
             description: job.description
                 ? job.description.length > 200
                     ? job.description.substring(0, 200) + '...'
@@ -725,6 +727,7 @@ class SmartSearchService {
             salary: job.salary || 'Thỏa thuận',
             city: job.city || 'Không xác định',
             type: job.type || 'Full-time',
+            workTime: job.workTime || '',
             field: job.field || 'Công nghệ thông tin',
             companyName: job.businessId?.companyName || 'Công ty',
             companyLogo: job.businessId?.logo || null,

@@ -1,191 +1,833 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hồ sơ cá nhân</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        .avatar-upload-overlay {
-            transition: all 0.3s ease;
-        }
-        .avatar-container:hover .avatar-upload-overlay {
-            opacity: 1;
-        }
-        .progress-bar {
-            transition: width 0.3s ease;
-        }
-        .assessment-card {
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .assessment-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        }
-        .tab-button {
-            transition: all 0.3s ease;
-        }
-        .tab-button.active {
-            border-bottom: 3px solid #3b82f6;
-            color: #3b82f6;
-        }
-        .form-input:focus {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-slide-in {
-            animation: slideIn 0.5s ease forwards;
-        }
-    </style>
-</head>
-<body class="bg-gray-50">
+<style>
+    /* ========== Profile Page Styles ========== */
+    :root {
+        --profile-primary: #2563EB;
+        --profile-primary-light: #3B82F6;
+        --profile-primary-bg: rgba(37, 99, 235, 0.06);
+        --profile-dark: #0F172A;
+        --profile-text: #334155;
+        --profile-muted: #64748B;
+        --profile-border: #E2E8F0;
+        --profile-bg: #F8FAFC;
+        --profile-card: #FFFFFF;
+        --profile-success: #059669;
+        --profile-danger: #DC2626;
+        --profile-warning: #D97706;
+        --profile-radius: 12px;
+        --profile-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+        --profile-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.07), 0 2px 4px -2px rgba(0,0,0,0.05);
+        --profile-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
+    }
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Profile Header -->
-        <div class="bg-white rounded-xl shadow-sm p-6 mb-6 animate-slide-in">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-6">
-                    <!-- Avatar Section -->
-                    <div class="relative avatar-container">
-                        <img id="avatarDisplay" 
-                             src="{{#if user.avatar}}{{user.avatar}}{{else}}/avatars/default-avatar.png{{/if}}" 
-                             alt="Avatar" 
-                             class="w-24 h-24 rounded-full object-cover border-4 border-blue-100">
-                        <div class="avatar-upload-overlay absolute inset-0 bg-black bg-opacity-50 rounded-full flex items-center justify-center opacity-0 cursor-pointer"
-                             onclick="document.getElementById('avatarInput').click()">
-                            <i class="fas fa-camera text-white text-xl"></i>
+    .profile-page {
+        background: var(--profile-bg);
+        min-height: calc(100vh - 64px);
+        padding-bottom: 3rem;
+    }
+
+    /* Cover Banner */
+    .profile-cover {
+        height: 200px;
+        background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 50%, #6366F1 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .profile-cover::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* Profile Card */
+    .profile-card {
+        background: var(--profile-card);
+        border-radius: var(--profile-radius);
+        box-shadow: var(--profile-shadow-md);
+        border: 1px solid var(--profile-border);
+        margin-top: -80px;
+        position: relative;
+        z-index: 2;
+    }
+    .profile-card__header {
+        padding: 1.75rem 2rem 1.25rem;
+    }
+    .profile-card__body {
+        padding: 0 2rem 1.75rem;
+    }
+
+    /* Avatar */
+    .profile-avatar {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        border: 4px solid #fff;
+        box-shadow: var(--profile-shadow-md);
+        object-fit: cover;
+        margin-top: -60px;
+        background: #fff;
+        cursor: pointer;
+        transition: transform 0.2s ease;
+    }
+    .profile-avatar:hover {
+        transform: scale(1.03);
+    }
+    .profile-avatar-wrapper {
+        position: relative;
+        display: inline-block;
+    }
+    .profile-avatar-overlay {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        width: 36px;
+        height: 36px;
+        background: var(--profile-primary);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 0.8rem;
+        cursor: pointer;
+        border: 3px solid #fff;
+        transition: background 0.2s ease, transform 0.2s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+    }
+    .profile-avatar-overlay:hover {
+        background: var(--profile-primary-light);
+        transform: scale(1.1);
+    }
+
+    /* Profile Info */
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--profile-dark);
+        margin-bottom: 0.15rem;
+        letter-spacing: -0.01em;
+    }
+    .profile-email {
+        font-size: 0.9rem;
+        color: var(--profile-muted);
+        margin-bottom: 0.5rem;
+    }
+    .profile-meta {
+        display: flex;
+        align-items: center;
+        gap: 1.25rem;
+        flex-wrap: wrap;
+    }
+    .profile-meta__item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.85rem;
+        color: var(--profile-muted);
+    }
+    .profile-meta__item i {
+        font-size: 0.8rem;
+        color: var(--profile-primary);
+        opacity: 0.7;
+    }
+
+    /* Progress bar */
+    .profile-progress {
+        max-width: 220px;
+    }
+    .profile-progress__bar {
+        height: 6px;
+        border-radius: 3px;
+        background: #E2E8F0;
+        overflow: hidden;
+    }
+    .profile-progress__fill {
+        height: 100%;
+        border-radius: 3px;
+        background: linear-gradient(90deg, var(--profile-primary), #6366F1);
+        transition: width 0.6s ease;
+    }
+    .profile-progress__text {
+        font-size: 0.78rem;
+        color: var(--profile-muted);
+        margin-bottom: 0.3rem;
+    }
+    .profile-progress__text span {
+        font-weight: 600;
+        color: var(--profile-primary);
+    }
+
+    /* CV Badge */
+    .profile-cv-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.4rem 0.85rem;
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 8px;
+        font-size: 0.82rem;
+        color: #166534;
+    }
+    .profile-cv-badge i {
+        color: #16A34A;
+    }
+    .profile-cv-badge a {
+        color: #166534;
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .profile-cv-badge a:hover {
+        text-decoration: underline;
+    }
+    .profile-cv-badge--empty {
+        background: #FEF3C7;
+        border-color: #FDE68A;
+        color: #92400E;
+    }
+    .profile-cv-badge--empty i {
+        color: #D97706;
+    }
+
+    /* Tabs */
+    .profile-tabs {
+        background: var(--profile-card);
+        border-radius: var(--profile-radius);
+        box-shadow: var(--profile-shadow);
+        border: 1px solid var(--profile-border);
+        overflow: hidden;
+    }
+    .profile-tabs__nav {
+        display: flex;
+        border-bottom: 1px solid var(--profile-border);
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        overflow-x: auto;
+    }
+    .profile-tabs__btn {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--profile-muted);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+    .profile-tabs__btn:hover {
+        color: var(--profile-primary);
+        background: var(--profile-primary-bg);
+    }
+    .profile-tabs__btn.active {
+        color: var(--profile-primary);
+        border-bottom-color: var(--profile-primary);
+        font-weight: 600;
+    }
+    .profile-tabs__content {
+        padding: 1.75rem 2rem;
+    }
+
+    /* Form */
+    .profile-form__group {
+        margin-bottom: 1.25rem;
+    }
+    .profile-form__label {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        color: var(--profile-text);
+        margin-bottom: 0.45rem;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+    }
+    .profile-form__label i {
+        color: var(--profile-primary);
+        opacity: 0.7;
+        font-size: 0.78rem;
+    }
+    .profile-form__label .required {
+        color: var(--profile-danger);
+        font-size: 0.7rem;
+    }
+    .profile-form__input {
+        width: 100%;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9rem;
+        color: var(--profile-dark);
+        background: var(--profile-bg);
+        border: 1.5px solid var(--profile-border);
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-family: 'Inter', sans-serif;
+    }
+    .profile-form__input:focus {
+        outline: none;
+        border-color: var(--profile-primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        background: #fff;
+    }
+    .profile-form__input:disabled {
+        background: #F1F5F9;
+        color: var(--profile-text);
+        cursor: not-allowed;
+        border-color: transparent;
+    }
+    .profile-form__input.is-error {
+        border-color: var(--profile-danger);
+        box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+    .profile-form__hint {
+        font-size: 0.75rem;
+        color: var(--profile-muted);
+        margin-top: 0.3rem;
+        display: none;
+    }
+    .profile-form__hint.is-error {
+        color: var(--profile-danger);
+        display: block;
+    }
+
+    /* Buttons */
+    .btn-profile-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background: var(--profile-primary);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-profile-primary:hover {
+        background: #1D4ED8;
+        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        transform: translateY(-1px);
+    }
+    .btn-profile-primary:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    .btn-profile-secondary {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--profile-text);
+        background: #fff;
+        border: 1.5px solid var(--profile-border);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-profile-secondary:hover {
+        border-color: #CBD5E1;
+        background: var(--profile-bg);
+    }
+    .btn-profile-success {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background: var(--profile-success);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-profile-success:hover {
+        background: #047857;
+        box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    }
+    .btn-profile-success:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .btn-profile-danger {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.55rem 1.25rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: #fff;
+        background: var(--profile-danger);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .btn-profile-danger:hover {
+        background: #B91C1C;
+    }
+
+    /* Action bar */
+    .profile-actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 1.25rem;
+        margin-top: 1.25rem;
+        border-top: 1px solid var(--profile-border);
+    }
+    .profile-form-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .profile-form-status.success { color: var(--profile-success); }
+    .profile-form-status.error { color: var(--profile-danger); }
+    .profile-form-status.loading { color: var(--profile-primary); }
+
+    /* CV Upload Area */
+    .cv-upload-area {
+        border: 2px dashed var(--profile-border);
+        border-radius: var(--profile-radius);
+        padding: 2.5rem 2rem;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    .cv-upload-area:hover {
+        border-color: var(--profile-primary);
+        background: var(--profile-primary-bg);
+    }
+    .cv-upload-area__icon {
+        font-size: 2.5rem;
+        color: #94A3B8;
+        margin-bottom: 0.75rem;
+    }
+    .cv-upload-area__title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--profile-dark);
+        margin-bottom: 0.35rem;
+    }
+    .cv-upload-area__desc {
+        font-size: 0.82rem;
+        color: var(--profile-muted);
+        margin-bottom: 1rem;
+    }
+
+    /* CV File Card */
+    .cv-file-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem 1.25rem;
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-radius: 10px;
+        margin-bottom: 1.25rem;
+    }
+    .cv-file-card__info {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+    }
+    .cv-file-card__icon {
+        width: 44px;
+        height: 44px;
+        background: #fff;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        color: #DC2626;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .cv-file-card__name {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #166534;
+    }
+    .cv-file-card__date {
+        font-size: 0.78rem;
+        color: #16A34A;
+        margin-top: 0.15rem;
+    }
+    .cv-file-card__actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Upload progress */
+    .cv-upload-progress {
+        background: #EFF6FF;
+        border: 1px solid #BFDBFE;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-top: 1rem;
+    }
+    .cv-upload-progress__bar {
+        height: 6px;
+        background: #DBEAFE;
+        border-radius: 3px;
+        overflow: hidden;
+        margin-top: 0.5rem;
+    }
+    .cv-upload-progress__fill {
+        height: 100%;
+        background: var(--profile-primary);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    /* Assessment Cards */
+    .assessment-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.25rem;
+    }
+    .assessment-card {
+        border-radius: var(--profile-radius);
+        padding: 1.5rem;
+        border: 1px solid;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    .assessment-card:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--profile-shadow-lg);
+    }
+    .assessment-card--mbti {
+        background: linear-gradient(135deg, #EFF6FF, #E0E7FF);
+        border-color: #BFDBFE;
+    }
+    .assessment-card--bigfive {
+        background: linear-gradient(135deg, #F0FDF4, #ECFDF5);
+        border-color: #BBF7D0;
+    }
+    .assessment-card--disc {
+        background: linear-gradient(135deg, #FAF5FF, #FDF2F8);
+        border-color: #E9D5FF;
+    }
+    .assessment-card--empty {
+        background: #F8FAFC;
+        border-color: var(--profile-border);
+        border-style: dashed;
+    }
+    .assessment-card__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+    .assessment-card__title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .assessment-card__icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.9rem;
+    }
+    .assessment-card__type {
+        font-size: 1.75rem;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 0.5rem;
+        letter-spacing: -0.02em;
+    }
+    .assessment-card__desc {
+        font-size: 0.82rem;
+        color: var(--profile-text);
+        line-height: 1.5;
+        margin-bottom: 0.75rem;
+    }
+    .assessment-card__date {
+        font-size: 0.75rem;
+        color: var(--profile-muted);
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+    }
+    .assessment-card__score {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        padding: 0.25rem 0;
+    }
+    .assessment-card__score-label {
+        color: var(--profile-text);
+    }
+    .assessment-card__score-value {
+        font-weight: 600;
+    }
+
+    /* Assessment Actions */
+    .assessment-action {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: #fff;
+        border: 1.5px solid var(--profile-border);
+        border-radius: var(--profile-radius);
+        text-decoration: none;
+        color: inherit;
+        transition: all 0.2s ease;
+    }
+    .assessment-action:hover {
+        border-color: var(--profile-primary);
+        background: var(--profile-primary-bg);
+        transform: translateY(-2px);
+        box-shadow: var(--profile-shadow-md);
+        color: inherit;
+        text-decoration: none;
+    }
+    .assessment-action__icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+    .assessment-action__title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--profile-dark);
+    }
+    .assessment-action__desc {
+        font-size: 0.78rem;
+        color: var(--profile-muted);
+        margin-top: 0.15rem;
+    }
+
+    /* Toast */
+    .profile-toast {
+        position: fixed;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 9999;
+        transform: translateX(calc(100% + 2rem));
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .profile-toast.is-visible {
+        transform: translateX(0);
+    }
+    .profile-toast__inner {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        padding: 1rem 1.25rem;
+        min-width: 320px;
+        border-left: 4px solid;
+    }
+    .profile-toast__inner.success { border-left-color: var(--profile-success); }
+    .profile-toast__inner.error { border-left-color: var(--profile-danger); }
+    .profile-toast__inner.info { border-left-color: var(--profile-primary); }
+    .profile-toast__icon {
+        font-size: 1.15rem;
+        flex-shrink: 0;
+    }
+    .profile-toast__title {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--profile-dark);
+    }
+    .profile-toast__desc {
+        font-size: 0.8rem;
+        color: var(--profile-muted);
+        margin-top: 0.1rem;
+    }
+
+    /* Animations */
+    @keyframes profileSlideUp {
+        from { opacity: 0; transform: translateY(16px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-profile {
+        animation: profileSlideUp 0.4s ease forwards;
+    }
+    .animate-profile-delay-1 { animation-delay: 0.1s; opacity: 0; }
+    .animate-profile-delay-2 { animation-delay: 0.2s; opacity: 0; }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .profile-cover { height: 140px; }
+        .profile-card__header { padding: 1.25rem 1.25rem 1rem; }
+        .profile-card__body { padding: 0 1.25rem 1.25rem; }
+        .profile-tabs__content { padding: 1.25rem; }
+        .profile-avatar { width: 96px; height: 96px; margin-top: -48px; }
+        .profile-name { font-size: 1.25rem; }
+        .profile-meta { gap: 0.75rem; }
+        .cv-file-card { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+        .cv-file-card__actions { width: 100%; }
+        .assessment-grid { grid-template-columns: 1fr; }
+    }
+</style>
+
+<div class="profile-page">
+    <!-- Cover Banner -->
+    <div class="profile-cover"></div>
+
+    <div class="container" style="max-width: 960px;">
+        <!-- Profile Header Card -->
+        <div class="profile-card animate-profile">
+            <div class="profile-card__header">
+                <div class="d-flex flex-column flex-md-row align-items-start align-items-md-center justify-content-between gap-3">
+                    <div class="d-flex align-items-end gap-3 flex-wrap">
+                        <!-- Avatar -->
+                        <div class="profile-avatar-wrapper">
+                            <img id="avatarDisplay"
+                                 src="{{#if user.avatar}}{{user.avatar}}{{else}}/avatars/default-avatar.png{{/if}}"
+                                 alt="{{user.username}}"
+                                 class="profile-avatar"
+                                 onclick="document.getElementById('avatarInput').click()">
+                            <div class="profile-avatar-overlay" onclick="document.getElementById('avatarInput').click()" title="Thay đổi ảnh đại diện">
+                                <i class="fas fa-camera"></i>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" class="d-none" onchange="uploadAvatar(event)">
                         </div>
-                        <input type="file" id="avatarInput" accept="image/*" class="hidden" onchange="uploadAvatar(event)">
-                    </div>
-                    
-                    <!-- Basic Info -->
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-900">{{user.username}}</h2>
-                        <p class="text-gray-600">{{user.email}}</p>
-                        <div class="flex items-center mt-2 space-x-4">
-                            <span class="text-sm text-gray-500">
-                                <i class="fas fa-phone mr-1"></i>{{#if user.phone}}{{user.phone}}{{else}}Chưa cập nhật{{/if}}
-                            </span>
-                            <span class="text-sm text-gray-500">
-                                <i class="fas fa-birthday-cake mr-1"></i>{{#if user.birthday}}{{user.birthday}}{{else}}Chưa cập nhật{{/if}}
-                            </span>
-                        </div>
-                        <!-- CV Section -->
-                        <div class="mt-3">
-                            <div class="flex items-center text-sm">
-                                <i class="fas fa-file-pdf text-red-500 mr-2"></i>
-                                {{#if user.cvPath}}
-                                    <span class="text-gray-600 mr-2">CV đã tải lên:</span>
-                                    <a href="/uploads/cv/file-1766900747012-437819385.pdf" target="_blank" 
-                                       class="text-blue-600 hover:underline flex items-center">
-                                        <i class="fas fa-eye mr-1"></i> Xem CV
-                                    </a>
-                                    <span class="mx-2 text-gray-300">|</span>
-                                    <a href="/uploads/cv/file-1766900747012-437819385.pdf" download
-                                       class="text-blue-600 hover:underline flex items-center">
-                                        <i class="fas fa-download mr-1"></i> Tải xuống
-                                    </a>
-                                {{else}}
-                                    <span class="text-gray-600">CV có sẵn:</span>
-                                    <a href="/uploads/cv/file-1766900747012-437819385.pdf" target="_blank" 
-                                       class="ml-2 text-blue-600 hover:underline flex items-center">
-                                        <i class="fas fa-eye mr-1"></i> Xem CV
-                                    </a>
-                                    <span class="mx-2 text-gray-300">|</span>
-                                    <a href="/uploads/cv/file-1766900747012-437819385.pdf" download
-                                       class="text-blue-600 hover:underline flex items-center">
-                                        <i class="fas fa-download mr-1"></i> Tải xuống
-                                    </a>
+                        <!-- Info -->
+                        <div style="padding-bottom: 4px;">
+                            <h1 class="profile-name">{{user.username}}</h1>
+                            <p class="profile-email mb-2">{{user.email}}</p>
+                            <div class="profile-meta">
+                                <span class="profile-meta__item">
+                                    <i class="fas fa-phone"></i>
+                                    {{#if user.phone}}{{user.phone}}{{else}}Chưa cập nhật{{/if}}
+                                </span>
+                                <span class="profile-meta__item">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    {{#if user.birthday}}{{user.birthday}}{{else}}Chưa cập nhật{{/if}}
+                                </span>
+                                {{#if user.major}}
+                                <span class="profile-meta__item">
+                                    <i class="fas fa-briefcase"></i>
+                                    {{user.major}}
+                                </span>
                                 {{/if}}
                             </div>
                         </div>
+                    </div>
+
+                    <div class="d-flex flex-column align-items-end gap-2">
+                        <button onclick="toggleEditMode()" class="btn-profile-primary" id="editBtn">
+                            <i class="fas fa-pen-to-square"></i>
+                            <span id="editButtonText">Chỉnh sửa</span>
+                        </button>
                         <!-- Profile Completion -->
-                        <div class="mt-3">
-                            <div class="flex items-center justify-between text-sm mb-1">
-                                <span class="text-gray-600">Hoàn thành hồ sơ</span>
-                                <span class="font-semibold text-blue-600">{{user.profileComplete}}%</span>
+                        <div class="profile-progress">
+                            <div class="profile-progress__text">
+                                Hoàn thành hồ sơ: <span>{{user.profileComplete}}%</span>
                             </div>
-                            <div class="w-48 bg-gray-200 rounded-full h-2">
-                                <div class="progress-bar bg-blue-600 h-2 rounded-full" style="width: {{user.profileComplete}}%"></div>
+                            <div class="profile-progress__bar">
+                                <div class="profile-progress__fill" style="width: {{user.profileComplete}}%"></div>
                             </div>
                         </div>
                     </div>
                 </div>
-                
-                <button onclick="toggleEditMode()" 
-                        class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition flex items-center"
-                        aria-label="Chỉnh sửa hồ sơ">
-                    <i class="fas fa-edit mr-2" aria-hidden="true"></i>
-                    <span id="editButtonText">Chỉnh sửa hồ sơ</span>
-                </button>
+            </div>
+
+            <!-- CV Quick Info -->
+            <div class="profile-card__body">
+                {{#if user.cvData.hasCV}}
+                    <div class="profile-cv-badge">
+                        <i class="fas fa-file-pdf"></i>
+                        <span>CV đã tải lên</span>
+                        <span style="color: #BBF7D0;">|</span>
+                        <a href="/users/cv" target="_blank"><i class="fas fa-eye"></i> Xem</a>
+                        <a href="/users/cv/download"><i class="fas fa-download"></i> Tải xuống</a>
+                    </div>
+                {{else}}
+                    <div class="profile-cv-badge profile-cv-badge--empty">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>Bạn chưa tải lên CV</span>
+                    </div>
+                {{/if}}
             </div>
         </div>
 
-        <!-- Tabs Navigation -->
-        <div class="bg-white rounded-xl shadow-sm mb-6">
-            <div class="flex space-x-8 px-6 pt-4">
-                <button class="tab-button active pb-3 px-1 font-medium" onclick="switchTab('profile')" 
-                        aria-selected="true" role="tab" aria-controls="profileTab">
-                    <i class="fas fa-user mr-2" aria-hidden="true"></i>Thông tin cá nhân
-                </button>
-                <button class="tab-button pb-3 px-1 font-medium text-gray-600" onclick="switchTab('cv')"
-                        aria-selected="false" role="tab" aria-controls="cvTab">
-                    <i class="fas fa-file-alt mr-2" aria-hidden="true"></i>CV & Hồ sơ
-                </button>
-                <button class="tab-button pb-3 px-1 font-medium text-gray-600" onclick="switchTab('assessments')"
-                        aria-selected="false" role="tab" aria-controls="assessmentsTab">
-                    <i class="fas fa-brain mr-2" aria-hidden="true"></i>Bài kiểm tra tính cách
-                </button>
-            </div>
-        </div>
+        <!-- Tabs Section -->
+        <div class="profile-tabs mt-4 animate-profile animate-profile-delay-1">
+            <ul class="profile-tabs__nav" role="tablist">
+                <li>
+                    <button class="profile-tabs__btn active" onclick="switchTab('profile', this)" role="tab" data-tab="profile">
+                        <i class="fas fa-user-circle"></i> Thông tin cá nhân
+                    </button>
+                </li>
+                <li>
+                    <button class="profile-tabs__btn" onclick="switchTab('cv', this)" role="tab" data-tab="cv">
+                        <i class="fas fa-file-alt"></i> CV & Hồ sơ
+                    </button>
+                </li>
+                <li>
+                    <button class="profile-tabs__btn" onclick="switchTab('assessments', this)" role="tab" data-tab="assessments">
+                        <i class="fas fa-brain"></i> Trắc nghiệm tính cách
+                    </button>
+                </li>
+            </ul>
 
-        <!-- Tab Content -->
-        <div id="tabContent">
-            <!-- Profile Tab -->
-            <div id="profileTab" class="tab-content block" role="tabpanel" aria-labelledby="profile-tab">
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <form id="profileForm" class="grid grid-cols-1 md:grid-cols-2 gap-6" novalidate>
+            <!-- ======== Profile Tab ======== -->
+            <div id="profileTab" class="profile-tabs__content tab-panel" role="tabpanel">
+                <form id="profileForm" novalidate>
+                    <div class="row">
                         <!-- Left Column -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-user mr-1"></i>Họ và tên
+                        <div class="col-md-6">
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-user"></i> Họ và tên
                                 </label>
                                 <input type="text" name="username" value="{{user.username}}" disabled
-                                       class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                       class="profile-form__input">
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-envelope mr-1"></i>Email
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-envelope"></i> Email
                                 </label>
                                 <input type="email" name="email" value="{{user.email}}" disabled
-                                       class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                       class="profile-form__input">
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-phone mr-1"></i>Số điện thoại
-                                    <span class="text-red-500 ml-1">*</span>
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-phone"></i> Số điện thoại <span class="required">*</span>
                                 </label>
                                 <input type="tel" name="phone" value="{{user.phone}}" disabled
                                        pattern="[0-9]{10,11}"
-                                       class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                       class="profile-form__input"
                                        placeholder="Nhập số điện thoại (10-11 số)">
-                                <span class="text-xs text-gray-500 mt-1 hidden">Số điện thoại phải có 10-11 chữ số</span>
+                                <div class="profile-form__hint">Số điện thoại phải có 10-11 chữ số</div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-venus-mars mr-1"></i>Giới tính
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-venus-mars"></i> Giới tính
                                 </label>
-                                <select name="gender" disabled
-                                        class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                <select name="gender" disabled class="profile-form__input">
                                     <option value="">Chọn giới tính</option>
                                     <option value="male" {{#if (eq user.gender 'male')}}selected{{/if}}>Nam</option>
                                     <option value="female" {{#if (eq user.gender 'female')}}selected{{/if}}>Nữ</option>
@@ -193,30 +835,22 @@
                                 </select>
                             </div>
                         </div>
-                        
-                        <!-- Right Column -->
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-birthday-cake mr-1"></i>Ngày sinh
-                                    <span class="text-red-500 ml-1">*</span>
-                                </label>
-                                <input type="date"
-       name="birthday"
-       value="{{formatDateInput user.birthday}}"
-       disabled
-       max=""
-       class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
 
-                                <span class="text-xs text-gray-500 mt-1 hidden">Bạn phải đủ 18 tuổi trở lên</span>
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-graduation-cap mr-1"></i>Bằng cấp cao nhất
+                        <!-- Right Column -->
+                        <div class="col-md-6">
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-birthday-cake"></i> Ngày sinh <span class="required">*</span>
                                 </label>
-                                <select name="degree" disabled
-                                        class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                <input type="date" name="birthday" value="{{formatDateInput user.birthday}}" disabled
+                                       max="" class="profile-form__input">
+                                <div class="profile-form__hint">Bạn phải đủ 18 tuổi trở lên</div>
+                            </div>
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-graduation-cap"></i> Bằng cấp cao nhất
+                                </label>
+                                <select name="degree" disabled class="profile-form__input">
                                     <option value="">Chọn bằng cấp</option>
                                     <option value="high_school" {{#if (eq user.degree 'high_school')}}selected{{/if}}>Trung học</option>
                                     <option value="college" {{#if (eq user.degree 'college')}}selected{{/if}}>Cao đẳng</option>
@@ -225,13 +859,11 @@
                                     <option value="phd" {{#if (eq user.degree 'phd')}}selected{{/if}}>Tiến sĩ</option>
                                 </select>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-briefcase mr-1"></i>Kinh nghiệm làm việc
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-briefcase"></i> Kinh nghiệm làm việc
                                 </label>
-                                <select name="experience" disabled
-                                        class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed">
+                                <select name="experience" disabled class="profile-form__input">
                                     <option value="">Chọn kinh nghiệm</option>
                                     <option value="0" {{#if (eq user.experience '0')}}selected{{/if}}>Chưa có kinh nghiệm</option>
                                     <option value="1" {{#if (eq user.experience '1')}}selected{{/if}}>Dưới 1 năm</option>
@@ -241,1013 +873,580 @@
                                     <option value="10" {{#if (eq user.experience '10')}}selected{{/if}}>Trên 5 năm</option>
                                 </select>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fas fa-tools mr-1"></i>Ngành nghề
-                                    <span class="text-red-500 ml-1">*</span>
+                            <div class="profile-form__group">
+                                <label class="profile-form__label">
+                                    <i class="fas fa-tools"></i> Ngành nghề <span class="required">*</span>
                                 </label>
-                                <input type="text" name="major" value="{{user.major}}" disabled
-                                       required
-                                       class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
-                                       placeholder="Ví dụ: Công nghệ thông tin, Marketing, Kế toán">
-                                <span class="text-xs text-gray-500 mt-1 hidden">Vui lòng nhập ngành nghề của bạn</span>
+                                <input type="text" name="major" value="{{user.major}}" disabled required
+                                       class="profile-form__input"
+                                       placeholder="Ví dụ: Công nghệ thông tin, Marketing">
+                                <div class="profile-form__hint">Vui lòng nhập ngành nghề của bạn</div>
                             </div>
                         </div>
-                        
-                        <!-- Action Buttons -->
-                        <div class="col-span-2 flex justify-between items-center pt-4 border-t">
-                            <div id="formStatus" class="text-sm hidden">
-                                <div class="flex items-center">
-                                    <div id="statusIcon"></div>
-                                    <span id="statusMessage" class="ml-2"></span>
-                                </div>
-                            </div>
-                            <div class="flex space-x-4 ml-auto">
-                                <button type="button" onclick="cancelEdit()" 
-                                        class="cancel-btn px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition flex items-center hidden"
-                                        aria-label="Hủy bỏ thay đổi">
-                                    <i class="fas fa-times mr-2" aria-hidden="true"></i>Hủy
-                                </button>
-                                <button type="submit" 
-                                        class="save-btn bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition flex items-center hidden"
-                                        aria-label="Lưu thay đổi hồ sơ">
-                                    <i id="saveButtonIcon" class="fas fa-save mr-2" aria-hidden="true"></i>
-                                    <span id="saveButtonText">Lưu thay đổi</span>
-                                </button>
-                            </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="profile-actions">
+                        <div id="formStatus" class="profile-form-status" style="display:none;">
+                            <span id="statusIcon"></span>
+                            <span id="statusMessage"></span>
                         </div>
-                    </form>
-                </div>
+                        <div class="d-flex gap-2 ms-auto">
+                            <button type="button" onclick="cancelEdit()" class="btn-profile-secondary cancel-btn" style="display:none;">
+                                <i class="fas fa-times"></i> Hủy
+                            </button>
+                            <button type="submit" class="btn-profile-success save-btn" style="display:none;">
+                                <i id="saveButtonIcon" class="fas fa-check"></i>
+                                <span id="saveButtonText">Lưu thay đổi</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
             </div>
 
-            <!-- CV Tab -->
-            <div id="cvTab" class="tab-content hidden">
-                <div class="bg-white rounded-xl shadow-sm p-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                        <i class="fas fa-file-alt mr-2 text-blue-600"></i>CV & Hồ sơ xin việc
-                    </h3>
-                    
-                    {{#if user.cvData.hasCV}}
-                        <div class="border rounded-lg p-4 mb-4 bg-green-50 border-green-200">
-                            <div class="flex items-center justify-between">
-                                <div>
-                                    <h4 class="font-medium text-green-800">{{user.cvData.filename}}</h4>
-                                    <p class="text-sm text-green-600 mt-1">
-                                        <i class="fas fa-clock mr-1"></i>
-                                        Đã tải lên: {{#if user.cvData.uploadedAt}}{{user.cvData.uploadedAt}}{{else}}Gần đây{{/if}}
-                                    </p>
-                                    {{#if user.cvData.message}}
-                                        <p class="text-sm text-gray-600 mt-2">{{user.cvData.message}}</p>
-                                    {{/if}}
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="viewCV()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                                        <i class="fas fa-eye mr-2"></i>Xem CV
-                                    </button>
-                                    <button onclick="deleteCV()" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition">
-                                        <i class="fas fa-trash mr-2"></i>Xóa
-                                    </button>
+            <!-- ======== CV Tab ======== -->
+            <div id="cvTab" class="profile-tabs__content tab-panel" style="display:none;" role="tabpanel">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--profile-dark); margin-bottom: 1.25rem;">
+                    <i class="fas fa-file-alt" style="color: var(--profile-primary); margin-right: 0.5rem;"></i>CV & Hồ sơ xin việc
+                </h3>
+
+                {{#if user.cvData.hasCV}}
+                    <div class="cv-file-card">
+                        <div class="cv-file-card__info">
+                            <div class="cv-file-card__icon">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div>
+                                <div class="cv-file-card__name">{{user.cvData.filename}}</div>
+                                <div class="cv-file-card__date">
+                                    <i class="fas fa-clock" style="margin-right: 0.25rem;"></i>
+                                    Đã tải lên: {{#if user.cvData.uploadedAt}}{{user.cvData.uploadedAt}}{{else}}Gần đây{{/if}}
                                 </div>
                             </div>
                         </div>
-                    {{/if}}
-                    
-                    <!-- CV Upload -->
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 mb-4"></i>
-                        <h4 class="text-lg font-medium text-gray-900 mb-2">Tải lên CV mới</h4>
-                        <p class="text-gray-600 mb-4">Hỗ trợ các định dạng: PDF, DOC, DOCX (Tối đa 5MB)</p>
-                        <input type="file" id="cvInput" accept=".pdf,.doc,.docx" class="hidden" onchange="uploadCV(event)">
-                        <button onclick="document.getElementById('cvInput').click()" 
-                                class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                            <i class="fas fa-upload mr-2"></i>Chọn file CV
-                        </button>
+                        <div class="cv-file-card__actions">
+                            <button onclick="viewCV()" class="btn-profile-primary" style="font-size:0.82rem; padding:0.45rem 1rem;">
+                                <i class="fas fa-eye"></i> Xem CV
+                            </button>
+                            <button onclick="deleteCV()" class="btn-profile-danger" style="font-size:0.82rem; padding:0.45rem 1rem;">
+                                <i class="fas fa-trash"></i> Xóa
+                            </button>
+                        </div>
                     </div>
-                    
-                    <!-- Upload Progress -->
-                    <div id="cvUploadProgress" class="hidden mt-4">
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-medium text-blue-900">Đang tải lên...</span>
-                                <span id="progressPercent" class="text-sm text-blue-700">0%</span>
-                            </div>
-                            <div class="w-full bg-blue-200 rounded-full h-2">
-                                <div id="progressBar" class="progress-bar bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
-                            </div>
-                        </div>
+                {{/if}}
+
+                <!-- CV Upload -->
+                <div class="cv-upload-area" onclick="document.getElementById('cvInput').click()">
+                    <div class="cv-upload-area__icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <div class="cv-upload-area__title">Tải lên CV mới</div>
+                    <div class="cv-upload-area__desc">Hỗ trợ các định dạng: PDF, DOC, DOCX (Tối đa 5MB)</div>
+                    <input type="file" id="cvInput" accept=".pdf,.doc,.docx" class="d-none" onchange="uploadCV(event)">
+                    <button type="button" class="btn-profile-primary" onclick="event.stopPropagation(); document.getElementById('cvInput').click()">
+                        <i class="fas fa-upload"></i> Chọn file CV
+                    </button>
+                </div>
+
+                <!-- Upload Progress -->
+                <div id="cvUploadProgress" class="cv-upload-progress" style="display:none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span style="font-size:0.85rem; font-weight:500; color:var(--profile-primary);">Đang tải lên...</span>
+                        <span id="progressPercent" style="font-size:0.85rem; color:var(--profile-primary);">0%</span>
+                    </div>
+                    <div class="cv-upload-progress__bar">
+                        <div id="progressBar" class="cv-upload-progress__fill" style="width:0%"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Assessments Tab -->
-            <div id="assessmentsTab" class="tab-content hidden">
-                <div class="space-y-6">
-                    <div class="bg-white rounded-xl shadow-sm p-6">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-                            <i class="fas fa-brain mr-2 text-purple-600"></i>Kết quả bài kiểm tra tính cách
-                        </h3>
-                        
-                        {{#if user.hasAssessments}}
-                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                                <!-- MBTI Assessment -->
-                                {{#if user.assessmentResults.mbti}}
-                                    <div class="assessment-card bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <h4 class="font-semibold text-blue-900">MBTI</h4>
-                                            <i class="fas fa-clipboard-list text-blue-600"></i>
-                                        </div>
-                                        <div class="text-center mb-3">
-                                            <span class="text-2xl font-bold text-blue-800">{{user.assessmentResults.mbti.type}}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-3">{{user.assessmentResults.mbti.description}}</p>
-                                        <div class="text-xs text-gray-500">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            {{#if user.assessmentResults.mbti.lastUpdated}}
-                                                {{user.assessmentResults.mbti.lastUpdated}}
-                                            {{else}}
-                                                Gần đây
-                                            {{/if}}
-                                        </div>
+            <!-- ======== Assessments Tab ======== -->
+            <div id="assessmentsTab" class="profile-tabs__content tab-panel" style="display:none;" role="tabpanel">
+                <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--profile-dark); margin-bottom: 1.25rem;">
+                    <i class="fas fa-brain" style="color: #7C3AED; margin-right: 0.5rem;"></i>Kết quả trắc nghiệm tính cách
+                </h3>
+
+                {{#if user.hasAssessments}}
+                    <div class="assessment-grid mb-4">
+                        <!-- MBTI -->
+                        {{#if user.assessmentResults.mbti}}
+                            <div class="assessment-card assessment-card--mbti">
+                                <div class="assessment-card__header">
+                                    <span class="assessment-card__title" style="color:#1E40AF;">MBTI</span>
+                                    <div class="assessment-card__icon" style="background:#DBEAFE; color:#2563EB;">
+                                        <i class="fas fa-clipboard-list"></i>
                                     </div>
+                                </div>
+                                <div class="assessment-card__type" style="color:#1E3A8A;">{{user.assessmentResults.mbti.type}}</div>
+                                <p class="assessment-card__desc">{{user.assessmentResults.mbti.description}}</p>
+                                <div class="assessment-card__date">
+                                    <i class="fas fa-clock"></i>
+                                    {{#if user.assessmentResults.mbti.lastUpdated}}{{user.assessmentResults.mbti.lastUpdated}}{{else}}Gần đây{{/if}}
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="assessment-card assessment-card--empty">
+                                <div class="text-center" style="padding:1rem 0; color:var(--profile-muted);">
+                                    <i class="fas fa-clipboard-list" style="font-size:1.5rem; margin-bottom:0.5rem; display:block;"></i>
+                                    <p style="font-size:0.85rem; margin:0;">Chưa có kết quả MBTI</p>
+                                </div>
+                            </div>
+                        {{/if}}
+
+                        <!-- Big Five -->
+                        {{#if user.assessmentResults.bigFive}}
+                            <div class="assessment-card assessment-card--bigfive">
+                                <div class="assessment-card__header">
+                                    <span class="assessment-card__title" style="color:#166534;">Big Five</span>
+                                    <div class="assessment-card__icon" style="background:#DCFCE7; color:#16A34A;">
+                                        <i class="fas fa-chart-bar"></i>
+                                    </div>
+                                </div>
+                                {{#if user.assessmentResults.bigFive.dominantTrait}}
+                                    <div class="assessment-card__type" style="color:#14532D; font-size:1.25rem;">{{user.assessmentResults.bigFive.dominantTrait}}</div>
                                 {{/if}}
-                                
-                                <!-- Big Five Assessment -->
-                                {{#if user.assessmentResults.bigFive}}
-                                    <div class="assessment-card bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <h4 class="font-semibold text-green-900">Big Five</h4>
-                                            <i class="fas fa-chart-radar text-green-600"></i>
+                                <div style="margin-bottom:0.75rem;">
+                                    {{#each user.assessmentResults.bigFive.scores}}
+                                        <div class="assessment-card__score">
+                                            <span class="assessment-card__score-label">{{@key}}</span>
+                                            <span class="assessment-card__score-value" style="color:#166534;">{{this}}%</span>
                                         </div>
-                                        {{#if user.assessmentResults.bigFive.dominantTrait}}
-                                            <div class="text-center mb-3">
-                                                <span class="text-lg font-bold text-green-800">{{user.assessmentResults.bigFive.dominantTrait}}</span>
-                                            </div>
-                                        {{/if}}
-                                        <div class="space-y-2 mb-3">
-                                            {{#each user.assessmentResults.bigFive.scores}}
-                                                <div class="flex justify-between text-sm">
-                                                    <span class="text-gray-600">{{@key}}</span>
-                                                    <span class="font-medium text-green-800">{{this}}%</span>
-                                                </div>
-                                            {{/each}}
-                                        </div>
-                                        <div class="text-xs text-gray-500">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            {{#if user.assessmentResults.bigFive.lastUpdated}}
-                                                {{user.assessmentResults.bigFive.lastUpdated}}
-                                            {{else}}
-                                                Gần đây
-                                            {{/if}}
-                                        </div>
+                                    {{/each}}
+                                </div>
+                                <div class="assessment-card__date">
+                                    <i class="fas fa-clock"></i>
+                                    {{#if user.assessmentResults.bigFive.lastUpdated}}{{user.assessmentResults.bigFive.lastUpdated}}{{else}}Gần đây{{/if}}
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="assessment-card assessment-card--empty">
+                                <div class="text-center" style="padding:1rem 0; color:var(--profile-muted);">
+                                    <i class="fas fa-chart-bar" style="font-size:1.5rem; margin-bottom:0.5rem; display:block;"></i>
+                                    <p style="font-size:0.85rem; margin:0;">Chưa có kết quả Big Five</p>
+                                </div>
+                            </div>
+                        {{/if}}
+
+                        <!-- DISC -->
+                        {{#if user.assessmentResults.disc}}
+                            <div class="assessment-card assessment-card--disc">
+                                <div class="assessment-card__header">
+                                    <span class="assessment-card__title" style="color:#6B21A8;">DISC</span>
+                                    <div class="assessment-card__icon" style="background:#F3E8FF; color:#7C3AED;">
+                                        <i class="fas fa-users"></i>
                                     </div>
-                                {{else}}
-                                    <div class="assessment-card bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-4">
-                                        <div class="text-center text-gray-500">
-                                            <i class="fas fa-chart-radar text-2xl mb-2"></i>
-                                            <p>Big Five: No data found</p>
-                                        </div>
-                                    </div>
-                                {{/if}}
-                                
-                                <!-- DISC Assessment -->
-                                {{#if user.assessmentResults.disc}}
-                                    <div class="assessment-card bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-4">
-                                        <div class="flex items-center justify-between mb-3">
-                                            <h4 class="font-semibold text-purple-900">DISC</h4>
-                                            <i class="fas fa-users text-purple-600"></i>
-                                        </div>
-                                        <div class="text-center mb-3">
-                                            <span class="text-lg font-bold text-purple-800">{{user.assessmentResults.disc.type}}</span>
-                                        </div>
-                                        <p class="text-sm text-gray-700 mb-3">{{user.assessmentResults.disc.description}}</p>
-                                        <div class="text-xs text-gray-500">
-                                            <i class="fas fa-clock mr-1"></i>
-                                            {{#if user.assessmentResults.disc.lastUpdated}}
-                                                {{user.assessmentResults.disc.lastUpdated}}
-                                            {{else}}
-                                                Gần đây
-                                            {{/if}}
-                                        </div>
-                                    </div>
-                                {{else}}
-                                    <div class="assessment-card bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 rounded-lg p-4">
-                                        <div class="text-center text-gray-500">
-                                            <i class="fas fa-users text-2xl mb-2"></i>
-                                            <p>DISC: No data found</p>
-                                        </div>
-                                    </div>
-                                {{/if}}
-                                <p class="text-gray-600 mb-6">Hãy làm các bài kiểm tra tính cách để hiểu rõ hơn về bản thân</p>
+                                </div>
+                                <div class="assessment-card__type" style="color:#581C87;">{{user.assessmentResults.disc.type}}</div>
+                                <p class="assessment-card__desc">{{user.assessmentResults.disc.description}}</p>
+                                <div class="assessment-card__date">
+                                    <i class="fas fa-clock"></i>
+                                    {{#if user.assessmentResults.disc.lastUpdated}}{{user.assessmentResults.disc.lastUpdated}}{{else}}Gần đây{{/if}}
+                                </div>
+                            </div>
+                        {{else}}
+                            <div class="assessment-card assessment-card--empty">
+                                <div class="text-center" style="padding:1rem 0; color:var(--profile-muted);">
+                                    <i class="fas fa-users" style="font-size:1.5rem; margin-bottom:0.5rem; display:block;"></i>
+                                    <p style="font-size:0.85rem; margin:0;">Chưa có kết quả DISC</p>
+                                </div>
                             </div>
                         {{/if}}
                     </div>
-                    
-                    <!-- Assessment Actions -->
-                    <div class="bg-white rounded-xl shadow-sm p-6">
-                        <h4 class="font-semibold text-gray-900 mb-4">Làm bài kiểm tra mới</h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <a href="/personality-assessments/mbti" 
-                               class="block p-4 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition text-center">
-                                <i class="fas fa-clipboard-list text-2xl text-blue-600 mb-2"></i>
-                                <h5 class="font-medium text-gray-900">MBTI</h5>
-                                <p class="text-sm text-gray-600 mt-1">16 loại tính cách</p>
-                            </a>
-                            <a href="/personality-assessments/big-five" 
-                               class="block p-4 border border-gray-200 rounded-lg hover:border-green-400 hover:bg-green-50 transition text-center">
-                                <i class="fas fa-chart-radar text-2xl text-green-600 mb-2"></i>
-                                <h5 class="font-medium text-gray-900">Big Five</h5>
-                                <p class="text-sm text-gray-600 mt-1">5 yếu tố tính cách</p>
-                            </a>
-                            <a href="/personality-assessments/disc" 
-                               class="block p-4 border border-gray-200 rounded-lg hover:border-purple-400 hover:bg-purple-50 transition text-center">
-                                <i class="fas fa-users text-2xl text-purple-600 mb-2"></i>
-                                <h5 class="font-medium text-gray-900">DISC</h5>
-                                <p class="text-sm text-gray-600 mt-1">4 phong cách hành vi</p>
-                            </a>
-                        </div>
+
+                    {{#unless user.hasAssessments}}
+                        <p style="color:var(--profile-muted); font-size:0.9rem; margin-bottom:1.5rem;">
+                            Hãy làm các bài trắc nghiệm tính cách để hiểu rõ hơn về bản thân
+                        </p>
+                    {{/unless}}
+                {{else}}
+                    <div style="text-align:center; padding:2rem 1rem; color:var(--profile-muted);">
+                        <i class="fas fa-brain" style="font-size:2.5rem; margin-bottom:0.75rem; display:block; opacity:0.3;"></i>
+                        <p style="font-size:0.95rem; margin-bottom:0.5rem; font-weight:500;">Bạn chưa làm bài trắc nghiệm nào</p>
+                        <p style="font-size:0.85rem;">Hãy làm các bài trắc nghiệm bên dưới để khám phá tính cách của bạn</p>
                     </div>
+                {{/if}}
+
+                <!-- Assessment Actions -->
+                <h4 style="font-size:0.95rem; font-weight:700; color:var(--profile-dark); margin: 1.5rem 0 1rem;">
+                    Làm bài trắc nghiệm
+                </h4>
+                <div class="assessment-grid">
+                    <a href="/personality-assessments/mbti" class="assessment-action">
+                        <div class="assessment-action__icon" style="background:#DBEAFE; color:#2563EB;">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div>
+                            <div class="assessment-action__title">MBTI</div>
+                            <div class="assessment-action__desc">16 loại tính cách</div>
+                        </div>
+                    </a>
+                    <a href="/personality-assessments/big-five" class="assessment-action">
+                        <div class="assessment-action__icon" style="background:#DCFCE7; color:#16A34A;">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div>
+                            <div class="assessment-action__title">Big Five</div>
+                            <div class="assessment-action__desc">5 yếu tố tính cách</div>
+                        </div>
+                    </a>
+                    <a href="/personality-assessments/disc" class="assessment-action">
+                        <div class="assessment-action__icon" style="background:#F3E8FF; color:#7C3AED;">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="assessment-action__title">DISC</div>
+                            <div class="assessment-action__desc">4 phong cách hành vi</div>
+                        </div>
+                    </a>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 transform translate-x-full transition-transform duration-300 z-50">
-        <div class="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-3 min-w-[300px]">
-            <div id="toastIcon"></div>
-            <div>
-                <p id="toastMessage" class="text-gray-900 font-medium"></p>
-                <p id="toastDescription" class="text-sm text-gray-600"></p>
-            </div>
+<!-- Toast Notification -->
+<div id="toast" class="profile-toast">
+    <div id="toastInner" class="profile-toast__inner info">
+        <div id="toastIcon" class="profile-toast__icon"></div>
+        <div>
+            <div id="toastMessage" class="profile-toast__title"></div>
+            <div id="toastDescription" class="profile-toast__desc"></div>
         </div>
     </div>
+</div>
 
-    <script>
-        let isEditMode = false;
+<script>
+    let isEditMode = false;
+    let originalFormData = {};
 
-        // Store original form values
-        let originalFormData = {};
-        
-        // Initialize original form data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('profileForm');
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('profileForm');
+        if (form) {
             const formData = new FormData(form);
             originalFormData = Object.fromEntries(formData.entries());
-            
-            // Set max date for birthday field (18 years ago)
+
+            // Set max date for birthday (18 years ago)
             const birthdayInput = form.querySelector('input[name="birthday"]');
             if (birthdayInput) {
                 const today = new Date();
                 const maxDate = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
                 birthdayInput.max = maxDate.toISOString().split('T')[0];
             }
-        });
-
-        // Tab switching
-        function switchTab(tabName) {
-            // Hide all tabs
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-            });
-            
-            // Remove active class from all buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active');
-                button.classList.add('text-gray-600');
-            });
-            
-            // Show selected tab
-            document.getElementById(tabName + 'Tab').classList.remove('hidden');
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            event.target.classList.remove('text-gray-600');
         }
 
-        // Edit mode toggle
-        function toggleEditMode() {
-            isEditMode = !isEditMode;
-            const form = document.getElementById('profileForm');
-            const inputs = form.querySelectorAll('input:not([type="email"]):not([name="username"]), select');
-            const editButton = document.getElementById('editButtonText');
-            const saveButton = form.querySelector('.save-btn');
-            const cancelButton = form.querySelector('.cancel-btn');
-            const formStatus = document.getElementById('formStatus');
-            
-            if (isEditMode) {
-                inputs.forEach(input => {
-                    input.disabled = false;
-                    input.classList.remove('disabled:bg-gray-100', 'disabled:cursor-not-allowed');
-                });
-                editButton.textContent = 'Đang chỉnh sửa';
-                saveButton.classList.remove('hidden');
-                cancelButton.classList.remove('hidden');
-                hideFormStatus();
-            } else {
-                inputs.forEach(input => {
-                    input.disabled = true;
-                    input.classList.add('disabled:bg-gray-100', 'disabled:cursor-not-allowed');
-                });
-                editButton.textContent = 'Chỉnh sửa hồ sơ';
-                saveButton.classList.add('hidden');
-                cancelButton.classList.add('hidden');
-                hideFormStatus();
-            }
+        // Restore active tab from session
+        const savedTab = sessionStorage.getItem('profileActiveTab');
+        if (savedTab) {
+            const btn = document.querySelector(`.profile-tabs__btn[data-tab="${savedTab}"]`);
+            if (btn) switchTab(savedTab, btn);
         }
+    });
 
-        function cancelEdit() {
-            isEditMode = false;
-            toggleEditMode();
-            // Reset form to original values
-            const form = document.getElementById('profileForm');
-            Object.keys(originalFormData).forEach(key => {
-                const input = form.querySelector(`[name="${key}"]`);
-                if (input) {
-                    input.value = originalFormData[key];
-                }
-            });
+    // Tab switching
+    function switchTab(tabName, btn) {
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.profile-tabs__btn').forEach(b => b.classList.remove('active'));
+
+        const panel = document.getElementById(tabName + 'Tab');
+        if (panel) panel.style.display = 'block';
+        if (btn) btn.classList.add('active');
+
+        sessionStorage.setItem('profileActiveTab', tabName);
+    }
+
+    // Edit mode
+    function toggleEditMode() {
+        isEditMode = !isEditMode;
+        const form = document.getElementById('profileForm');
+        const inputs = form.querySelectorAll('input:not([type="email"]):not([name="username"]), select');
+        const editText = document.getElementById('editButtonText');
+        const saveBtn = form.querySelector('.save-btn');
+        const cancelBtn = form.querySelector('.cancel-btn');
+
+        if (isEditMode) {
+            inputs.forEach(input => input.disabled = false);
+            editText.textContent = 'Đang chỉnh sửa';
+            saveBtn.style.display = 'inline-flex';
+            cancelBtn.style.display = 'inline-flex';
+            hideFormStatus();
+        } else {
+            inputs.forEach(input => input.disabled = true);
+            editText.textContent = 'Chỉnh sửa';
+            saveBtn.style.display = 'none';
+            cancelBtn.style.display = 'none';
             hideFormStatus();
         }
-        
-        // Form status functions
-        function showFormStatus(type, message) {
-            const formStatus = document.getElementById('formStatus');
-            const statusIcon = document.getElementById('statusIcon');
-            const statusMessage = document.getElementById('statusMessage');
-            
-            formStatus.classList.remove('hidden', 'text-green-600', 'text-red-600', 'text-blue-600');
-            
-            const icons = {
-                success: '<i class="fas fa-check-circle text-green-500"></i>',
-                error: '<i class="fas fa-exclamation-circle text-red-500"></i>',
-                info: '<i class="fas fa-info-circle text-blue-500"></i>',
-                loading: '<i class="fas fa-spinner fa-spin text-blue-500"></i>'
-            };
-            
-            statusIcon.innerHTML = icons[type] || icons.info;
-            statusMessage.textContent = message;
-            formStatus.classList.add(`text-${type === 'error' ? 'red' : type === 'success' ? 'green' : 'blue'}-600`);
+    }
+
+    function cancelEdit() {
+        isEditMode = true; // will be toggled to false
+        toggleEditMode();
+        const form = document.getElementById('profileForm');
+        Object.keys(originalFormData).forEach(key => {
+            const input = form.querySelector(`[name="${key}"]`);
+            if (input) input.value = originalFormData[key];
+        });
+    }
+
+    // Form status
+    function showFormStatus(type, message) {
+        const el = document.getElementById('formStatus');
+        const icon = document.getElementById('statusIcon');
+        const msg = document.getElementById('statusMessage');
+
+        el.style.display = 'flex';
+        el.className = 'profile-form-status ' + type;
+
+        const icons = {
+            success: '<i class="fas fa-check-circle"></i>',
+            error: '<i class="fas fa-exclamation-circle"></i>',
+            loading: '<i class="fas fa-spinner fa-spin"></i>'
+        };
+        icon.innerHTML = icons[type] || icons.loading;
+        msg.textContent = message;
+    }
+
+    function hideFormStatus() {
+        document.getElementById('formStatus').style.display = 'none';
+    }
+
+    function setSaveButtonLoading(loading) {
+        const btn = document.querySelector('.save-btn');
+        const icon = document.getElementById('saveButtonIcon');
+        const text = document.getElementById('saveButtonText');
+        if (loading) {
+            btn.disabled = true;
+            icon.className = 'fas fa-spinner fa-spin';
+            text.textContent = 'Đang lưu...';
+        } else {
+            btn.disabled = false;
+            icon.className = 'fas fa-check';
+            text.textContent = 'Lưu thay đổi';
         }
-        
-        function hideFormStatus() {
-            const formStatus = document.getElementById('formStatus');
-            formStatus.classList.add('hidden');
+    }
+
+    // Validation
+    function validateForm(data) {
+        const errors = [];
+        if (data.phone) {
+            if (!/^[0-9]{10,11}$/.test(data.phone.replace(/[^0-9]/g, ''))) {
+                errors.push('Số điện thoại phải có 10-11 chữ số');
+            }
         }
-        
-        function setSaveButtonLoading(loading) {
-            const saveButton = document.querySelector('.save-btn');
-            const saveButtonIcon = document.getElementById('saveButtonIcon');
-            const saveButtonText = document.getElementById('saveButtonText');
-            
-            if (loading) {
-                saveButton.disabled = true;
-                saveButton.classList.add('opacity-75', 'cursor-not-allowed');
-                saveButtonIcon.className = 'fas fa-spinner fa-spin mr-2';
-                saveButtonText.textContent = 'Đang lưu...';
+        if (data.birthday) {
+            const age = Math.floor((new Date() - new Date(data.birthday)) / (365.25 * 24 * 60 * 60 * 1000));
+            if (age < 18) errors.push('Bạn phải đủ 18 tuổi trở lên');
+        }
+        if (!data.major || data.major.trim().length < 2) {
+            errors.push('Ngành nghề phải có ít nhất 2 ký tự');
+        }
+        return errors;
+    }
+
+    function showFieldErrors(errors) {
+        const form = document.getElementById('profileForm');
+        form.querySelectorAll('.is-error').forEach(el => el.classList.remove('is-error'));
+        form.querySelectorAll('.profile-form__hint.is-error').forEach(el => el.classList.remove('is-error'));
+
+        errors.forEach(error => {
+            let fieldName = '';
+            if (error.includes('Số điện thoại')) fieldName = 'phone';
+            else if (error.includes('tuổi')) fieldName = 'birthday';
+            else if (error.includes('Ngành nghề')) fieldName = 'major';
+
+            if (fieldName) {
+                const field = form.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    field.classList.add('is-error');
+                    const hint = field.parentElement.querySelector('.profile-form__hint');
+                    if (hint) {
+                        hint.textContent = error;
+                        hint.classList.add('is-error');
+                    }
+                }
+            }
+        });
+    }
+
+    // Profile form submit
+    document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = Object.fromEntries(formData.entries());
+
+        const validationErrors = validateForm(data);
+        if (validationErrors.length > 0) {
+            showFieldErrors(validationErrors);
+            showFormStatus('error', validationErrors[0]);
+            return;
+        }
+        showFieldErrors([]);
+
+        try {
+            setSaveButtonLoading(true);
+            showFormStatus('loading', 'Đang cập nhật hồ sơ...');
+
+            const response = await fetch('/users/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                showFormStatus('success', result.message || 'Hồ sơ đã được cập nhật');
+                showToast('success', 'Thành công', result.message || 'Hồ sơ đã được cập nhật');
+                originalFormData = Object.fromEntries(new FormData(this).entries());
+                toggleEditMode();
+                setTimeout(() => window.location.reload(), 1000);
             } else {
-                saveButton.disabled = false;
-                saveButton.classList.remove('opacity-75', 'cursor-not-allowed');
-                saveButtonIcon.className = 'fas fa-save mr-2';
-                saveButtonText.textContent = 'Lưu thay đổi';
+                showFormStatus('error', result.message || 'Không thể cập nhật hồ sơ');
+                showToast('error', 'Lỗi', result.message || 'Không thể cập nhật hồ sơ');
             }
+        } catch (error) {
+            showFormStatus('error', 'Vui lòng kiểm tra kết nối và thử lại');
+            showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
+        } finally {
+            setSaveButtonLoading(false);
+        }
+    });
+
+    // Avatar upload
+    async function uploadAvatar(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('error', 'Lỗi', 'Vui lòng chọn file ảnh');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('error', 'Lỗi', 'File ảnh không được vượt quá 5MB');
+            return;
         }
 
-        // Client-side validation
-        function validateForm(data) {
-            const errors = [];
-            
-            // Phone validation
-            if (data.phone) {
-                const phoneRegex = /^[0-9]{10,11}$/;
-                if (!phoneRegex.test(data.phone.replace(/[^0-9]/g, ''))) {
-                    errors.push('Số điện thoại phải có 10-11 chữ số');
-                }
+        const formData = new FormData();
+        formData.append('avatar', file);
+
+        try {
+            showToast('info', 'Đang tải lên', 'Avatar đang được cập nhật...');
+            const response = await fetch('/users/upload-avatar', {
+                method: 'POST',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                body: formData
+            });
+            const result = await response.json();
+
+            if (response.ok && result.success) {
+                document.getElementById('avatarDisplay').src = result.avatar + '?t=' + Date.now();
+                showToast('success', 'Thành công', 'Avatar đã được cập nhật');
+            } else {
+                showToast('error', 'Lỗi', result.message || 'Không thể cập nhật avatar');
             }
-            
-            // Birthday validation
-            if (data.birthday) {
-                const birthday = new Date(data.birthday);
-                const today = new Date();
-                const age = Math.floor((today - birthday) / (365.25 * 24 * 60 * 60 * 1000));
-                if (age < 18) {
-                    errors.push('Bạn phải đủ 18 tuổi trở lên');
-                }
-            }
-            
-            // Major validation
-            if (!data.major || data.major.trim().length < 2) {
-                errors.push('Ngành nghề phải có ít nhất 2 ký tự');
-            }
-            
-            return errors;
+        } catch (error) {
+            showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
         }
-        
-        // Show field errors
-        function showFieldErrors(errors) {
-            const form = document.getElementById('profileForm');
-            
-            // Clear previous errors
-            form.querySelectorAll('.border-red-500').forEach(el => {
-                el.classList.remove('border-red-500');
-                el.classList.add('border-gray-300');
-            });
-            form.querySelectorAll('.text-red-500').forEach(el => {
-                if (!el.classList.contains('ml-1')) { // Keep required indicators
-                    el.classList.add('hidden');
-                }
-            });
-            
-            // Show new errors
-            errors.forEach(error => {
-                let fieldName = '';
-                if (error.includes('Số điện thoại')) fieldName = 'phone';
-                else if (error.includes('tuổi')) fieldName = 'birthday';
-                else if (error.includes('Ngành nghề')) fieldName = 'major';
-                
-                if (fieldName) {
-                    const field = form.querySelector(`[name="${fieldName}"]`);
-                    if (field) {
-                        field.classList.remove('border-gray-300');
-                        field.classList.add('border-red-500');
-                        const helpText = field.parentElement.querySelector('.text-xs.text-gray-500');
-                        if (helpText) {
-                            helpText.textContent = error;
-                            helpText.classList.remove('text-gray-500', 'hidden');
-                            helpText.classList.add('text-red-500');
-                        }
-                    }
-                }
-            });
+        event.target.value = '';
+    }
+
+    // CV upload
+    async function uploadCV(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+        if (!allowedTypes.includes(file.type)) {
+            showToast('error', 'Lỗi', 'Vui lòng chọn file PDF, DOC hoặc DOCX');
+            return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('error', 'Lỗi', 'File CV không được vượt quá 5MB');
+            return;
         }
 
-        // Profile form submission
-        document.getElementById('profileForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-            
-            console.log('=== Frontend Debug ===');
-            console.log('Form data:', data);
-            
-            // Client-side validation
-            const validationErrors = validateForm(data);
-            if (validationErrors.length > 0) {
-                console.log('Validation errors:', validationErrors);
-                showFieldErrors(validationErrors);
-                showFormStatus('error', validationErrors[0]);
-                return;
-            }
-            
-            // Clear any previous errors
-            showFieldErrors([]);
-            
-            try {
-                setSaveButtonLoading(true);
-                showFormStatus('loading', 'Đang cập nhật hồ sơ...');
-                
-                const response = await fetch('/users/profile', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                console.log('Response status:', response.status);
-                console.log('Response headers:', response.headers);
-                
-                const result = await response.json();
-                console.log('Response data:', result);
-                
-                if (response.ok && result.success) {
-                    showFormStatus('success', result.message || 'Hồ sơ của bạn đã được cập nhật');
-                    showToast('success', 'Cập nhật thành công', result.message || 'Hồ sơ của bạn đã được cập nhật');
-                    
-                    // Update original form data
-                    const form = document.getElementById('profileForm');
-                    const newFormData = new FormData(form);
-                    originalFormData = Object.fromEntries(newFormData.entries());
-                    
-                    toggleEditMode();
-                    // Reload page after 1 second to show updated data
+        const formData = new FormData();
+        formData.append('username', '{{user.username}}');
+        formData.append('file', file);
+
+        const progressDiv = document.getElementById('cvUploadProgress');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        progressDiv.style.display = 'block';
+
+        try {
+            const xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const pct = Math.round((e.loaded / e.total) * 100);
+                    progressBar.style.width = pct + '%';
+                    progressPercent.textContent = pct + '%';
+                }
+            });
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 200) {
+                    showToast('success', 'Thành công', 'CV đã được tải lên và xử lý');
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    console.log('Error response:', result);
-                    showFormStatus('error', result.message || 'Không thể cập nhật hồ sơ');
-                    showToast('error', 'Lỗi', result.message || 'Không thể cập nhật hồ sơ');
+                    showToast('error', 'Lỗi', 'Không thể tải lên CV');
                 }
-            } catch (error) {
-                console.error('Profile update error:', error);
-                showFormStatus('error', 'Vui lòng kiểm tra kết nối và thử lại');
-                showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
-            } finally {
-                setSaveButtonLoading(false);
-            }
-        });
-
-        // Avatar upload
-        async function uploadAvatar(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file
-            if (!file.type.startsWith('image/')) {
-                showToast('error', 'Lỗi', 'Vui lòng chọn file ảnh');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('error', 'Lỗi', 'File ảnh không được vượt quá 5MB');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('avatar', file);
-            
-            try {
-                showToast('info', 'Đang tải lên', 'Avatar đang được cập nhật...');
-                
-                const response = await fetch('/users/upload-avatar', {
-                    method: 'POST',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok && result.success) {
-                    document.getElementById('avatarDisplay').src = result.avatar + '?t=' + Date.now();
-                    showToast('success', 'Thành công', 'Avatar đã được cập nhật');
-                } else {
-                    showToast('error', 'Lỗi', result.message || 'Không thể cập nhật avatar');
-                }
-            } catch (error) {
-                console.error('Avatar upload error:', error);
-                showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
-            }
-            
-            // Reset input
-            event.target.value = '';
-        }
-
-        // CV upload
-        async function uploadCV(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            // Validate file
-            const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-            if (!allowedTypes.includes(file.type)) {
-                showToast('error', 'Lỗi', 'Vui lòng chọn file PDF, DOC hoặc DOCX');
-                return;
-            }
-            
-            if (file.size > 5 * 1024 * 1024) {
-                showToast('error', 'Lỗi', 'File CV không được vượt quá 5MB');
-                return;
-            }
-            
-            const formData = new FormData();
-            formData.append('username', '{{user.username}}');
-            formData.append('file', file);
-            
-            // Show progress
-            const progressDiv = document.getElementById('cvUploadProgress');
-            const progressBar = document.getElementById('progressBar');
-            const progressPercent = document.getElementById('progressPercent');
-            
-            progressDiv.classList.remove('hidden');
-            
-            try {
-                const xhr = new XMLHttpRequest();
-                
-                // Progress tracking
-                xhr.upload.addEventListener('progress', function(e) {
-                    if (e.lengthComputable) {
-                        const percentComplete = Math.round((e.loaded / e.total) * 100);
-                        progressBar.style.width = percentComplete + '%';
-                        progressPercent.textContent = percentComplete + '%';
-                    }
-                });
-                
-                xhr.addEventListener('load', function() {
-                    if (xhr.status === 200) {
-                        const result = JSON.parse(xhr.responseText);
-                        showToast('success', 'Thành công', 'CV đã được tải lên và xử lý');
-                        // Reload page to show updated CV
-                        setTimeout(() => window.location.reload(), 1000);
-                    } else {
-                        showToast('error', 'Lỗi', 'Không thể tải lên CV');
-                    }
-                    progressDiv.classList.add('hidden');
-                });
-                
-                xhr.addEventListener('error', function() {
-                    showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
-                    progressDiv.classList.add('hidden');
-                });
-                
-                xhr.open('POST', '/ai-service/upload_resume');
-                xhr.send(formData);
-                
-            } catch (error) {
-                showToast('error', 'Lỗi', 'Không thể tải lên CV');
-                progressDiv.classList.add('hidden');
-            }
-            
-            // Reset input
-            event.target.value = '';
-        }
-
-        // CV actions
-        function viewCV() {
-            window.open('/users/cv', '_blank');
-        }
-
-        async function deleteCV() {
-            if (!confirm('Bạn có chắc chắn muốn xóa CV này?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/ai-service/resume/{{user.username}}`, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    showToast('success', 'Thành công', 'CV đã được xóa');
-                    setTimeout(() => window.location.reload(), 1000);
-                } else {
-                    showToast('error', 'Lỗi', result.message || 'Không thể xóa CV');
-                }
-            } catch (error) {
-                console.error('CV delete error:', error);
-                showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối và thử lại');
-            }
-        }
-
-        // Toast notification
-        function showToast(type, title, message) {
-            const toast = document.getElementById('toast');
-            const toastIcon = document.getElementById('toastIcon');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastDescription = document.getElementById('toastDescription');
-            
-            // Set icon based on type
-            const icons = {
-                success: '<i class="fas fa-check-circle text-green-500 text-xl"></i>',
-                error: '<i class="fas fa-exclamation-circle text-red-500 text-xl"></i>',
-                info: '<i class="fas fa-info-circle text-blue-500 text-xl"></i>'
-            };
-            
-            toastIcon.innerHTML = icons[type] || icons.info;
-            toastMessage.textContent = title;
-            toastDescription.textContent = message;
-            
-            // Show toast
-            toast.classList.remove('translate-x-full');
-            
-            // Hide after 3 seconds
-            setTimeout(() => {
-                toast.classList.add('translate-x-full');
-            }, 3000);
-        }
-
-        // Logout
-        function logout() {
-            if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-                window.location.href = '/logout';
-            }
-        }
-
-        // Add animations on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.animate-slide-in');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.1}s`;
+                progressDiv.style.display = 'none';
             });
-        });
-    </script>
-        <!-- CV Tab -->
-        <div id="cv-tab" class="hidden">
-            <div class="bg-white rounded-xl shadow-sm p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-xl font-bold text-gray-800">Hồ sơ CV của bạn</h2>
-                    <button id="upload-cv-btn" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                        <i class="fas fa-upload mr-2"></i>Tải lên CV mới
-                    </button>
-                </div>
-                
-                {{#if cvData}}
-                    <div class="border border-gray-200 rounded-lg p-4">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <i class="fas fa-file-pdf text-red-500 text-3xl mr-4"></i>
-                                <div>
-                                    <h3 class="font-medium text-gray-800">{{cvData.original_filename}}</h3>
-                                    <p class="text-sm text-gray-500">{{formatFileSize cvData.size}} • {{formatDate cvData.uploaded_at}}</p>
-                                </div>
-                            </div>
-                            <div class="flex space-x-2">
-                                <a href="/cv/download/{{cvData._id}}" class="px-3 py-1.5 bg-blue-50 text-blue-600 text-sm font-medium rounded hover:bg-blue-100 transition-colors">
-                                    <i class="fas fa-download mr-1"></i>Tải xuống
-                                </a>
-                                <button onclick="deleteCV('{{cvData._id}}')" class="px-3 py-1.5 bg-red-50 text-red-600 text-sm font-medium rounded hover:bg-red-100 transition-colors">
-                                    <i class="fas fa-trash mr-1"></i>Xóa
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="mt-6">
-                            <h4 class="text-sm font-medium text-gray-700 mb-2">Xem trước</h4>
-                            <div class="border border-gray-200 rounded-lg h-96 overflow-hidden">
-                                <iframe src="/cv/view/{{cvData._id}}" class="w-full h-full" frameborder="0">
-                                    Trình duyệt của bạn không hỗ trợ xem trước PDF. Vui lòng tải xuống để xem.
-                                </iframe>
-                            </div>
-                        </div>
-                    </div>
-                {{else}}
-                    <div class="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
-                        <i class="fas fa-file-upload text-4xl text-gray-300 mb-3"></i>
-                        <h3 class="text-lg font-medium text-gray-700 mb-2">Chưa có hồ sơ CV nào</h3>
-                        <p class="text-gray-500 mb-4">Tải lên CV của bạn để nhà tuyển dụng có thể xem xét hồ sơ</p>
-                        <button id="upload-cv-empty-btn" class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-upload mr-2"></i>Tải lên CV
-                        </button>
-                    </div>
-                {{/if}}
-                
-                <!-- CV Upload Modal -->
-                <div id="cv-upload-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-                    <div class="bg-white rounded-xl p-6 w-full max-w-md">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-semibold text-gray-800">Tải lên CV mới</h3>
-                            <button id="close-modal" class="text-gray-400 hover:text-gray-600">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
-                        <form id="cv-upload-form" action="/cv/upload" method="POST" enctype="multipart/form-data" class="space-y-4">
-                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                                <input type="file" id="cv-file" name="cv" accept=".pdf,.doc,.docx" class="hidden" required>
-                                <label for="cv-file" class="cursor-pointer">
-                                    <i class="fas fa-file-upload text-4xl text-blue-500 mb-2"></i>
-                                    <p class="text-sm text-gray-600">Kéo thả file vào đây hoặc nhấn để chọn file</p>
-                                    <p class="text-xs text-gray-500 mt-1">Hỗ trợ: PDF, DOC, DOCX (tối đa 5MB)</p>
-                                </label>
-                                <div id="file-name" class="mt-2 text-sm font-medium text-gray-700"></div>
-                            </div>
-                            
-                            <div class="flex justify-end space-x-3 pt-2">
-                                <button type="button" id="cancel-upload" class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
-                                    Hủy
-                                </button>
-                                <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors">
-                                    Tải lên
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Tab switching functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('[id$="-tab"]');
-
-            // Add CV tab button if it doesn't exist
-            const tabContainer = document.querySelector('.flex.space-x-1.border-b.border-gray-200.mb-6');
-            if (tabContainer && !document.querySelector('[data-tab="cv"]')) {
-                const cvTabButton = document.createElement('button');
-                cvTabButton.className = 'tab-button px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600 focus:outline-none';
-                cvTabButton.setAttribute('data-tab', 'cv');
-                cvTabButton.innerHTML = '<i class="fas fa-file-alt mr-1"></i>Hồ sơ CV';
-                tabContainer.appendChild(cvTabButton);
-                
-                // Add the new button to the tabButtons NodeList
-                tabButtons.forEach = Array.prototype.forEach;
-                tabButtons.push(cvTabButton);
-            }
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    // Remove active class from all buttons and hide all contents
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => content.classList.add('hidden'));
-
-                    // Add active class to clicked button and show corresponding content
-                    button.classList.add('active');
-                    const tabName = button.getAttribute('data-tab');
-                    const tabContent = document.getElementById(`${tabName}-tab`);
-                    if (tabContent) {
-                        tabContent.classList.remove('hidden');
-                    }
-                });
+            xhr.addEventListener('error', function() {
+                showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối');
+                progressDiv.style.display = 'none';
             });
-
-            // CV Upload Modal Logic
-            const uploadCvBtn = document.getElementById('upload-cv-btn');
-            const uploadCvEmptyBtn = document.getElementById('upload-cv-empty-btn');
-            const cvUploadModal = document.getElementById('cv-upload-modal');
-            const closeModal = document.getElementById('close-modal');
-            const cancelUpload = document.getElementById('cancel-upload');
-            const cvFileInput = document.getElementById('cv-file');
-            const fileName = document.getElementById('file-name');
-            const cvUploadForm = document.getElementById('cv-upload-form');
-
-            // Show modal when either upload button is clicked
-            [uploadCvBtn, uploadCvEmptyBtn].forEach(btn => {
-                if (btn) {
-                    btn.addEventListener('click', () => {
-                        cvUploadModal.classList.remove('hidden');
-                        document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
-                    });
-                }
-            });
-
-            // Close modal functions
-            function closeModalFunc() {
-                cvUploadModal.classList.add('hidden');
-                document.body.style.overflow = 'auto';
-                if (cvFileInput) cvFileInput.value = '';
-                if (fileName) fileName.textContent = '';
-            }
-
-            if (closeModal) closeModal.addEventListener('click', closeModalFunc);
-            if (cancelUpload) cancelUpload.addEventListener('click', closeModalFunc);
-
-            // Close modal when clicking outside the modal content
-            if (cvUploadModal) {
-                cvUploadModal.addEventListener('click', (e) => {
-                    if (e.target === cvUploadModal) {
-                        closeModalFunc();
-                    }
-                });
-            }
-
-            // Show selected file name
-            if (cvFileInput) {
-                cvFileInput.addEventListener('change', (e) => {
-                    const file = e.target.files[0];
-                    if (file && fileName) {
-                        fileName.textContent = file.name;
-                    }
-                });
-            }
-
-            // Handle form submission with fetch for better UX
-            if (cvUploadForm) {
-                cvUploadForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
-                    
-                    const formData = new FormData(cvUploadForm);
-                    const submitBtn = cvUploadForm.querySelector('button[type="submit"]');
-                    const originalBtnText = submitBtn.innerHTML;
-                    
-                    try {
-                        // Show loading state
-                        submitBtn.disabled = true;
-                        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Đang tải lên...';
-                        
-                        const response = await fetch('/cv/upload', {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        const result = await response.json();
-                        
-                        if (response.ok) {
-                            // Show success message and reload the page
-                            alert('Tải lên CV thành công!');
-                            window.location.reload();
-                        } else {
-                            throw new Error(result.message || 'Có lỗi xảy ra khi tải lên CV');
-                        }
-                    } catch (error) {
-                        console.error('Upload error:', error);
-                        alert(error.message || 'Có lỗi xảy ra khi tải lên CV');
-                    } finally {
-                        // Reset button state
-                        submitBtn.disabled = false;
-                        submitBtn.innerHTML = originalBtnText;
-                    }
-                });
-            }
-        });
-
-        // Function to delete CV
-        async function deleteCV(cvId) {
-            if (!confirm('Bạn có chắc chắn muốn xóa CV này không?')) {
-                return;
-            }
-            
-            try {
-                const response = await fetch(`/cv/delete/${cvId}`, {
-                    method: 'DELETE'
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert('Đã xóa CV thành công!');
-                    window.location.reload();
-                } else {
-                    throw new Error(result.message || 'Có lỗi xảy ra khi xóa CV');
-                }
-            } catch (error) {
-                console.error('Delete error:', error);
-                alert(error.message || 'Có lỗi xảy ra khi xóa CV');
-            }
+            xhr.open('POST', '/ai-service/upload_resume');
+            xhr.send(formData);
+        } catch (error) {
+            showToast('error', 'Lỗi', 'Không thể tải lên CV');
+            progressDiv.style.display = 'none';
         }
+        event.target.value = '';
+    }
 
-        // Add PDF viewer to the CV tab
-        function switchTab(tabId) {
-            // Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(tab => {
-                tab.classList.add('hidden');
-                tab.classList.remove('block');
+    // CV actions
+    function viewCV() {
+        window.open('/users/cv', '_blank');
+    }
+
+    async function deleteCV() {
+        if (!confirm('Bạn có chắc chắn muốn xóa CV này?')) return;
+        try {
+            const response = await fetch('/ai-service/resume/{{user.username}}', {
+                method: 'DELETE',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            
-            // Deactivate all tab buttons
-            document.querySelectorAll('.tab-button').forEach(button => {
-                button.classList.remove('active', 'text-blue-600');
-                button.classList.add('text-gray-600');
-            });
-            
-            // Show the selected tab content
-            const selectedTab = document.getElementById(tabId + 'Tab');
-            if (selectedTab) {
-                selectedTab.classList.remove('hidden');
-                selectedTab.classList.add('block');
-                
-                // Activate the clicked tab button
-                const clickedButton = document.querySelector(`[onclick="switchTab('${tabId}')"]`);
-                if (clickedButton) {
-                    clickedButton.classList.remove('text-gray-600');
-                    clickedButton.classList.add('active', 'text-blue-600');
-                }
+            const result = await response.json();
+            if (response.ok) {
+                showToast('success', 'Thành công', 'CV đã được xóa');
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showToast('error', 'Lỗi', result.message || 'Không thể xóa CV');
             }
-            
-            // Store the active tab in sessionStorage
-            sessionStorage.setItem('activeTab', tabId);
+        } catch (error) {
+            showToast('error', 'Lỗi mạng', 'Vui lòng kiểm tra kết nối');
         }
-        
-        // Check for active tab in sessionStorage on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            const activeTab = sessionStorage.getItem('activeTab') || 'profile';
-            switchTab(activeTab);
-        });
-        
-        // Avatar upload functionality
-        async function uploadAvatar(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const formData = new FormData();
-            formData.append('avatar', file);
-            
-            try {
-                const response = await fetch('/users/upload-avatar', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    // Update the avatar display
-                    const avatarDisplay = document.getElementById('avatarDisplay');
-                    if (avatarDisplay) {
-                        // Add a timestamp to prevent caching
-                        const timestamp = new Date().getTime();
-                        avatarDisplay.src = `${result.avatarUrl}?t=${timestamp}`;
-                    }
-                    
-                    // Show success message
-                    alert('Cập nhật ảnh đại diện thành công!');
-                } else {
-                    alert(result.message || 'Có lỗi xảy ra khi tải lên ảnh đại diện');
-                }
-            } catch (error) {
-                console.error('Error uploading avatar:', error);
-                alert('Đã xảy ra lỗi khi tải lên ảnh đại diện');
-            }
-        }
-    </script>
-</body>
-</html>
+    }
+
+    // Toast notification
+    function showToast(type, title, message) {
+        const toast = document.getElementById('toast');
+        const inner = document.getElementById('toastInner');
+        const icon = document.getElementById('toastIcon');
+        const msg = document.getElementById('toastMessage');
+        const desc = document.getElementById('toastDescription');
+
+        const icons = {
+            success: '<i class="fas fa-check-circle" style="color:#059669;"></i>',
+            error: '<i class="fas fa-exclamation-circle" style="color:#DC2626;"></i>',
+            info: '<i class="fas fa-info-circle" style="color:#2563EB;"></i>'
+        };
+
+        inner.className = 'profile-toast__inner ' + type;
+        icon.innerHTML = icons[type] || icons.info;
+        msg.textContent = title;
+        desc.textContent = message;
+
+        toast.classList.add('is-visible');
+        setTimeout(() => toast.classList.remove('is-visible'), 3500);
+    }
+</script>

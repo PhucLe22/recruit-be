@@ -51,6 +51,7 @@ class UserController{
             // Format user data for the view
             const userData = {
                 ...user,
+                name: user.username, // Alias for header partial compatibility
                 profileComplete: this.calculateProfileCompleteness(user),
                 assessmentResults: {
                     mbti: mbtiResult ? this.formatMBTIResult(mbtiResult) : null,
@@ -348,8 +349,6 @@ class UserController{
         try {
             const fs = require('fs').promises;
             const path = require('path');
-            const CV = require('../../../models/CV');
-            const User = require('../../../models/User');
             
             let userId = req.params.userId || (req.user && req.user._id);
             
@@ -396,15 +395,16 @@ class UserController{
             }
 
             // Handle different path formats
+            // __dirname = blog/src/app/controllers/users, so ../../../../public = blog/public
             let filePath;
             if (cvData.file_path.startsWith('http') || cvData.file_path.startsWith('/')) {
                 // If it's a full URL or absolute path, use as is
-                filePath = cvData.file_path.startsWith('/') 
-                    ? path.join(__dirname, '../../../public', cvData.file_path)
+                filePath = cvData.file_path.startsWith('/')
+                    ? path.join(__dirname, '../../../../public', cvData.file_path)
                     : cvData.file_path;
             } else {
                 // Otherwise, assume it's relative to public/uploads
-                filePath = path.join(__dirname, '../../../public/uploads', cvData.file_path);
+                filePath = path.join(__dirname, '../../../../public/uploads', cvData.file_path);
             }
             
             console.log(`Looking for CV file at: ${filePath}`);
@@ -452,11 +452,11 @@ class UserController{
                     
                     // Try alternative locations
                     const possiblePaths = [
-                        path.join(__dirname, '../../../public', cvData.file_path),
-                        path.join(__dirname, '../../../public/uploads', cvData.filename),
-                        path.join(__dirname, '../../../public/uploads', path.basename(cvData.file_path)),
-                        path.join(__dirname, '../../../public', 'ai-uploads', path.basename(cvData.file_path)),
-                        path.join(__dirname, '../../../public', 'ai-uploads', cvData.filename)
+                        path.join(__dirname, '../../../../public', cvData.file_path),
+                        path.join(__dirname, '../../../../public/uploads', cvData.filename),
+                        path.join(__dirname, '../../../../public/uploads', path.basename(cvData.file_path)),
+                        path.join(__dirname, '../../../../public', 'ai-uploads', path.basename(cvData.file_path)),
+                        path.join(__dirname, '../../../../public', 'ai-uploads', cvData.filename)
                     ];
                     
                     let found = false;
@@ -518,7 +518,6 @@ class UserController{
         try {
             const fs = require('fs').promises;
             const path = require('path');
-            const CV = require('../../../models/CV');
             
             let userId = req.params.userId || (req.user && req.user._id);
             
@@ -554,7 +553,8 @@ class UserController{
             }
 
             // Construct the file path
-            const filePath = path.join(__dirname, '../../../public', cvData.file_path);
+            // __dirname = blog/src/app/controllers/users, so ../../../../public = blog/public
+            const filePath = path.join(__dirname, '../../../../public', cvData.file_path);
             console.log(`Looking for CV file at: ${filePath}`);
             
             try {

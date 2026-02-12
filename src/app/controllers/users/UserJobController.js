@@ -104,6 +104,8 @@ class UserJobController {
                 totalJobs: appliedJobs.length,
                 user: req.account,
                 isLogin: true,
+                styles: ['/css/applied-jobs.css'],
+                scripts: ['/js/applied-jobs.js'],
             });
         } catch (error) {
             next(error);

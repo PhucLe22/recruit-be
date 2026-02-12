@@ -470,9 +470,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            text-decoration: none;
+            font-size: 0.95rem;
         }
 
-        .pagination-btn:hover {
+        a.pagination-btn:hover {
             background: #f1f5f9;
             color: #3b82f6;
         }
@@ -481,9 +483,10 @@
             background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
             color: white;
             box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            pointer-events: none;
         }
 
-        .pagination-btn:disabled {
+        button.pagination-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
@@ -601,16 +604,12 @@
         <div class="stats-bar">
             <div class="stats-info">
                 <div class="stat-item">
-                    <div class="stat-value">{{list.length}}</div>
+                    <div class="stat-value">{{totalBusinesses}}</div>
                     <div class="stat-label">Doanh nghiệp</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-value">{{totalBusinesses}}</div>
-                    <div class="stat-label">Tổng số</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-value">{{activeBusinesses}}</div>
-                    <div class="stat-label">Đang tuyển</div>
+                    <div class="stat-value">{{currentPage}}/{{totalPages}}</div>
+                    <div class="stat-label">Trang</div>
                 </div>
             </div>
             <select class="sort-dropdown" id="sortDropdown">
@@ -698,18 +697,36 @@
         {{/if}}
 
         <!-- Pagination -->
-        {{#if list.length}}
+        {{#if (gt totalPages 1)}}
             <div class="pagination-wrapper">
                 <div class="pagination">
-                    <button class="pagination-btn" disabled>
-                        <i class="fas fa-chevron-left"></i>
-                    </button>
-                    <button class="pagination-btn active">1</button>
-                    <button class="pagination-btn">2</button>
-                    <button class="pagination-btn">3</button>
-                    <button class="pagination-btn">
-                        <i class="fas fa-chevron-right"></i>
-                    </button>
+                    {{#if hasPrevPage}}
+                        <a href="?page={{prevPage}}" class="pagination-btn">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    {{else}}
+                        <button class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                    {{/if}}
+
+                    {{#each pages}}
+                        {{#if this.active}}
+                            <span class="pagination-btn active">{{this.number}}</span>
+                        {{else}}
+                            <a href="?page={{this.number}}" class="pagination-btn">{{this.number}}</a>
+                        {{/if}}
+                    {{/each}}
+
+                    {{#if hasNextPage}}
+                        <a href="?page={{nextPage}}" class="pagination-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    {{else}}
+                        <button class="pagination-btn" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    {{/if}}
                 </div>
             </div>
         {{/if}}

@@ -1,159 +1,909 @@
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2><i class="fas fa-bookmark me-2"></i>Công việc đã lưu</h2>
-                <span class="badge bg-primary">{{totalJobs}} công việc</span>
+<!-- Page Hero -->
+<div class="saved-hero">
+    <div class="container">
+        <div class="saved-hero__content">
+            <div class="saved-hero__text">
+                <h1 class="saved-hero__title">
+                    <i class="fas fa-heart"></i>
+                    Công việc đã lưu
+                </h1>
+                <p class="saved-hero__subtitle">Quản lý danh sách công việc yêu thích của bạn</p>
             </div>
+            <div class="saved-hero__stats">
+                <div class="saved-stat">
+                    <span class="saved-stat__number">{{totalJobs}}</span>
+                    <span class="saved-stat__label">Đã lưu</span>
+                </div>
+                <div class="saved-stat">
+                    <span class="saved-stat__number" id="appliedCount">0</span>
+                    <span class="saved-stat__label">Đã ứng tuyển</span>
+                </div>
+                <div class="saved-stat">
+                    <span class="saved-stat__number" id="notAppliedCount">0</span>
+                    <span class="saved-stat__label">Chưa ứng tuyển</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-            {{#if savedJobs}}
-                <div class="row">
-                    {{#each savedJobs}}
-                        <div class="col-md-6 col-lg-4 mb-4">
-                            <div class="card h-100 job-card">
-                                <div class="card-body d-flex flex-column">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title flex-grow-1">{{jobTitle}}</h5>
-                                        <button class="btn btn-sm btn-outline-danger unsave-job" 
-                                                data-job-id="{{jobId}}" 
-                                                title="Xóa khỏi danh sách lưu">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                    </div>
-                                    
-                                    <p class="text-muted mb-2">
-                                        <i class="fas fa-building me-1"></i>{{companyName}}
-                                    </p>
-                                    
-                                    <div class="mb-2">
-                                        <span class="badge bg-success me-2">{{type}}</span>
-                                        <span class="badge bg-info">{{city}}</span>
-                                    </div>
-                                    
-                                    <p class="card-text flex-grow-1">{{description}}</p>
-                                    
-                                    <div class="d-flex justify-content-between align-items-center mt-auto">
-                                        <small class="text-muted">
-                                            <i class="fas fa-calendar me-1"></i>Đã lưu: {{savedDate}}
-                                        </small>
-                                        <span class="text-primary fw-bold">{{salary}}</span>
-                                    </div>
-                                    
-                                    <div class="mt-3">
-                                        <a href="/jobs/{{slug}}" class="btn btn-primary btn-sm me-2">
-                                            <i class="fas fa-eye me-1"></i>Xem chi tiết
-                                        </a>
-                                        {{#unless isApplied}}
-                                            <a href="/jobs/apply/{{slug}}" class="btn btn-success btn-sm">
-                                                <i class="fas fa-paper-plane me-1"></i>Ứng tuyển
-                                            </a>
-                                        {{else}}
-                                            <span class="badge bg-secondary">Đã ứng tuyển</span>
-                                        {{/unless}}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {{/each}}
+{{#if savedJobs}}
+<!-- Filter Tabs -->
+<div class="container">
+    <div class="saved-filters">
+        <button class="saved-filter active" data-filter="all">
+            <i class="fas fa-th-list"></i> Tất cả
+            <span class="saved-filter__count">{{totalJobs}}</span>
+        </button>
+        <button class="saved-filter" data-filter="not-applied">
+            <i class="fas fa-clock"></i> Chưa ứng tuyển
+        </button>
+        <button class="saved-filter" data-filter="applied">
+            <i class="fas fa-check-circle"></i> Đã ứng tuyển
+        </button>
+    </div>
+</div>
+
+<!-- Job Cards -->
+<div class="container">
+    <div class="saved-list" id="savedJobsList">
+        {{#each savedJobs}}
+        <div class="saved-card" data-applied="{{#if isApplied}}applied{{else}}not-applied{{/if}}" data-job-id="{{jobId}}" data-aos="fade-up" data-aos-delay="{{@index}}00">
+            <div class="saved-card__accent"></div>
+            <div class="saved-card__body">
+                <div class="saved-card__header">
+                    <div class="saved-card__company-icon">
+                        <i class="fas fa-building"></i>
+                    </div>
+                    <div class="saved-card__info">
+                        <h3 class="saved-card__title">
+                            {{#unless isDeleted}}
+                                <a href="/jobs/{{slug}}">{{jobTitle}}</a>
+                            {{else}}
+                                <span class="saved-card__deleted">{{jobTitle}}</span>
+                            {{/unless}}
+                        </h3>
+                        <p class="saved-card__company">{{companyName}}</p>
+                    </div>
+                    <div class="saved-card__header-actions">
+                        {{#if isApplied}}
+                            <span class="saved-card__applied-badge">
+                                <i class="fas fa-check"></i> Đã ứng tuyển
+                            </span>
+                        {{/if}}
+                        <button class="saved-card__remove unsave-btn" data-job-id="{{jobId}}" title="Bỏ lưu">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
                 </div>
-            {{else}}
-                <div class="text-center py-5">
-                    <i class="fas fa-bookmark fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">Bạn chưa lưu công việc nào</h4>
-                    <p class="text-muted">Hãy xem và lưu những công việc bạn quan tâm!</p>
-                    <a href="/" class="btn btn-primary">
-                        <i class="fas fa-search me-2"></i>Tìm công việc
-                    </a>
+
+                <div class="saved-card__details">
+                    <div class="saved-card__tag">
+                        <i class="fas fa-briefcase"></i> {{type}}
+                    </div>
+                    <div class="saved-card__tag">
+                        <i class="fas fa-map-marker-alt"></i> {{city}}
+                    </div>
+                    <div class="saved-card__tag saved-card__tag--salary">
+                        <i class="fas fa-wallet"></i> {{salary}}
+                    </div>
                 </div>
-            {{/if}}
+
+                <p class="saved-card__desc">{{description}}</p>
+
+                <div class="saved-card__footer">
+                    <div class="saved-card__date">
+                        <i class="fas fa-calendar-alt"></i>
+                        Đã lưu ngày {{savedDate}}
+                    </div>
+                    <div class="saved-card__actions">
+                        {{#unless isDeleted}}
+                            <a href="/jobs/{{slug}}" class="saved-card__btn saved-card__btn--outline">
+                                <i class="fas fa-eye"></i> Xem chi tiết
+                            </a>
+                            {{#unless isApplied}}
+                                <a href="/jobs/apply/{{slug}}" class="saved-card__btn saved-card__btn--primary">
+                                    <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
+                                </a>
+                            {{/unless}}
+                        {{else}}
+                            <span class="saved-card__btn saved-card__btn--disabled">
+                                <i class="fas fa-exclamation-triangle"></i> Đã bị xóa
+                            </span>
+                        {{/unless}}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {{/each}}
+    </div>
+
+    <!-- No results for filter -->
+    <div class="saved-empty-filter" id="emptyFilter" style="display: none;">
+        <i class="fas fa-filter"></i>
+        <h4>Không có công việc nào</h4>
+        <p>Không tìm thấy công việc phù hợp với bộ lọc này.</p>
+    </div>
+</div>
+
+{{else}}
+<!-- Empty State -->
+<div class="container">
+    <div class="saved-empty">
+        <div class="saved-empty__icon">
+            <i class="fas fa-heart"></i>
+        </div>
+        <h3 class="saved-empty__title">Bạn chưa lưu công việc nào</h3>
+        <p class="saved-empty__text">Khám phá và lưu lại những công việc bạn quan tâm để xem lại sau!</p>
+        <a href="/jobs/search-results" class="saved-empty__btn">
+            <i class="fas fa-search"></i> Tìm kiếm công việc
+        </a>
+    </div>
+</div>
+{{/if}}
+
+<!-- Unsave Confirmation Modal -->
+<div class="saved-modal-overlay" id="unsaveModal">
+    <div class="saved-modal">
+        <div class="saved-modal__icon">
+            <i class="fas fa-heart-broken"></i>
+        </div>
+        <h4 class="saved-modal__title">Bỏ lưu công việc?</h4>
+        <p class="saved-modal__text">Bạn có chắc muốn xóa công việc này khỏi danh sách đã lưu?</p>
+        <div class="saved-modal__actions">
+            <button class="saved-modal__btn saved-modal__btn--cancel" id="modalCancel">Hủy</button>
+            <button class="saved-modal__btn saved-modal__btn--confirm" id="modalConfirm">Bỏ lưu</button>
         </div>
     </div>
 </div>
 
 <style>
-.job-card {
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    border: 1px solid #e9ecef;
+/* ===== Hero Section ===== */
+.saved-hero {
+    background: linear-gradient(135deg, #0f172a 0%, #134e4a 50%, #0f766e 100%);
+    padding: 48px 0 40px;
+    color: #fff;
+    margin-bottom: 0;
 }
 
-.job-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+.saved-hero__content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 24px;
 }
 
-.unsave-job {
+.saved-hero__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.saved-hero__title i {
+    font-size: 1.5rem;
+    opacity: 0.9;
+}
+
+.saved-hero__subtitle {
+    margin: 0;
+    opacity: 0.85;
+    font-size: 0.95rem;
+}
+
+.saved-hero__stats {
+    display: flex;
+    gap: 16px;
+}
+
+.saved-stat {
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 14px 20px;
+    text-align: center;
+    min-width: 80px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.saved-stat__number {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.saved-stat__label {
+    font-size: 0.75rem;
+    opacity: 0.85;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== Filter Tabs ===== */
+.saved-filters {
+    display: flex;
+    gap: 8px;
+    padding: 20px 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+.saved-filters::-webkit-scrollbar {
+    display: none;
+}
+
+.saved-filter {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 999px;
+    background: #fff;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
     transition: all 0.2s ease;
 }
 
-.unsave-job:hover {
-    background-color: #dc3545;
-    color: white;
+.saved-filter:hover {
+    border-color: #0f766e;
+    color: #0f766e;
+    background: #f0fdfa;
+}
+
+.saved-filter.active {
+    background: #134e4a;
+    color: #fff;
+    border-color: #134e4a;
+}
+
+.saved-filter__count {
+    background: rgba(255, 255, 255, 0.3);
+    padding: 1px 8px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+/* ===== Job Cards ===== */
+.saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-bottom: 48px;
+}
+
+.saved-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    border: 1px solid #f1f5f9;
+    transition: all 0.3s ease;
+}
+
+.saved-card:hover {
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+    border-color: #e2e8f0;
+}
+
+.saved-card.removing {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+}
+
+.saved-card__accent {
+    width: 5px;
+    flex-shrink: 0;
+    background: linear-gradient(180deg, #134e4a, #0f766e);
+}
+
+.saved-card__body {
+    flex: 1;
+    padding: 20px 24px;
+    min-width: 0;
+}
+
+.saved-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 14px;
+}
+
+.saved-card__company-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: #134e4a;
+    font-size: 1.1rem;
+}
+
+.saved-card__info {
+    flex: 1;
+    min-width: 0;
+}
+
+.saved-card__title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin: 0 0 4px;
+    line-height: 1.4;
+}
+
+.saved-card__title a {
+    color: #1e293b;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.saved-card__title a:hover {
+    color: #0f766e;
+}
+
+.saved-card__deleted {
+    color: #94a3b8;
+    text-decoration: line-through;
+}
+
+.saved-card__company {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.saved-card__header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.saved-card__applied-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: #ecfdf5;
+    color: #059669;
+    border: 1px solid #d1fae5;
+}
+
+.saved-card__remove {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid #99f6e4;
+    background: #fff;
+    color: #0f766e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.saved-card__remove:hover {
+    background: #dc2626;
+    color: #fff;
+    border-color: #dc2626;
     transform: scale(1.1);
 }
 
-.card-title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #2c3e50;
-    line-height: 1.3;
+/* ===== Tags ===== */
+.saved-card__details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
 }
 
-.card-text {
+.saved-card__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 10px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: #475569;
+}
+
+.saved-card__tag i {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+.saved-card__tag--salary {
+    color: #059669;
+    background: #ecfdf5;
+    border-color: #d1fae5;
+    font-weight: 600;
+}
+
+.saved-card__tag--salary i {
+    color: #059669;
+}
+
+/* ===== Description ===== */
+.saved-card__desc {
+    color: #64748b;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0 0 14px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ===== Footer ===== */
+.saved-card__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.saved-card__date {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.saved-card__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.saved-card__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    border: none;
+}
+
+.saved-card__btn--primary {
+    background: #134e4a;
+    color: #fff;
+}
+
+.saved-card__btn--primary:hover {
+    background: #0f766e;
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(19, 78, 74, 0.3);
+}
+
+.saved-card__btn--outline {
+    background: #fff;
+    color: #475569;
+    border: 1.5px solid #e2e8f0;
+}
+
+.saved-card__btn--outline:hover {
+    color: #0f766e;
+    border-color: #0f766e;
+    background: #f0fdfa;
+}
+
+.saved-card__btn--disabled {
+    background: #f8fafc;
+    color: #94a3b8;
+    cursor: not-allowed;
+    border: 1px solid #e2e8f0;
+}
+
+/* ===== Empty State ===== */
+.saved-empty {
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.saved-empty__icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 24px;
+    font-size: 2rem;
+    color: #134e4a;
+}
+
+.saved-empty__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.saved-empty__text {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin: 0 0 24px;
+}
+
+.saved-empty__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    background: #134e4a;
+    color: #fff;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.saved-empty__btn:hover {
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(19, 78, 74, 0.35);
+}
+
+/* ===== Empty Filter ===== */
+.saved-empty-filter {
+    text-align: center;
+    padding: 60px 20px;
+    color: #94a3b8;
+}
+
+.saved-empty-filter i {
+    font-size: 2.5rem;
+    margin-bottom: 16px;
+    display: block;
+}
+
+.saved-empty-filter h4 {
+    color: #475569;
+    font-size: 1.1rem;
+    margin: 0 0 8px;
+}
+
+.saved-empty-filter p {
     font-size: 0.9rem;
-    color: #6c757d;
-    line-height: 1.4;
+    margin: 0;
+}
+
+/* ===== Modal ===== */
+.saved-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+}
+
+.saved-modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.saved-modal {
+    background: #fff;
+    border-radius: 16px;
+    padding: 32px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    transform: scale(0.9) translateY(10px);
+    transition: transform 0.25s ease;
+}
+
+.saved-modal-overlay.active .saved-modal {
+    transform: scale(1) translateY(0);
+}
+
+.saved-modal__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: #fef2f2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    font-size: 1.4rem;
+    color: #dc2626;
+}
+
+.saved-modal__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 8px;
+}
+
+.saved-modal__text {
+    color: #64748b;
+    font-size: 0.875rem;
+    margin: 0 0 24px;
+    line-height: 1.5;
+}
+
+.saved-modal__actions {
+    display: flex;
+    gap: 10px;
+}
+
+.saved-modal__btn {
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+}
+
+.saved-modal__btn--cancel {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.saved-modal__btn--cancel:hover {
+    background: #e2e8f0;
+}
+
+.saved-modal__btn--confirm {
+    background: #dc2626;
+    color: #fff;
+}
+
+.saved-modal__btn--confirm:hover {
+    background: #b91c1c;
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .saved-hero {
+        padding: 32px 0 28px;
+    }
+
+    .saved-hero__content {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .saved-hero__title {
+        font-size: 1.35rem;
+    }
+
+    .saved-hero__stats {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .saved-stat {
+        flex: 1;
+        min-width: 0;
+        padding: 10px 8px;
+    }
+
+    .saved-stat__number {
+        font-size: 1.2rem;
+    }
+
+    .saved-card__header {
+        flex-wrap: wrap;
+    }
+
+    .saved-card__header-actions {
+        order: -1;
+        margin-left: auto;
+    }
+
+    .saved-card__body {
+        padding: 16px;
+    }
+
+    .saved-card__footer {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    .saved-card__actions {
+        width: 100%;
+    }
+
+    .saved-card__btn {
+        flex: 1;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .saved-hero__stats {
+        gap: 8px;
+    }
+
+    .saved-stat {
+        padding: 8px 6px;
+    }
+
+    .saved-stat__number {
+        font-size: 1rem;
+    }
+
+    .saved-stat__label {
+        font-size: 0.65rem;
+    }
+
+    .saved-filters {
+        padding: 16px 0;
+    }
 }
 </style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Handle unsave job button clicks
-    document.querySelectorAll('.unsave-job').forEach(button => {
-        button.addEventListener('click', async function(e) {
-            e.preventDefault();
-            
-            const jobId = this.dataset.jobId;
-            const card = this.closest('.job-card');
-            
-            if (confirm('Bạn có chắc muốn xóa công việc này khỏi danh sách lưu?')) {
-                try {
-                    const response = await fetch(`/users/saved-jobs/${jobId}`, {
-                        method: 'DELETE',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                    
-                    if (response.ok) {
-                        // Animate card removal
-                        card.style.transition = 'all 0.3s ease';
-                        card.style.opacity = '0';
-                        card.style.transform = 'scale(0.8)';
-                        
-                        setTimeout(() => {
-                            card.remove();
-                            
-                            // Update total count
-                            const totalBadge = document.querySelector('.badge.bg-primary');
-                            if (totalBadge) {
-                                const currentCount = parseInt(totalBadge.textContent);
-                                totalBadge.textContent = `${currentCount - 1} công việc`;
-                            }
-                            
-                            // Show message if no jobs left
-                            const remainingCards = document.querySelectorAll('.job-card');
-                            if (remainingCards.length === 0) {
-                                location.reload();
-                            }
-                        }, 300);
-                    } else {
-                        alert('Có lỗi xảy ra. Vui lòng thử lại.');
-                    }
-                } catch (error) {
-                    console.error('Error:', error);
-                    alert('Có lỗi xảy ra. Vui lòng thử lại.');
+    const cards = document.querySelectorAll('.saved-card');
+    const filters = document.querySelectorAll('.saved-filter');
+    const emptyFilter = document.getElementById('emptyFilter');
+    const jobsList = document.getElementById('savedJobsList');
+    const modal = document.getElementById('unsaveModal');
+    const modalCancel = document.getElementById('modalCancel');
+    const modalConfirm = document.getElementById('modalConfirm');
+    let pendingJobId = null;
+    let pendingCard = null;
+
+    // Count stats
+    let appliedCount = 0;
+    let notAppliedCount = 0;
+    cards.forEach(card => {
+        if (card.dataset.applied === 'applied') appliedCount++;
+        else notAppliedCount++;
+    });
+
+    const appliedEl = document.getElementById('appliedCount');
+    const notAppliedEl = document.getElementById('notAppliedCount');
+    if (appliedEl) appliedEl.textContent = appliedCount;
+    if (notAppliedEl) notAppliedEl.textContent = notAppliedCount;
+
+    // Filter functionality
+    filters.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filter = this.dataset.filter;
+
+            filters.forEach(f => f.classList.remove('active'));
+            this.classList.add('active');
+
+            let visibleCount = 0;
+            cards.forEach(card => {
+                if (card.classList.contains('removing')) return;
+                if (filter === 'all' || card.dataset.applied === filter) {
+                    card.style.display = '';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            if (emptyFilter && jobsList) {
+                if (visibleCount === 0) {
+                    emptyFilter.style.display = '';
+                    jobsList.style.display = 'none';
+                } else {
+                    emptyFilter.style.display = 'none';
+                    jobsList.style.display = '';
                 }
             }
+        });
+    });
+
+    // Unsave modal handling
+    function openModal(jobId, card) {
+        pendingJobId = jobId;
+        pendingCard = card;
+        modal.classList.add('active');
+    }
+
+    function closeModal() {
+        modal.classList.remove('active');
+        pendingJobId = null;
+        pendingCard = null;
+    }
+
+    modalCancel.addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) closeModal();
+    });
+
+    modalConfirm.addEventListener('click', async function() {
+        if (!pendingJobId || !pendingCard) return;
+
+        const jobId = pendingJobId;
+        const card = pendingCard;
+        closeModal();
+
+        try {
+            const response = await fetch(`/users/saved-jobs/${jobId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' }
+            });
+
+            if (response.ok) {
+                card.classList.add('removing');
+
+                setTimeout(() => {
+                    card.remove();
+
+                    // Update total count
+                    const totalBadge = document.querySelector('.saved-filter__count');
+                    const remaining = document.querySelectorAll('.saved-card:not(.removing)');
+                    if (totalBadge) {
+                        totalBadge.textContent = remaining.length;
+                    }
+
+                    if (remaining.length === 0) {
+                        location.reload();
+                    }
+                }, 400);
+            } else {
+                alert('Có lỗi xảy ra. Vui lòng thử lại.');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Có lỗi xảy ra. Vui lòng thử lại.');
+        }
+    });
+
+    // Attach unsave buttons
+    document.querySelectorAll('.unsave-btn').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const jobId = this.dataset.jobId;
+            const card = this.closest('.saved-card');
+            openModal(jobId, card);
         });
     });
 });

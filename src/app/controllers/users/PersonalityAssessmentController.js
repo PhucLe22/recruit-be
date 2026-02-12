@@ -57,7 +57,8 @@ class PersonalityAssessmentController {
             };
 
             // Save result to cache
-            const savedResult = await this.saveMBTIResult(req.user._id, result);
+            const userId = req.session.users?._id || null;
+            const savedResult = await this.saveMBTIResult(userId, result);
 
             res.json({
                 success: true,
@@ -87,7 +88,7 @@ class PersonalityAssessmentController {
                 // Fallback: try to get from AI service
                 const userId = resultId.includes('user') ? resultId : '692f840f28a9b73f73b61550';
                 try {
-                    const aiResponse = await fetch(`http://localhost:8000/api/personality-assessment/user/${userId}/latest/mbti`);
+                    const aiResponse = await fetch(`${AI_SERVICE_URL}/api/personality-assessment/user/${userId}/latest/mbti`);
                     const aiData = await aiResponse.json();
                     if (aiData.success && aiData.result && aiData.result.type) {
                         mbtiType = aiData.result.type;
@@ -195,7 +196,8 @@ class PersonalityAssessmentController {
             };
 
             // Save result to cache
-            const savedResult = await this.saveBigFiveResult(req.user._id, resultData);
+            const userId = req.session.users?._id || null;
+            const savedResult = await this.saveBigFiveResult(userId, resultData);
 
             res.json({
                 success: true,
@@ -227,7 +229,7 @@ class PersonalityAssessmentController {
                 // Fallback: try to get from AI service
                 const userId = resultId.includes('user') ? resultId : '692f840f28a9b73f73b61550';
                 try {
-                    const aiResponse = await fetch(`http://localhost:8000/api/personality-assessment/user/${userId}/latest/big_five`);
+                    const aiResponse = await fetch(`${AI_SERVICE_URL}/api/personality-assessment/user/${userId}/latest/big_five`);
                     const aiData = await aiResponse.json();
 
                     console.log('AI Service Response:', { status: aiResponse.ok, data: aiData });
@@ -422,7 +424,8 @@ class PersonalityAssessmentController {
             };
 
             // Save result to cache
-            const savedResult = await this.saveDISCResult(req.user._id, result);
+            const userId = req.session.users?._id || null;
+            const savedResult = await this.saveDISCResult(userId, result);
 
             res.json({
                 success: true,
@@ -455,7 +458,7 @@ class PersonalityAssessmentController {
                 // Fallback: try to get from AI service
                 const userId = resultId.includes('user') ? resultId : '692f840f28a9b73f73b61550';
                 try {
-                    const aiResponse = await fetch(`http://localhost:8000/api/personality-assessment/user/${userId}/latest/disc`);
+                    const aiResponse = await fetch(`${AI_SERVICE_URL}/api/personality-assessment/user/${userId}/latest/disc`);
                     const aiData = await aiResponse.json();
 
                     console.log('AI Service Response for DISC:', { status: aiResponse.ok, data: aiData });

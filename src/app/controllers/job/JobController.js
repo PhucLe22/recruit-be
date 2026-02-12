@@ -124,8 +124,10 @@ class JobController {
             }
 
             // Return HTML view for regular requests
+            // detail.hbs has its own full HTML structure, so render without layout
             if (job.status === 'closed') {
                 return res.render('jobs/detail', {
+                    layout: false,
                     job: mongooseToObject(job),
                     jobs: multipleMongooseToObject(jobs),
                     business: mongooseToObject(business),
@@ -138,6 +140,7 @@ class JobController {
 
             if (!jobApplied) {
                 return res.render('jobs/detail', {
+                    layout: false,
                     job: mongooseToObject(job),
                     jobs: multipleMongooseToObject(jobs),
                     business: mongooseToObject(business),
@@ -149,6 +152,7 @@ class JobController {
             }
 
             res.render('jobs/detail', {
+                layout: false,
                 job: mongooseToObject(job),
                 jobs: multipleMongooseToObject(jobs),
                 business: mongooseToObject(business),

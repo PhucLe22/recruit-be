@@ -6,6 +6,8 @@ const { multipleMongooseToObject } = require('../../../util/mongoose');
 const { formatDate } = require('../../../middlewares/formatDate');
 const axios = require('axios');
 
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
 class BusinessController {
     update(req, res, next) {
         const jobAppliedId = req.params.jobAppliedId;
@@ -547,7 +549,7 @@ class BusinessController {
             console.log('📤 Sending payload:', payload);
 
             const response = await axios.post(
-                'http://localhost:8000/api/create-meet',
+                `${AI_SERVICE_URL}/api/create-meet`,
                 payload,
             );
             res.json(response.data);

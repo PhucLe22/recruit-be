@@ -33,12 +33,13 @@ router.get('/', isLogin, async (req, res) => {
             }
         }
         
-        res.render('cv-assistant', { 
+        res.render('cv-assistant', {
             title: 'CV Assistant',
             user: req.user || req.session.user || null,
             currentUser: req.user || req.session.user || null,
             isLogin: req.isLogin || false,
             userCVData: userCVData,
+            aiServiceUrl: process.env.AI_SERVICE_URL || 'http://localhost:8000',
             layout: 'main'
         });
     } catch (error) {

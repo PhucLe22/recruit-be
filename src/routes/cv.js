@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const { upload, cleanupFile } = require('../config/multer');
-const { verifyToken } = require('../middlewares/verifyToken');
+const { requireAuth } = require('../middlewares/isLogin');
 const cvUploadController = require('../app/controllers/job/CVUploadController');
 const axios = require('axios');
 const FormData = require('form-data');
 const fs = require('fs').promises;
 const path = require('path');
+
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
 // Error handling middleware for file uploads
 const handleUploadError = (err, req, res, next) => {
@@ -32,30 +34,34 @@ router.get('/', (req, res) => {
     res.json({ message: 'CV Upload API is running' });
 });
 
-router.get('/uploadCV-page', verifyToken, (req, res) => {
+router.get('/uploadCV', requireAuth, async (req, res) => {
+    const CV = require('../app/models/CV');
+    let existingCV = null;
+    try {
+        existingCV = await CV.findOne({ username: req.account?.username });
+    } catch (e) {}
     res.render('users/uploadCv', {
-        success: false,
-        message: '',
         user: req.account?.username || '',
-        resumeData: req.session.resumeData || {}, // lấy từ session
+        existingCV: existingCV || null,
+        resumeData: req.session.resumeData || {},
     });
 });
 router.post(
     '/upload',
-    verifyToken,
+    requireAuth,
     upload.single('file'),
     cvUploadController.upload,
 );
 
 router.get(
     '/jobs/suggestions/:username',
-    verifyToken,
+    requireAuth,
     cvUploadController.getJobSuggestions,
 );
 
 // CV Assistant Upload Endpoint
 router.post('/assistant-upload', 
-    verifyToken, 
+    requireAuth, 
     (req, res, next) => {
         // Single file upload with error handling
         upload.single('resume')(req, res, (err) => {
@@ -124,7 +130,7 @@ router.post('/assistant-upload',
             throw new Error('Không thể đọc file CV. Vui lòng thử lại với file khác.');
         }
 
-        const aiAgentUrl = 'http://localhost:8000/upload_resume';
+        const aiAgentUrl = `${AI_SERVICE_URL}/upload_resume`;
         console.log('🚀 Sending to AI agent...', {
             url: aiAgentUrl,
             file: req.file.originalname,

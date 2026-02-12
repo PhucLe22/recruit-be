@@ -77,32 +77,34 @@ class AIServiceController {
                     error: 'Username and file are required'
                 });
             }
-            
-            // Read file content as buffer
-            const fileContent = fs.readFileSync(file.path);
-            
-            // Use built-in FormData for Node.js
-            const FormData = require('form-data');
-            const formData = new FormData();
-            formData.append('username', username);
-            formData.append('file', fileContent, file.originalname);
 
-            const response = await axios.post(`${this.AI_SERVICE_URL}/upload_resume`, formData, {
-                headers: {
-                    ...formData.getHeaders()
-                },
-                timeout: 60000 // 60 seconds for file upload
-            });
+            // Save CV record to MongoDB directly (file already saved by multer)
+            const CV = require('../../models/CV');
+            const userId = req.user?._id || req.session?.user?._id;
+            const filePath = `/uploads/${file.filename}`;
 
-            // Clean up uploaded file
-            fs.unlinkSync(file.path);
+            if (userId) {
+                await CV.findOneAndUpdate(
+                    { username: username },
+                    {
+                        $set: {
+                            user_id: userId,
+                            username: username,
+                            file_path: filePath,
+                            filename: file.originalname,
+                            uploaded_at: new Date(),
+                        }
+                    },
+                    { upsert: true, new: true, setDefaultsOnInsert: true }
+                );
+            }
 
-            return res.json(response.data);
+            return res.json({ message: 'CV đã được tải lên thành công' });
         } catch (error) {
             console.error('Upload resume error:', error.message);
             return res.status(500).json({
                 error: 'Failed to upload resume',
-                details: error.response?.data?.error || error.message
+                details: error.message
             });
         }
     }

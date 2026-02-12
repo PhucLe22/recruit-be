@@ -1,0 +1,481 @@
+/* =============================================
+   ASSESSMENT HOME PAGE STYLES
+   Matches home.css design system
+   ============================================= */
+
+/* =============================================
+   Hero Section
+   ============================================= */
+.assessment-hero-section {
+    background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #1e40af 100%);
+    padding: 60px 0 50px;
+    position: relative;
+    overflow: hidden;
+}
+
+.assessment-hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 40%);
+}
+
+.assessment-hero {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+}
+
+.assessment-hero h1 {
+    font-size: 3.2rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    animation: fadeInUp 0.8s ease;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+}
+
+.assessment-hero h1 i {
+    margin-right: 12px;
+}
+
+.assessment-hero p {
+    font-size: 1.2rem;
+    margin-bottom: 0;
+    opacity: 0.85;
+    animation: fadeInUp 0.8s ease 0.2s both;
+    font-weight: 400;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+/* =============================================
+   User Info Banner
+   ============================================= */
+.user-info {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    position: relative;
+    z-index: 1;
+    margin-top: 30px;
+}
+
+.user-info-inner {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: white;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    font-size: 0.95rem;
+}
+
+.user-info-inner strong {
+    font-weight: 700;
+}
+
+/* =============================================
+   Cards Section
+   ============================================= */
+.assessment-cards-section {
+    padding: 80px 0;
+    background: #ffffff;
+}
+
+.assessment-cards-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2d3748;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.section-subtitle {
+    font-size: 1rem;
+    color: #718096;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    align-items: stretch;
+}
+
+/* =============================================
+   Assessment Card - matches feature-card
+   ============================================= */
+.assessment-card {
+    background: white;
+    border-radius: 16px;
+    padding: 30px 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.assessment-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.assessment-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-color: #2563eb;
+}
+
+/* =============================================
+   Card Icon - matches feature-icon
+   ============================================= */
+.assessment-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    color: white;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.2);
+    transition: all 0.3s ease;
+}
+
+.assessment-card:hover .assessment-icon {
+    transform: scale(1.05);
+    box-shadow: 0 12px 28px rgba(37, 99, 235, 0.3);
+}
+
+/* =============================================
+   Card Content
+   ============================================= */
+.assessment-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.assessment-subtitle {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.assessment-description {
+    color: #718096;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    flex-grow: 0;
+}
+
+/* =============================================
+   Feature List - matches feature-list
+   ============================================= */
+.assessment-features {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 24px;
+    text-align: left;
+    flex-grow: 1;
+}
+
+.assessment-features li {
+    padding: 8px 0;
+    color: #4a5568;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.3s ease;
+}
+
+.assessment-features li:hover {
+    color: #2563eb;
+    transform: translateX(5px);
+}
+
+.assessment-features li::before {
+    content: '\f00c';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    color: #48bb78;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+}
+
+/* =============================================
+   Button - matches feature-btn
+   ============================================= */
+.assessment-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: none;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+    margin-top: auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.assessment-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s;
+}
+
+.assessment-button:hover::before {
+    left: 100%;
+}
+
+.assessment-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+    color: white;
+    text-decoration: none;
+}
+
+/* =============================================
+   Card Color Schemes
+   ============================================= */
+
+/* MBTI */
+.mbti-card::before {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+}
+
+.mbti-card .assessment-icon {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.2);
+}
+
+.mbti-card:hover .assessment-icon {
+    box-shadow: 0 12px 28px rgba(220, 38, 38, 0.3);
+}
+
+.mbti-card .assessment-button {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.mbti-card .assessment-button:hover {
+    box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+}
+
+/* Big Five */
+.bigfive-card::before {
+    background: linear-gradient(90deg, #0d9488, #14b8a6);
+}
+
+.bigfive-card .assessment-icon {
+    background: linear-gradient(135deg, #0d9488, #14b8a6);
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.2);
+}
+
+.bigfive-card:hover .assessment-icon {
+    box-shadow: 0 12px 28px rgba(13, 148, 136, 0.3);
+}
+
+.bigfive-card .assessment-button {
+    background: linear-gradient(135deg, #0d9488, #14b8a6);
+    box-shadow: 0 4px 12px rgba(13, 148, 136, 0.2);
+}
+
+.bigfive-card .assessment-button:hover {
+    box-shadow: 0 8px 20px rgba(13, 148, 136, 0.3);
+}
+
+/* DISC */
+.disc-card::before {
+    background: linear-gradient(90deg, #d97706, #f59e0b);
+}
+
+.disc-card .assessment-icon {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.2);
+}
+
+.disc-card:hover .assessment-icon {
+    box-shadow: 0 12px 28px rgba(217, 119, 6, 0.3);
+}
+
+.disc-card .assessment-button {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    box-shadow: 0 4px 12px rgba(217, 119, 6, 0.2);
+}
+
+.disc-card .assessment-button:hover {
+    box-shadow: 0 8px 20px rgba(217, 119, 6, 0.3);
+}
+
+/* =============================================
+   Info Section
+   ============================================= */
+.info-cards-section {
+    padding: 0 0 80px;
+    background: #ffffff;
+}
+
+.info-cards-section .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+}
+
+.info-section {
+    background: #f8f9fa;
+    border-radius: 16px;
+    padding: 30px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid #e5e7eb;
+}
+
+.info-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #2563eb, #3b82f6);
+}
+
+.info-section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-color: #2563eb;
+}
+
+.info-section h2 {
+    color: #2d3748;
+    margin-bottom: 12px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.info-section h2 i {
+    color: #2563eb;
+    font-size: 1.1rem;
+}
+
+.info-section p {
+    color: #718096;
+    line-height: 1.6;
+    font-size: 0.9rem;
+    margin: 0;
+}
+
+/* =============================================
+   Animations
+   ============================================= */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =============================================
+   Responsive
+   ============================================= */
+@media (min-width: 768px) and (max-width: 1199px) {
+    .assessment-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 767px) {
+    .assessment-hero h1 {
+        font-size: 2.5rem;
+    }
+
+    .assessment-hero p {
+        font-size: 1.1rem;
+    }
+
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .assessment-card {
+        padding: 28px 20px;
+    }
+}

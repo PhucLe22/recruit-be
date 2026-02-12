@@ -5,1282 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bài kiểm tra tính cách MBTI - JobLife</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
-        }
-
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-            display: flex;
-            gap: 2rem;
-            min-height: 100vh;
-        }
-
-        .sidebar {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 1.5rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            position: sticky;
-            top: 1rem;
-            height: fit-content;
-            max-height: calc(100vh - 2rem);
-            overflow-y: auto;
-        }
-
-        .content-area {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 2rem;
-            padding: 2rem;
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            text-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .header p {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-
-        /* Sidebar Styles */
-        .progress-overview {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .progress-circle {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 1rem;
-            position: relative;
-        }
-
-        .progress-circle svg {
-            transform: rotate(-90deg);
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-
-        .question-list {
-            background: white;
-            border-radius: 15px;
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .question-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .question-item:hover {
-            background: #f8f9fa;
-        }
-
-        .question-item.current {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border: 2px solid #667eea;
-        }
-
-        .question-item.answered {
-            background: rgba(76, 175, 80, 0.1);
-        }
-
-        .question-number {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            background: #667eea;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            margin-right: 1rem;
-            font-size: 0.9rem;
-        }
-
-        .question-item.answered .question-number {
-            background: #4caf50;
-        }
-
-        .question-text {
-            flex: 1;
-            font-size: 0.9rem;
-            color: #333;
-            line-height: 1.3;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .question-status {
-            margin-left: 1rem;
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .status-icon {
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .status-icon:hover {
-            transform: scale(1.2);
-        }
-
-        .status-icon.flagged {
-            color: #ff6b6b;
-        }
-
-        .status-icon.flagged:hover {
-            color: #ff5252;
-        }
-
-        /* Content Area Styles */
-        .assessment-controls {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .view-btn {
-            padding: 0.5rem 1rem;
-            border: 2px solid #667eea;
-            background: white;
-            color: #667eea;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-        }
-
-        .view-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .view-btn:hover {
-            background: #667eea;
-            color: white;
-            transform: translateY(-2px);
-        }
-
-        .stats-info {
-            display: flex;
-            gap: 2rem;
-        }
-
-        .stat-item {
-            text-align: center;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #667eea;
-        }
-
-        .stat-label {
-            font-size: 0.9rem;
-            color: #666;
-        }
-
-        /* Welcome Section */
-        .welcome-section {
-            background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .welcome-section h2 {
-            color: #333;
-            margin-bottom: 1.5rem;
-            font-size: 2rem;
-        }
-
-        .welcome-section p {
-            color: #666;
-            line-height: 1.7;
-            margin-bottom: 2rem;
-            font-size: 1.1rem;
-        }
-
-        .tips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .tip-card {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            padding: 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .tip-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .tip-icon {
-            font-size: 1.5rem;
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-
-        .tip-text {
-            color: #666;
-            line-height: 1.4;
-        }
-
-        /* Questions Grid View */
-        .questions-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .question-card {
-            background: white;
-            border: 3px solid transparent;
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .question-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .question-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        .question-card.current-question {
-            border-color: #667eea;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-        }
-
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .question-badge {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.5rem 1rem;
-            border-radius: 25px;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .flag-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            color: #ddd;
-            transition: all 0.3s ease;
-            padding: 0.5rem;
-        }
-
-        .flag-btn:hover {
-            color: #ff6b6b;
-            transform: scale(1.2);
-        }
-
-        .flag-btn.flagged {
-            color: #ff6b6b;
-        }
-
-        .question-title {
-            font-size: 1.2rem;
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            line-height: 1.5;
-        }
-
-        .options-container {
-            display: grid;
-            gap: 1rem;
-        }
-
-        .option-item {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 1.2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-
-        .option-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-
-        .option-item.selected {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border-color: #667cea;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-
-        .option-radio {
-            width: 20px;
-            height: 20px;
-            border: 3px solid #ddd;
-            border-radius: 50%;
-            margin-right: 1rem;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .option-item.selected .option-radio {
-            border-color: #667eea;
-            background: #667eea;
-        }
-
-        .option-item.selected .option-radio::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background: white;
-            border-radius: 50%;
-        }
-
-        .option-content {
-            flex: 1;
-        }
-
-        .option-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 0.25rem;
-            display: block;
-        }
-
-        .option-text {
-            color: #666;
-            line-height: 1.4;
-        }
-
-        /* Single Question View */
-        .single-question-view {
-            display: none;
-            background: white;
-            border-radius: 20px;
-            padding: 3rem;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-
-        .single-question-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .large-question-number {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0 auto 2rem;
-        }
-
-        .large-question-text {
-            font-size: 1.5rem;
-            color: #333;
-            text-align: center;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            font-weight: 600;
-        }
-
-        .large-options {
-            display: grid;
-            gap: 1.5rem;
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .large-option {
-            background: #f8f9fa;
-            border: 3px solid #e9ecef;
-            border-radius: 20px;
-            padding: 2rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: center;
-            position: relative;
-        }
-
-        .large-option:hover {
-            background: #e9ecef;
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .large-option.selected {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.15), rgba(118, 75, 162, 0.15));
-            border-color: #667eea;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.25);
-        }
-
-        .large-option-text {
-            color: #333;
-            font-size: 1.1rem;
-            line-height: 1.5;
-            font-weight: 500;
-        }
-
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 2rem;
-            margin-top: 3rem;
-            padding-top: 2rem;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .btn {
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 50px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background: #5a6268;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-        }
-
-        .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .btn-large {
-            padding: 1.5rem 3rem;
-            font-size: 1.2rem;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-            backdrop-filter: blur(5px);
-        }
-
-        .loading-content {
-            text-align: center;
-            color: white;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 3rem;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-        }
-
-        .spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid rgba(255, 255, 255, 0.3);
-            border-top: 6px solid white;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 2rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 1200px) {
-            .main-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                position: static;
-                max-height: none;
-            }
-
-            .content-area {
-                min-height: auto;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .main-container {
-                padding: 0.5rem;
-            }
-
-            .header {
-                padding: 1.5rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .header p {
-                font-size: 1rem;
-            }
-
-            .welcome-section {
-                padding: 2rem;
-            }
-
-            .questions-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .large-options {
-                gap: 1rem;
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .btn {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .tips-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link href="/css/mbti-assessment.css" rel="stylesheet">
 </head>
 <body>
-    <div class="header">
-        <h1><i class="fas fa-brain"></i> Bài kiểm tra MBTI</h1>
-        <p>Khám phá loại tính cách của bạn - 16 loại tính cách Myers-Briggs</p>
-    </div>
+    {{> header}}
+
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
 
     <div class="main-container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <!-- Progress Overview -->
-            <div class="progress-overview">
-                <div class="progress-circle">
-                    <svg width="120" height="120">
-                        <circle cx="60" cy="60" r="54" stroke="rgba(255,255,255,0.3)" stroke-width="12" fill="none"/>
-                        <circle id="progressCircle" cx="60" cy="60" r="54" stroke="white" stroke-width="12" fill="none"
-                                stroke-dasharray="339.292" stroke-dashoffset="339.292"/>
-                    </svg>
-                    <div class="progress-text" id="progressPercent">0%</div>
-                </div>
-                <h3>Tiến độ</h3>
-                <p id="progressDetail">0 / 20 câu</p>
-            </div>
+        <aside class="sidebar" id="sidebar">
+            <h2><i class="fas fa-brain"></i> MBTI</h2>
 
-            <!-- Question List -->
-            <div class="question-list" id="questionList">
-                <!-- Questions will be dynamically inserted here -->
-            </div>
-        </div>
-
-        <!-- Content Area -->
-        <div class="content-area">
-            <!-- Assessment Controls -->
-            <div class="assessment-controls">
-                <div class="view-toggle">
-                    <button class="view-btn active" onclick="showGridView()">
-                        <i class="fas fa-th"></i> Tất cả
-                    </button>
-                    <button class="view-btn" onclick="showSingleView()">
-                        <i class="fas fa-list"></i> Đơn
-                    </button>
-                </div>
-                <div class="stats-info">
-                    <div class="stat-item">
-                        <div class="stat-value" id="answeredCount">0</div>
-                        <div class="stat-label">Đã trả lời</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="flaggedCount">0</div>
-                        <div class="stat-label">Đã đánh dấu</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value" id="remainingCount">20</div>
-                        <div class="stat-label">Còn lại</div>
-                    </div>
+            <div class="progress-circle">
+                <svg class="progress-ring" viewBox="0 0 120 120">
+                    <circle class="progress-ring-bg" cx="60" cy="60" r="54"></circle>
+                    <circle class="progress-ring-fill" cx="60" cy="60" r="54"
+                            stroke-dasharray="0 339.292" id="progressRing"></circle>
+                </svg>
+                <div class="progress-text">
+                    <div id="progressPercent">0%</div>
+                    <div style="font-size: 0.9rem; opacity: 0.8;">Hoàn thành</div>
                 </div>
             </div>
 
-            <!-- Welcome Section -->
-            <div class="welcome-section" id="welcomeSection">
-                <h2><i class="fas fa-info-circle"></i> Chào mừng đến với bài kiểm tra MBTI</h2>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <div class="stat-value" id="answeredCount">0</div>
+                    <div class="stat-label">Đã trả lời</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="flaggedCount">0</div>
+                    <div class="stat-label">Đã đánh dấu</div>
+                </div>
+            </div>
+
+            <h3 style="margin: 2rem 0 1rem; font-size: 1.1rem; opacity: 0.9;">Danh sách câu hỏi</h3>
+            <div class="question-grid" id="questionGrid">
+                <!-- Question items will be generated here -->
+            </div>
+
+            <div style="margin-top: 2rem;">
+                <button class="btn btn-secondary" style="width: 100%; margin-bottom: 1rem;" onclick="showFlaggedQuestions()">
+                    <i class="fas fa-flag"></i> Xem câu đã đánh dấu
+                </button>
+                <button class="btn btn-success" style="width: 100%;" onclick="submitAssessment()" id="submitBtn" disabled>
+                    <i class="fas fa-check"></i> Hoàn thành bài kiểm tra
+                </button>
+            </div>
+        </aside>
+
+        <main class="content-area">
+            <div class="assessment-header">
+                <h1><i class="fas fa-brain"></i> Bài kiểm tra tính cách MBTI</h1>
+                <p>Khám phá loại tính cách của bạn - 16 loại tính cách Myers-Briggs</p>
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="setViewMode('single')">
+                    <i class="fas fa-list"></i> Từng câu
+                </button>
+                <button class="view-btn" onclick="setViewMode('grid')">
+                    <i class="fas fa-th"></i> Lưới
+                </button>
+            </div>
+
+            <div id="introSection" class="intro-section">
+                <h2><i class="fas fa-info-circle"></i> Giới thiệu bài kiểm tra MBTI</h2>
                 <p>
-                    Bài kiểm tra này sẽ giúp bạn xác định loại tính cách của mình trong 16 nhóm tính cách MBTI.
-                    Hãy trả lời các câu hỏi một cách trung thực để có kết quả chính xác nhất.
+                    MBTI (Myers-Briggs Type Indicator) là một trong những bài kiểm tra tính cách phổ biến nhất thế giới,
+                    giúp phân loại 16 nhóm tính cách dựa trên 4 cặp đặc điểm. Hãy trả lời các câu hỏi một cách trung thực
+                    để có kết quả chính xác nhất.
                 </p>
-                <div class="tips-grid">
-                    <div class="tip-card">
-                        <div class="tip-icon"><i class="fas fa-lightbulb"></i></div>
-                        <div class="tip-text">Không có đáp án đúng hay sai - chọn phương án phù hợp nhất với bạn</div>
+
+                <div class="instruction-box">
+                    <i class="fas fa-lightbulb"></i>
+                    <strong>Hướng dẫn:</strong> Với mỗi câu hỏi, hãy chọn phương án mô tả chính xác nhất cách bạn thường hành động hoặc suy nghĩ trong cuộc sống hàng ngày.
+                </div>
+
+                <div class="mbti-grid">
+                    <div class="mbti-item">
+                        <div class="mbti-letter">E / I</div>
+                        <div class="mbti-name">Extraversion / Introversion</div>
+                        <div class="mbti-desc">Hướng ngoại / Hướng nội</div>
                     </div>
-                    <div class="tip-card">
-                        <div class="tip-icon"><i class="fas fa-clock"></i></div>
-                        <div class="tip-text">Đừng suy nghĩ quá lâu - chọn câu trả lời đầu tiên bạn nghĩ đến</div>
+                    <div class="mbti-item">
+                        <div class="mbti-letter">S / N</div>
+                        <div class="mbti-name">Sensing / Intuition</div>
+                        <div class="mbti-desc">Cảm giác / Trực giác</div>
                     </div>
-                    <div class="tip-card">
-                        <div class="tip-icon"><i class="fas fa-bookmark"></i></div>
-                        <div class="tip-text">Sử dụng nút đánh dấu để lưu câu hỏi bạn muốn xem lại</div>
+                    <div class="mbti-item">
+                        <div class="mbti-letter">T / F</div>
+                        <div class="mbti-name">Thinking / Feeling</div>
+                        <div class="mbti-desc">Lý trí / Cảm xúc</div>
                     </div>
-                    <div class="tip-card">
-                        <div class="tip-icon"><i class="fas fa-chart-line"></i></div>
-                        <div class="tip-text">Bài kiểm tra mất khoảng 10-15 phút để hoàn thành</div>
+                    <div class="mbti-item">
+                        <div class="mbti-letter">J / P</div>
+                        <div class="mbti-name">Judging / Perceiving</div>
+                        <div class="mbti-desc">Nguyên tắc / Linh hoạt</div>
                     </div>
                 </div>
-                <button class="btn btn-primary btn-large" onclick="startAssessment()">
+
+                <button class="btn btn-primary" onclick="startAssessment()">
                     <i class="fas fa-play"></i> Bắt đầu bài kiểm tra
                 </button>
             </div>
 
-            <!-- Questions Grid View -->
-            <div id="questionsGrid" class="questions-grid" style="display: none;">
-                <!-- Questions will be dynamically inserted here -->
-            </div>
-
-            <!-- Single Question View -->
-            <div id="singleQuestionView" class="single-question-view" style="display: none;">
-                <!-- Single question will be dynamically inserted here -->
-            </div>
-
-            <!-- Action Buttons -->
-            <div id="actionButtons" class="action-buttons" style="display: none;">
-                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
-                    <i class="fas fa-arrow-left"></i> Câu trước
-                </button>
-                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
-                    Tiếp theo <i class="fas fa-arrow-right"></i>
-                </button>
-                <button class="btn btn-success btn-large" id="submitBtn" onclick="submitAssessment()" style="display: none;">
-                    <i class="fas fa-check"></i> Hoàn thành và nộp bài
-                </button>
-            </div>
-
-            <!-- Submit Button for Grid View -->
-            <div id="gridSubmitButton" style="display: none; text-align: center; margin-top: 2rem;">
-                <button class="btn btn-success btn-large" onclick="submitAssessment()">
-                    <i class="fas fa-check"></i> Hoàn thành và nộp bài
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div class="loading-overlay" id="loadingOverlay">
-        <div class="loading-content">
-            <div class="spinner"></div>
-            <h3>Đang xử lý kết quả...</h3>
-            <p>AI đang phân tích câu trả lời của bạn</p>
-            <p>Vui lòng đợi trong giây lát</p>
-        </div>
-    </div>
-
-    <script>
-        // MBTI Questions Data - 20 questions
-        const questions = [
-            { id: 1, question: "Bạn thích dành thời gian ở:", options: [{ value: 'I', text: "Một mình hoặc với nhóm nhỏ bạn thân" }, { value: 'E', text: "Cùng nhiều người và tham gia các hoạt động xã hội" }] },
-            { id: 2, question: "Bạn thường tập trung vào:", options: [{ value: 'S', text: "Thông tin cụ thể, thực tế và chi tiết" }, { value: 'N', text: "Các khả năng, ý tưởng và bức tranh tổng thể" }] },
-            { id: 3, question: "Khi ra quyết định, bạn dựa vào:", options: [{ value: 'T', text: "Lý trí, logic và các nguyên tắc khách quan" }, { value: 'F', text: "Cảm xúc, giá trị và ảnh hưởng đến người khác" }] },
-            { id: 4, question: "Bạn thích sống một cách:", options: [{ value: 'J', text: "Có kế hoạch, có tổ chức và có quyết định" }, { value: 'P', text: "Linh hoạt, tự nhiên và để mở các lựa chọn" }] },
-            { id: 5, question: "Bạn cảm thấy thoải mái hơn khi:", options: [{ value: 'I', text: "Nghĩ kỹ rồi mới nói" }, { value: 'E', text: "Nói và suy nghĩ đồng thời" }] },
-            { id: 6, question: "Bạn tin tưởng hơn vào:", options: [{ value: 'S', text: "Kinh nghiệm trong quá khứ" }, { value: 'N', text: "Trực giác và cảm hứng" }] },
-            { id: 7, question: "Bạn đánh giá cao hơn:", options: [{ value: 'T', text: "Sự công bằng và thống nhất" }, { value: 'F', text: "Sự đồng cảm và thấu hiểu" }] },
-            { id: 8, question: "Bạn thích làm việc:", options: [{ value: 'J', text: "Theo lịch trình và hoàn thành đúng hạn" }, { value: 'P', text: "Linh hoạt và thích nghi với thay đổi" }] },
-            { id: 9, question: "Bạn được mô tả là người:", options: [{ value: 'I', text: "Rất riêng tư và kín đáo" }, { value: 'E', text: "Hướng ngoại và cởi mở" }] },
-            { id: 10, question: "Bạn thích:", options: [{ value: 'S', text: "Sự rõ ràng và cụ thể" }, { value: 'N', text: "Sự trừu tượng và sáng tạo" }] },
-            { id: 11, question: "Khi gặp vấn đề, bạn:", options: [{ value: 'T', text: "Phân tích logic để tìm giải pháp" }, { value: 'F', text: "Xem xét cảm xúc của những người liên quan" }] },
-            { id: 12, question: "Bạn thích kế hoạch:", options: [{ value: 'J', text: "Chi tiết và rõ ràng trước khi bắt đầu" }, { value: 'P', text: "Linh hoạt và điều chỉnh khi cần" }] },
-            { id: 13, question: "Trong một cuộc họp, bạn:", options: [{ value: 'I', text: "Lắng nghe nhiều hơn nói" }, { value: 'E', text: "Tham gia tích cực vào cuộc thảo luận" }] },
-            { id: 14, question: "Bạn học tập tốt nhất thông qua:", options: [{ value: 'S', text: "Ví dụ cụ thể và thực hành" }, { value: 'N', text: "Lý thuyết và khái niệm chung" }] },
-            { id: 15, question: "Khi xung đột, bạn:", options: [{ value: 'T', text: "Tập trung vào sự công bằng" }, { value: 'F', text: "Quan tâm đến cảm xúc của mọi người" }] },
-            { id: 16, question: "Bạn thích công việc:", options: [{ value: 'J', text: "Có deadline rõ ràng" }, { value: 'P', text: "Có sự linh hoạt về thời gian" }] },
-            { id: 17, question: "Bạn cảm thấy năng lượng từ:", options: [{ value: 'I', text: "Thời gian một mình" }, { value: 'E', text: "Tương tác xã hội" }] },
-            { id: 18, question: "Bạn tin vào:", options: [{ value: 'S', text: "Những gì bạn có thể nhìn thấy và chứng minh" }, { value: 'N', text: "Khả năng và tiềm năng ẩn" }] },
-            { id: 19, question: "Bạn đưa ra quyết định dựa trên:", options: [{ value: 'T', text: "Nguyên tắc và logic" }, { value: 'F', text: "Giá trị cá nhân" }] },
-            { id: 20, question: "Bạn thích:", options: [{ value: 'J', text: "Hoàn thành công việc trước deadline" }, { value: 'P', text: "Làm việc dưới áp lực" }] }
-        ];
-
-        // State Management
-        let currentView = 'grid';
-        let currentQuestion = 0;
-        let answers = new Array(questions.length).fill(null);
-        let flaggedQuestions = new Set();
-
-        // Initialize the application
-        function initApp() {
-            renderQuestionList();
-            updateStats();
-            setupEventListeners();
-        }
-
-        // Render question list in sidebar
-        function renderQuestionList() {
-            const questionList = document.getElementById('questionList');
-            questionList.innerHTML = questions.map((question, index) => `
-                <div class="question-item ${index === currentQuestion ? 'current' : ''} ${answers[index] ? 'answered' : ''}"
-                     onclick="jumpToQuestion(${index})" data-question-id="${index}">
-                    <div class="question-number">${index + 1}</div>
-                    <div class="question-text">${question.question.substring(0, 60)}${question.question.length > 60 ? '...' : ''}</div>
-                    <div class="question-status">
-                        <span class="status-icon flagged ${flaggedQuestions.has(index) ? 'flagged' : ''}"
-                              onclick="toggleFlag(event, ${index})" title="Đánh dấu câu hỏi">
-                            <i class="fas ${flaggedQuestions.has(index) ? 'fa-bookmark' : 'fa-bookmark-o'}"></i>
-                        </span>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Update question list (refresh current question highlight)
-        function updateQuestionList() {
-            const questionItems = document.querySelectorAll('.question-item');
-            questionItems.forEach((item, index) => {
-                item.classList.remove('current');
-                if (index === currentQuestion) {
-                    item.classList.add('current');
-                }
-                if (answers[index]) {
-                    item.classList.add('answered');
-                } else {
-                    item.classList.remove('answered');
-                }
-            });
-        }
-
-        // Update statistics
-        function updateStats() {
-            const answeredCount = answers.filter(a => a !== null).length;
-            const flaggedCount = flaggedQuestions.size;
-            const remainingCount = questions.length - answeredCount;
-
-            document.getElementById('answeredCount').textContent = answeredCount;
-            document.getElementById('flaggedCount').textContent = flaggedCount;
-            document.getElementById('remainingCount').textContent = remainingCount;
-
-            updateProgress();
-            updateProgressCircle();
-        }
-
-        // Update progress
-        function updateProgress() {
-            const answeredCount = answers.filter(a => a !== null).length;
-            const progress = (answeredCount / questions.length) * 100;
-
-            document.getElementById('progressText').textContent = `${Math.round(progress)}%`;
-            document.getElementById('progressDetail').textContent = `${answeredCount} / ${questions.length} câu`;
-        }
-
-        // Update progress circle
-        function updateProgressCircle() {
-            const answeredCount = answers.filter(a => a !== null).length;
-            const progress = (answeredCount / questions.length);
-            const circumference = 2 * Math.PI * 54; // radius = 54
-            const offset = circumference - (progress * circumference);
-
-            document.getElementById('progressCircle').style.strokeDashoffset = offset;
-            document.getElementById('progressPercent').textContent = Math.round(progress * 100) + '%';
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Keyboard navigation
-            document.addEventListener('keydown', function(e) {
-                if (document.getElementById('welcomeSection').style.display !== 'none') {
-                    return;
-                }
-
-                if (e.key === 'ArrowRight' && currentQuestion < questions.length - 1) {
-                    if (!document.getElementById('nextBtn').disabled) {
-                        nextQuestion();
-                    }
-                } else if (e.key === 'ArrowLeft' && currentQuestion > 0) {
-                    previousQuestion();
-                } else if (e.key >= '1' && e.key <= '2') {
-                    const optionIndex = parseInt(e.key) - 1;
-                    const question = questions[currentQuestion];
-                    if (optionIndex < question.options.length) {
-                        selectOption(question.options[optionIndex].value, currentQuestion);
-                    }
-                } else if (e.key === 'f' || e.key === 'F') {
-                    toggleFlag(e, currentQuestion);
-                }
-            });
-        }
-
-        // View switching
-        function showGridView() {
-            currentView = 'grid';
-            document.getElementById('questionsGrid').style.display = 'grid';
-            document.getElementById('singleQuestionView').style.display = 'none';
-            document.getElementById('actionButtons').style.display = 'none';
-            document.getElementById('gridSubmitButton').style.display = 'block';
-
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-        }
-
-        function showSingleView() {
-            currentView = 'single';
-            document.getElementById('questionsGrid').style.display = 'none';
-            document.getElementById('singleQuestionView').style.display = 'block';
-            document.getElementById('actionButtons').style.display = 'flex';
-            document.getElementById('gridSubmitButton').style.display = 'none';
-
-            document.querySelectorAll('.view-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            if (currentView === 'single') {
-                showSingleQuestion(currentQuestion);
-            }
-        }
-
-        // Start assessment
-        function startAssessment() {
-            document.getElementById('welcomeSection').style.display = 'none';
-            document.getElementById('questionsGrid').style.display = 'grid';
-            document.getElementById('gridSubmitButton').style.display = 'block';
-            renderQuestionsGrid();
-
-            if (currentView === 'single') {
-                showSingleView();
-            }
-
-            updateQuestionList();
-            updateStats();
-        }
-
-        // Render questions grid
-        function renderQuestionsGrid() {
-            const gridContainer = document.getElementById('questionsGrid');
-            gridContainer.innerHTML = questions.map((question, index) => `
-                <div class="question-card ${index === currentQuestion ? 'current-question' : ''}"
-                     data-question-id="${index}">
+            <div id="questionContainer" class="question-container">
+                <div class="question-card">
                     <div class="question-header">
-                        <span class="question-badge">Câu ${index + 1}</span>
-                        <button class="flag-btn ${flaggedQuestions.has(index) ? 'flagged' : ''}"
-                                onclick="toggleFlag(event, ${index})" title="Đánh dấu câu hỏi">
-                            <i class="fas ${flaggedQuestions.has(index) ? 'fa-bookmark' : 'fa-bookmark-o'}"></i>
-                        </button>
+                        <div class="question-number" id="questionNumber">1</div>
+                        <div class="question-actions">
+                            <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">
+                                <i class="fas fa-flag"></i> Đánh dấu
+                            </button>
+                        </div>
                     </div>
-                    <h3 class="question-title">${question.question}</h3>
-                    <div class="options-container">
-                        ${question.options.map((option, optionIndex) => `
-                            <div class="option-item ${answers[index] === option.value ? 'selected' : ''}"
-                                 onclick="selectOptionGrid('${option.value}', ${index})" style="cursor: pointer;">
-                                <div class="option-radio"></div>
-                                <div class="option-content">
-                                    <span class="option-label">${String.fromCharCode(65 + optionIndex)}.</span>
-                                    <span class="option-text">${option.text}</span>
-                                </div>
-                            </div>
-                        `).join('')}
+                    <div class="question-text" id="questionText">
+                        Question text will appear here
+                    </div>
+                    <div class="options-container" id="optionsContainer">
+                        <!-- Options will be generated here -->
                     </div>
                 </div>
-            `).join('');
-        }
 
-        // Select option in grid view
-        function selectOptionGrid(value, questionIndex) {
-            answers[questionIndex] = value;
-            renderQuestionsGrid();
-            updateStats();
-            updateQuestionList();
-        }
-
-        // Show single question
-        function showSingleQuestion(index) {
-            if (index < 0 || index >= questions.length) return;
-
-            currentQuestion = index;
-            const question = questions[index];
-
-            const singleView = document.getElementById('singleQuestionView');
-            singleView.innerHTML = `
-                <div class="single-question-content">
-                    <div class="large-question-number">${index + 1}</div>
-                    <h3 class="large-question-text">${question.question}</h3>
-                    <div class="large-options">
-                        ${question.options.map((option, optionIndex) => `
-                            <div class="large-option ${answers[index] === option.value ? 'selected' : ''}"
-                                 onclick="selectOptionSingle('${option.value}', ${index})" style="cursor: pointer;">
-                                <div class="option-text">${option.text}</div>
-                            </div>
-                        `).join('')}
-                    </div>
+                <div class="navigation">
+                    <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" disabled>
+                        <i class="fas fa-arrow-left"></i> Câu trước
+                    </button>
+                    <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()">
+                        Câu tiếp theo <i class="fas fa-arrow-right"></i>
+                    </button>
                 </div>
-            `;
+            </div>
 
-            updateNavigationButtons();
-            updateQuestionList();
-        }
+            <div id="gridContainer" class="questions-grid-container">
+                <div class="questions-grid" id="questionsGrid">
+                    <!-- Grid questions will be generated here -->
+                </div>
+            </div>
 
-        // Select option in single view
-        function selectOptionSingle(value, questionIndex) {
-            answers[questionIndex] = value;
-            showSingleQuestion(questionIndex);
-            updateStats();
-            updateQuestionList();
-            updateNavigationButtons();
-        }
+            <div id="loadingSection" class="loading">
+                <div class="spinner"></div>
+                <h3>Đang phân tích kết quả...</h3>
+                <p>Hệ thống AI đang phân tích câu trả lời của bạn. Vui lòng chờ trong giây lát.</p>
+            </div>
+        </main>
+    </div>
 
-        // Select option
-        function selectOption(value, questionIndex) {
-            answers[questionIndex] = value;
-            const question = questions[questionIndex];
-
-            // Update UI for grid view
-            if (currentView === 'grid') {
-                const questionCard = document.querySelector(`[data-question-id="${questionIndex}"]`);
-                if (questionCard) {
-                    const options = questionCard.querySelectorAll('.option-item');
-                    options.forEach((option, index) => {
-                        const optionValue = question.options[index].value;
-                        option.classList.remove('selected');
-                        if (optionValue === value) {
-                            option.classList.add('selected');
-                        }
-                    });
-                }
-            }
-
-            // Update UI for single view
-            if (currentView === 'single') {
-                const options = document.querySelectorAll('.large-option');
-                options.forEach((option, index) => {
-                    const optionValue = question.options[index].value;
-                    option.classList.remove('selected');
-                    if (optionValue === value) {
-                        option.classList.add('selected');
-                    }
-                });
-            }
-
-            updateStats();
-            updateQuestionList();
-            updateNavigationButtons();
-        }
-
-        // Toggle flag
-        function toggleFlag(event, questionIndex) {
-            event.stopPropagation();
-
-            if (flaggedQuestions.has(questionIndex)) {
-                flaggedQuestions.delete(questionIndex);
-            } else {
-                flaggedQuestions.add(questionIndex);
-            }
-
-            updateQuestionList();
-            updateStats();
-
-            // Update flag button in grid view
-            if (currentView === 'grid') {
-                const questionCard = document.querySelector(`[data-question-id="${questionIndex}"]`);
-                if (questionCard) {
-                    const flagBtn = questionCard.querySelector('.flag-btn');
-                    flagBtn.classList.toggle('flagged');
-                    const icon = flagBtn.querySelector('i');
-                    icon.className = flaggedQuestions.has(questionIndex) ? 'fas fa-bookmark' : 'fa-bookmark-o';
-                }
-            }
-        }
-
-        // Jump to question
-        function jumpToQuestion(index) {
-            currentQuestion = index;
-
-            if (currentView === 'grid') {
-                // Scroll to question in grid view
-                const questionCard = document.querySelector(`[data-question-id="${index}"]`);
-                if (questionCard) {
-                    questionCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
-            } else {
-                showSingleQuestion(index);
-            }
-
-            updateQuestionList();
-            updateNavigationButtons();
-        }
-
-        // Navigation functions
-        function nextQuestion() {
-            if (currentQuestion < questions.length - 1) {
-                if (currentView === 'single') {
-                    showSingleQuestion(currentQuestion + 1);
-                } else {
-                    currentQuestion++;
-                    updateQuestionList();
-                }
-            } else {
-                showSubmitButton();
-            }
-        }
-
-        function previousQuestion() {
-            if (currentQuestion > 0) {
-                if (currentView === 'single') {
-                    showSingleQuestion(currentQuestion - 1);
-                } else {
-                    currentQuestion--;
-                    updateQuestionList();
-                }
-            }
-        }
-
-        function updateNavigationButtons() {
-            const prevBtn = document.getElementById('prevBtn');
-            const nextBtn = document.getElementById('nextBtn');
-            const submitBtn = document.getElementById('submitBtn');
-
-            prevBtn.disabled = currentQuestion === 0;
-
-            if (currentView === 'single') {
-                if (currentQuestion === questions.length - 1) {
-                    nextBtn.style.display = 'none';
-                    submitBtn.style.display = 'inline-flex';
-                    submitBtn.disabled = answers[currentQuestion] === null;
-                } else {
-                    nextBtn.style.display = 'inline-flex';
-                    submitBtn.style.display = 'none';
-                    nextBtn.disabled = answers[currentQuestion] === null;
-                }
-            }
-        }
-
-        function showSubmitButton() {
-            const nextBtn = document.getElementById('nextBtn');
-            const submitBtn = document.getElementById('submitBtn');
-
-            nextBtn.style.display = 'none';
-            submitBtn.style.display = 'inline-flex';
-            submitBtn.disabled = answers.includes(null);
-        }
-
-        // Calculate MBTI type from answers
-        function calculateMBTIType() {
-            const scores = { E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0 };
-            
-            answers.forEach((answer, index) => {
-                if (answer && questions[index]) {
-                    const option = questions[index].options.find(opt => opt.value === answer);
-                    if (option && option.value) {
-                        scores[option.value]++;
-                    }
-                }
-            });
-
-            // Determine type based on highest scores in each dimension
-            const type = 
-                (scores.E >= scores.I ? 'E' : 'I') +
-                (scores.N >= scores.S ? 'N' : 'S') +
-                (scores.T >= scores.F ? 'T' : 'F') +
-                (scores.J >= scores.P ? 'J' : 'P');
-
-            return {
-                type: type,
-                scores: scores
-            };
-        }
-
-        // Submit assessment
-        async function submitAssessment() {
-            // Check if all questions are answered
-            const answeredCount = answers.filter(a => a !== null).length;
-            if (answeredCount < questions.length) {
-                const unansweredCount = questions.length - answeredCount;
-                alert(`Vui lòng trả lời tất cả các câu hỏi.\nCòn ${unansweredCount} câu chưa trả lời.`);
-                return;
-            }
-
-            // Show loading overlay
-            document.getElementById('loadingOverlay').style.display = 'flex';
-
-            try {
-                // Calculate MBTI type
-                const mbtiResult = calculateMBTIType();
-
-                const response = await fetch('/personality-assessments/mbti/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        answers: answers,
-                        mbtiType: mbtiResult.type,
-                        scores: mbtiResult.scores
-                    })
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    // Redirect to results page
-                    window.location.href = data.redirectTo;
-                } else {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    alert(data.error || 'Có lỗi xảy ra khi nộp bài. Vui lòng thử lại.');
-                }
-            } catch (error) {
-                console.error('Error submitting assessment:', error);
-                document.getElementById('loadingOverlay').style.display = 'none';
-                alert('Có lỗi xảy ra khi kết nối đến máy chủ. Vui lòng kiểm tra kết nối internet.');
-            }
-        }
-
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
+    <script src="/js/mbti-assessment.js"></script>
 </body>
 </html>

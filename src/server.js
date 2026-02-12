@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 3000;
@@ -14,7 +16,13 @@ const { isLogin, userDataMiddleware } = require('./middlewares/isLogin');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const flash = require('connect-flash');
 
-require('dotenv').config();
+// Flexible BASE_URL: uses .env in production, falls back to localhost for local dev
+const BASE_URL = process.env.BASE_URL || `http://localhost:${port}`;
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+
+// Make URLs available to all views and controllers
+app.locals.baseUrl = BASE_URL;
+app.locals.aiServiceUrl = AI_SERVICE_URL;
 
 // Trust proxy for secure cookies behind Render's reverse proxy
 app.set('trust proxy', 1);
@@ -360,7 +368,7 @@ passport.use(
         {
             clientID: process.env.GG_CLIENT_ID,
             clientSecret: process.env.GG_CLIENT_SECRET,
-            callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
+            callbackURL: `${BASE_URL}/auth/google/callback`,
         },
         async (accessToken, refreshToken, profile, done) => {
             try {

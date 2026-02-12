@@ -95,10 +95,17 @@ class ApplyController {
       }
 
       // Create application
+      const businessId = job.businessId?._id || job.businessId;
+      if (!businessId) {
+        return res.status(400).json({
+          success: false,
+          message: "Công ty tuyển dụng không tồn tại."
+        });
+      }
       const application = new AppliedJobs({
         user_id: userId,
         job_id: job._id,
-        business_id: job.businessId._id,
+        business_id: businessId,
         cv_id: cv._id
       });
       await application.save();
@@ -121,33 +128,15 @@ class ApplyController {
 
       // Get business details from AppliedJobs
       const appliedJob = await AppliedJobs.findById(application._id);
-      console.log('AppliedJob data:', {
-        appliedJobId: appliedJob._id,
-        business_id: appliedJob.businessId,
-        businessId: appliedJob.businessId
-      });
-      
+
       let business = null;
-      if (appliedJob.businessId) {
-        business = await Business.findById(appliedJob.businessId);
+      if (appliedJob.business_id) {
+        business = await Business.findById(appliedJob.business_id);
       }
-      
-      console.log('Business data:', {
-        businessId: business?._id,
-        companyName: business?.companyName,
-        found: !!business,
-        allBusinessFields: business ? Object.keys(business.toObject()) : null
-      });
-      
+
       // Fallback to job's businessId if business lookup fails
       if (!business && job.businessId) {
-        console.log('Using fallback job.businessId:', job.businessId);
-        business = await Business.findById(job.businessId._id);
-        console.log('Fallback business data:', {
-          businessId: business?._id,
-          companyName: business?.companyName,
-          found: !!business
-        });
+        business = await Business.findById(job.businessId._id || job.businessId);
       }
 
       // Increase application count
@@ -159,24 +148,14 @@ class ApplyController {
       try {
         const templatePath = path.join(__dirname, '../../../templates/job-application-confirmation.html');
         const emailTemplate = fs.readFileSync(templatePath, 'utf8');
-        
-        console.log('Template variables:', {
-          applicantName: user.name || user.username,
-          jobTitle: job.title,
-          companyName: business?.companyName || 'Unknown Company',
-          appliedDate: new Date().toLocaleDateString(),
-          applicationId: application._id
-        });
-        
+
         const emailContent = emailTemplate
           .replace(/\{\{applicantName\}\}/g, user.name || user.username)
           .replace(/\{\{jobTitle\}\}/g, job.title)
           .replace(/\{\{companyName\}\}/g, business?.companyName || 'Unknown Company')
           .replace(/\{\{appliedDate\}\}/g, new Date().toLocaleDateString())
           .replace(/\{\{applicationId\}\}/g, application._id)
-          .replace(/\{\{dashboardUrl\}\}/g, `${process.env.BASE_URL}/dashboard`);
-
-        console.log('Email content preview:', emailContent.substring(0, 500));
+          .replace(/\{\{dashboardUrl\}\}/g, `${req.app.locals.baseUrl}/dashboard`);
 
         await EmailService.sendEmail(
           user.email,
@@ -207,11 +186,11 @@ class ApplyController {
           console.error('Failed to clean up uploaded file:', cleanupErr);
         }
       }
-      console.error("Apply error:", error);
+      console.error("Apply error:", error.message, error.stack);
       return res.status(500).json({
         success: false,
-        message: "Error submitting application",
-        error: error.message
+        message: "Lỗi khi gửi đơn ứng tuyển. Vui lòng thử lại.",
+        error: process.env.NODE_ENV !== 'production' ? error.message : undefined
       });
     }
   }

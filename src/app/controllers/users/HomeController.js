@@ -43,7 +43,9 @@ class HomeController {
             res.render('home', {
                 title: 'Trang chủ',
                 user: req.user || null,
-                validJobs: validJobs || []
+                validJobs: validJobs || [],
+                styles: ['/css/home.css'],
+                scripts: ['/js/home.js']
             });
         } catch (error) {
             console.error('Error in HomeController.index:', error);
@@ -51,7 +53,9 @@ class HomeController {
             res.render('home', {
                 title: 'Trang chủ',
                 user: req.user || null,
-                validJobs: []
+                validJobs: [],
+                styles: ['/css/home.css'],
+                scripts: ['/js/home.js']
             });
         }
     }

@@ -4,22 +4,24 @@ body {
 }
 
 h3 {
-  color: blue;
+  color: #2d3748;
 }
 
 h2 {
-  color: orange;
+  color: #1a202c;
 }
 
-/* Jobs section - wider container */
-.jobs-section .container {
+/* Jobs section & Features section - consistent wider container */
+.jobs-section .container,
+.features-section .container {
   max-width: 95% !important;
   padding-left: 15px;
   padding-right: 15px;
 }
 
 @media (min-width: 768px) {
-  .jobs-section .container {
+  .jobs-section .container,
+  .features-section .container {
     max-width: 90% !important;
     padding-left: 20px;
     padding-right: 20px;
@@ -27,8 +29,9 @@ h2 {
 }
 
 @media (min-width: 1200px) {
-  .jobs-section .container {
-    max-width: 1400px !important;
+  .jobs-section .container,
+  .features-section .container {
+    max-width: 1600px !important;
     padding-left: 30px;
     padding-right: 30px;
   }

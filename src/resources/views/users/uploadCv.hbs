@@ -1,0 +1,566 @@
+{{!< layouts/main}}
+
+<div class="upload-cv-page">
+    <div class="container">
+        <div class="upload-cv-card">
+            <div class="upload-cv-header">
+                <div class="upload-cv-icon">
+                    <i class="fas fa-file-upload"></i>
+                </div>
+                <h1>Tải CV của bạn</h1>
+                <p>Upload CV để hệ thống AI phân tích và gợi ý việc làm phù hợp</p>
+            </div>
+
+            {{#if existingCV}}
+            <div class="existing-cv-info">
+                <div class="existing-cv-badge">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Bạn đã có CV trong hệ thống</span>
+                </div>
+                {{#if existingCV.filename}}
+                <div class="existing-cv-detail">
+                    <i class="fas fa-file-pdf"></i>
+                    <strong>{{existingCV.filename}}</strong>
+                </div>
+                {{/if}}
+                {{#if existingCV.uploaded_at}}
+                <div class="existing-cv-detail">
+                    <i class="fas fa-clock"></i>
+                    <span>Tải lên: {{formatDate existingCV.uploaded_at}}</span>
+                </div>
+                {{/if}}
+                <p class="existing-cv-hint">Bạn có thể tải lên CV mới để thay thế CV hiện tại</p>
+                <div class="existing-cv-actions">
+                    <button onclick="viewCV()" class="cv-action-btn cv-action-view">
+                        <i class="fas fa-eye"></i> Xem CV
+                    </button>
+                    <button onclick="deleteCV()" class="cv-action-btn cv-action-delete">
+                        <i class="fas fa-trash"></i> Xóa CV
+                    </button>
+                </div>
+            </div>
+            {{/if}}
+
+            <form action="/cv/upload" method="POST" enctype="multipart/form-data" id="uploadCvForm">
+                <div class="cv-upload-area" id="dropZone">
+                    <input type="file" id="cv-file-input" name="file"
+                           accept=".pdf,.doc,.docx" class="cv-file-hidden">
+                    <label for="cv-file-input" class="cv-drop-label">
+                        <div class="cv-drop-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="cv-drop-text">
+                            <span class="cv-drop-main" id="cv-file-name">Kéo thả file vào đây hoặc click để chọn</span>
+                            <span class="cv-drop-sub">PDF, DOC, DOCX - Tối đa 5MB</span>
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" class="upload-cv-btn" id="uploadBtn" disabled>
+                    <i class="fas fa-upload"></i>
+                    <span>Tải lên CV</span>
+                </button>
+
+                <!-- Upload Progress -->
+                <div id="uploadProgress" class="upload-progress" style="display:none;">
+                    <div class="upload-progress__header">
+                        <span class="upload-progress__label">Đang tải lên...</span>
+                        <span id="progressPercent" class="upload-progress__percent">0%</span>
+                    </div>
+                    <div class="upload-progress__bar">
+                        <div id="progressBar" class="upload-progress__fill" style="width:0%"></div>
+                    </div>
+                </div>
+
+                <!-- Upload Result -->
+                <div id="uploadResult" class="upload-result" style="display:none;"></div>
+            </form>
+
+            <a href="/cv-assistant" class="cv-assistant-banner">
+                <div class="cv-assistant-banner__icon">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="cv-assistant-banner__content">
+                    <strong>Trợ lý CV thông minh</strong>
+                    <p>Phân tích AI, gợi ý việc làm phù hợp và ứng tuyển nhanh chóng</p>
+                </div>
+                <div class="cv-assistant-banner__arrow">
+                    <i class="fas fa-chevron-right"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .upload-cv-page {
+        min-height: calc(100vh - 80px);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e9f2 100%);
+        padding: 40px 0;
+    }
+
+    .upload-cv-card {
+        max-width: 640px;
+        margin: 0 auto;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+        padding: 40px;
+    }
+
+    .upload-cv-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+
+    .upload-cv-icon {
+        width: 64px;
+        height: 64px;
+        background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 16px;
+        font-size: 1.5rem;
+        color: #fff;
+    }
+
+    .upload-cv-header h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 8px;
+    }
+
+    .upload-cv-header p {
+        color: #64748b;
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    /* Existing CV info */
+    .existing-cv-info {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        border-radius: 12px;
+        padding: 16px 20px;
+        margin-bottom: 24px;
+    }
+
+    .existing-cv-badge {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #16a34a;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .existing-cv-detail {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #475569;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+    }
+
+    .existing-cv-hint {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin: 8px 0 0;
+    }
+
+    .existing-cv-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 12px;
+    }
+
+    .cv-action-btn {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+    }
+
+    .cv-action-view {
+        background: #1d4ed8;
+        color: #fff;
+    }
+
+    .cv-action-view:hover {
+        background: #1e40af;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(29, 78, 216, 0.3);
+    }
+
+    .cv-action-delete {
+        background: #fee2e2;
+        color: #dc2626;
+    }
+
+    .cv-action-delete:hover {
+        background: #fecaca;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.2);
+    }
+
+    /* Upload area */
+    .cv-upload-area {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+        margin-bottom: 20px;
+    }
+
+    .cv-upload-area:hover,
+    .cv-upload-area.dragover {
+        border-color: #1d4ed8;
+        background: #eff6ff;
+    }
+
+    .cv-file-hidden {
+        display: none;
+    }
+
+    .cv-drop-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        cursor: pointer;
+        text-align: center;
+    }
+
+    .cv-drop-icon {
+        font-size: 2.5rem;
+        color: #94a3b8;
+        margin-bottom: 12px;
+        transition: color 0.3s ease;
+    }
+
+    .cv-upload-area:hover .cv-drop-icon {
+        color: #1d4ed8;
+    }
+
+    .cv-drop-main {
+        display: block;
+        font-size: 1rem;
+        font-weight: 500;
+        color: #334155;
+        margin-bottom: 4px;
+    }
+
+    .cv-drop-sub {
+        display: block;
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+
+    .cv-drop-label.has-file .cv-drop-main {
+        color: #1d4ed8;
+        font-weight: 600;
+    }
+
+    /* Upload button */
+    .upload-cv-btn {
+        width: 100%;
+        padding: 14px 24px;
+        background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .upload-cv-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .upload-cv-btn:not(:disabled):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 16px rgba(29, 78, 216, 0.3);
+    }
+
+    /* CV Assistant Banner */
+    .cv-assistant-banner {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-top: 28px;
+        padding: 16px 20px;
+        background: linear-gradient(135deg, #eff6ff 0%, #eef2ff 100%);
+        border: 1px solid #c7d2fe;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        cursor: pointer;
+    }
+
+    .cv-assistant-banner:hover {
+        border-color: #818cf8;
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+        transform: translateY(-2px);
+    }
+
+    .cv-assistant-banner__icon {
+        width: 44px;
+        height: 44px;
+        min-width: 44px;
+        background: linear-gradient(135deg, #1e3a5f, #1d4ed8);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.2rem;
+    }
+
+    .cv-assistant-banner__content strong {
+        display: block;
+        font-size: 0.95rem;
+        color: #1e293b;
+        margin-bottom: 2px;
+    }
+
+    .cv-assistant-banner__content p {
+        font-size: 0.84rem;
+        color: #64748b;
+        margin: 0;
+    }
+
+    .cv-assistant-banner__arrow {
+        margin-left: auto;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        transition: transform 0.2s ease;
+    }
+
+    .cv-assistant-banner:hover .cv-assistant-banner__arrow {
+        transform: translateX(3px);
+        color: #1d4ed8;
+    }
+
+    /* Upload Progress */
+    .upload-progress {
+        margin-top: 16px;
+        padding: 12px 16px;
+        background: #f8fafc;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+    }
+
+    .upload-progress__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .upload-progress__label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #1d4ed8;
+    }
+
+    .upload-progress__percent {
+        font-size: 0.85rem;
+        color: #1d4ed8;
+        font-weight: 600;
+    }
+
+    .upload-progress__bar {
+        height: 6px;
+        background: #e2e8f0;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .upload-progress__fill {
+        height: 100%;
+        background: linear-gradient(90deg, #1d4ed8, #3b82f6);
+        border-radius: 3px;
+        transition: width 0.3s ease;
+    }
+
+    /* Upload Result */
+    .upload-result {
+        margin-top: 16px;
+        padding: 12px 16px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .upload-result.success {
+        background: #f0fdf4;
+        border: 1px solid #bbf7d0;
+        color: #16a34a;
+    }
+
+    .upload-result.error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #dc2626;
+    }
+
+    @media (max-width: 640px) {
+        .upload-cv-card {
+            margin: 0 12px;
+            padding: 24px;
+        }
+    }
+</style>
+
+<script>
+    const fileInput = document.getElementById('cv-file-input');
+    const fileName = document.getElementById('cv-file-name');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const dropZone = document.getElementById('dropZone');
+    const dropLabel = dropZone.querySelector('.cv-drop-label');
+
+    fileInput.addEventListener('change', function () {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            const maxSize = 5 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File quá lớn. Tối đa 5MB.');
+                this.value = '';
+                return;
+            }
+            fileName.textContent = file.name;
+            dropLabel.classList.add('has-file');
+            uploadBtn.disabled = false;
+        } else {
+            fileName.textContent = 'Kéo thả file vào đây hoặc click để chọn';
+            dropLabel.classList.remove('has-file');
+            uploadBtn.disabled = true;
+        }
+    });
+
+    // Drag and drop
+    ['dragenter', 'dragover'].forEach(evt => {
+        dropZone.addEventListener(evt, function (e) {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+    });
+
+    ['dragleave', 'drop'].forEach(evt => {
+        dropZone.addEventListener(evt, function (e) {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+        });
+    });
+
+    dropZone.addEventListener('drop', function (e) {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;
+            fileInput.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // Form submit - use AJAX like profile page
+    document.getElementById('uploadCvForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        const file = fileInput.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('username', '{{user}}');
+        formData.append('file', file);
+
+        const progressDiv = document.getElementById('uploadProgress');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const resultDiv = document.getElementById('uploadResult');
+
+        progressDiv.style.display = 'block';
+        resultDiv.style.display = 'none';
+        uploadBtn.disabled = true;
+        uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Đang xử lý...</span>';
+
+        const xhr = new XMLHttpRequest();
+        xhr.upload.addEventListener('progress', function (ev) {
+            if (ev.lengthComputable) {
+                const pct = Math.round((ev.loaded / ev.total) * 100);
+                progressBar.style.width = pct + '%';
+                progressPercent.textContent = pct + '%';
+            }
+        });
+        xhr.addEventListener('load', function () {
+            progressDiv.style.display = 'none';
+            if (xhr.status === 200) {
+                resultDiv.className = 'upload-result success';
+                resultDiv.innerHTML = '<i class="fas fa-check-circle"></i> CV đã được tải lên thành công!';
+                resultDiv.style.display = 'block';
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                let msg = 'Không thể tải lên CV';
+                try {
+                    const res = JSON.parse(xhr.responseText);
+                    msg = res.message || res.error || msg;
+                } catch (e) {}
+                resultDiv.className = 'upload-result error';
+                resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> ' + msg;
+                resultDiv.style.display = 'block';
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> <span>Tải lên CV</span>';
+            }
+        });
+        xhr.addEventListener('error', function () {
+            progressDiv.style.display = 'none';
+            resultDiv.className = 'upload-result error';
+            resultDiv.innerHTML = '<i class="fas fa-exclamation-circle"></i> Lỗi mạng. Vui lòng thử lại.';
+            resultDiv.style.display = 'block';
+            uploadBtn.disabled = false;
+            uploadBtn.innerHTML = '<i class="fas fa-upload"></i> <span>Tải lên CV</span>';
+        });
+        xhr.open('POST', '/ai-service/upload_resume');
+        xhr.send(formData);
+    });
+
+    // View CV
+    function viewCV() {
+        window.open('/users/cv', '_blank');
+    }
+
+    // Delete CV
+    async function deleteCV() {
+        if (!confirm('Bạn có chắc chắn muốn xóa CV này?')) return;
+        try {
+            const response = await fetch('/ai-service/resume/{{user}}', {
+                method: 'DELETE',
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('CV đã được xóa thành công');
+                window.location.reload();
+            } else {
+                alert(result.message || 'Không thể xóa CV');
+            }
+        } catch (error) {
+            alert('Lỗi mạng. Vui lòng kiểm tra kết nối và thử lại.');
+        }
+    }
+</script>
