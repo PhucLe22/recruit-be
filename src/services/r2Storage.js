@@ -1,62 +1,100 @@
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
+const { GridFSBucket } = require('mongodb');
+const { Readable } = require('stream');
 
-// Initialize Firebase Admin with service account
-if (!admin.apps.length) {
-    const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT || '{}');
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-    });
+const BUCKET_NAME = 'uploads';
+const BASE_URL = process.env.BASE_URL || '';
+
+let bucket;
+
+function getBucket() {
+    if (!bucket) {
+        const db = mongoose.connection.db;
+        if (!db) throw new Error('MongoDB not connected');
+        bucket = new GridFSBucket(db, { bucketName: BUCKET_NAME });
+    }
+    return bucket;
 }
 
-const bucket = admin.storage().bucket();
-const PUBLIC_URL = (process.env.FIREBASE_STORAGE_PUBLIC_URL || '').replace(/\/$/, '');
-const BUCKET = process.env.FIREBASE_STORAGE_BUCKET;
+// Reset bucket reference when connection changes (e.g. reconnect)
+mongoose.connection.on('connected', () => {
+    bucket = null;
+});
 
 async function uploadFile(buffer, key, contentType) {
-    const file = bucket.file(key);
-    await file.save(buffer, {
-        metadata: { contentType },
-        public: true,
+    const gfs = getBucket();
+
+    // Delete existing file with same key if exists
+    try {
+        const existing = await gfs.find({ filename: key }).toArray();
+        for (const file of existing) {
+            await gfs.delete(file._id);
+        }
+    } catch (err) {
+        // ignore - file may not exist
+    }
+
+    return new Promise((resolve, reject) => {
+        const readStream = Readable.from(buffer);
+        const uploadStream = gfs.openUploadStream(key, {
+            contentType: contentType,
+            metadata: { originalKey: key },
+        });
+
+        readStream.pipe(uploadStream)
+            .on('error', reject)
+            .on('finish', () => {
+                resolve(getPublicUrl(key));
+            });
     });
-    return getPublicUrl(key);
 }
 
 async function deleteFile(key) {
     try {
-        const file = bucket.file(key);
-        const [exists] = await file.exists();
-        if (exists) await file.delete();
+        const gfs = getBucket();
+        const files = await gfs.find({ filename: key }).toArray();
+        for (const file of files) {
+            await gfs.delete(file._id);
+        }
     } catch (err) {
         console.error('Storage delete error:', err.message);
     }
 }
 
 async function getFileBuffer(key) {
-    const file = bucket.file(key);
-    const [buffer] = await file.download();
-    return buffer;
+    const gfs = getBucket();
+    const files = await gfs.find({ filename: key }).toArray();
+    if (!files.length) throw new Error(`File not found: ${key}`);
+
+    return new Promise((resolve, reject) => {
+        const chunks = [];
+        const downloadStream = gfs.openDownloadStreamByName(key);
+        downloadStream
+            .on('data', (chunk) => chunks.push(chunk))
+            .on('error', reject)
+            .on('end', () => resolve(Buffer.concat(chunks)));
+    });
 }
 
 async function fileExists(key) {
     try {
-        const file = bucket.file(key);
-        const [exists] = await file.exists();
-        return exists;
+        const gfs = getBucket();
+        const files = await gfs.find({ filename: key }).toArray();
+        return files.length > 0;
     } catch {
         return false;
     }
 }
 
 function getPublicUrl(key) {
-    return `${PUBLIC_URL}/${key}`;
+    return `${BASE_URL}/api/files/${encodeURIComponent(key)}`;
 }
 
 /**
  * Resolves a DB path (legacy or new) to a full public URL.
  * - Full URLs (http/https) are returned as-is
- * - Relative paths like /uploads/avatars/file.jpg -> PUBLIC_URL/uploads/avatars/file.jpg
- * - Plain keys like ai-uploads/file.pdf -> PUBLIC_URL/ai-uploads/file.pdf
+ * - Relative paths like /uploads/avatars/file.jpg -> BASE_URL/api/files/uploads/avatars/file.jpg
+ * - Plain keys like ai-uploads/file.pdf -> BASE_URL/api/files/ai-uploads/file.pdf
  */
 function resolveFileUrl(dbPath) {
     if (!dbPath) return null;
@@ -67,20 +105,47 @@ function resolveFileUrl(dbPath) {
 
 /**
  * Extracts the storage key from a full URL or DB path.
- * - Full storage URL -> strips the public URL prefix
+ * - Full URL with /api/files/ -> strips the prefix
  * - /uploads/avatars/file.jpg -> uploads/avatars/file.jpg
  * - uploads/avatars/file.jpg -> uploads/avatars/file.jpg
  */
 function extractKey(dbPath) {
     if (!dbPath) return null;
-    if (dbPath.startsWith(PUBLIC_URL)) {
-        return dbPath.substring(PUBLIC_URL.length + 1);
-    }
+    // Handle full URLs with /api/files/ prefix
+    const apiFilesMatch = dbPath.match(/\/api\/files\/(.+)$/);
+    if (apiFilesMatch) return decodeURIComponent(apiFilesMatch[1]);
     return dbPath.startsWith('/') ? dbPath.substring(1) : dbPath;
 }
 
+/**
+ * Express route handler to serve files from GridFS.
+ * Mount this at /api/files/:key(*) in your router.
+ */
+async function serveFile(req, res) {
+    try {
+        const key = decodeURIComponent(req.params.key || req.params[0]);
+        const gfs = getBucket();
+        const files = await gfs.find({ filename: key }).toArray();
+
+        if (!files.length) {
+            return res.status(404).json({ error: 'File not found' });
+        }
+
+        const file = files[0];
+        res.set('Content-Type', file.contentType || 'application/octet-stream');
+        res.set('Content-Length', file.length);
+        res.set('Cache-Control', 'public, max-age=31536000');
+
+        const downloadStream = gfs.openDownloadStreamByName(key);
+        downloadStream.pipe(res);
+    } catch (err) {
+        console.error('File serve error:', err.message);
+        res.status(500).json({ error: 'Failed to serve file' });
+    }
+}
+
 module.exports = {
-    bucket,
+    getBucket,
     uploadFile,
     deleteFile,
     getFileBuffer,
@@ -88,5 +153,6 @@ module.exports = {
     getPublicUrl,
     resolveFileUrl,
     extractKey,
-    BUCKET,
+    serveFile,
+    BUCKET: BUCKET_NAME,
 };

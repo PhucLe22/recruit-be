@@ -41,7 +41,7 @@ app.engine(
                 if (!filePath) return '/images/default-avatar.png';
                 if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
                 const key = filePath.startsWith('/') ? filePath.substring(1) : filePath;
-                return `${process.env.FIREBASE_STORAGE_PUBLIC_URL || ''}/${key}`;
+                return `${process.env.BASE_URL || ''}/api/files/${encodeURIComponent(key)}`;
             },
             json: (context) => JSON.stringify(context),
             uppercase: (str) => {
@@ -279,13 +279,18 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Redirect legacy upload URLs to cloud storage
-const STORAGE_PUBLIC_URL = process.env.FIREBASE_STORAGE_PUBLIC_URL || '';
+// Serve files from MongoDB GridFS
+const r2Storage = require('./services/r2Storage');
+app.get('/api/files/:key(*)', r2Storage.serveFile);
+
+// Redirect legacy upload URLs to GridFS route
 app.use('/uploads', (req, res) => {
-    res.redirect(301, `${STORAGE_PUBLIC_URL}/uploads${req.path}`);
+    const key = `uploads${req.path}`;
+    res.redirect(301, `/api/files/${encodeURIComponent(key)}`);
 });
 app.use('/ai-uploads', (req, res) => {
-    res.redirect(301, `${STORAGE_PUBLIC_URL}/ai-uploads${req.path}`);
+    const key = `ai-uploads${req.path}`;
+    res.redirect(301, `/api/files/${encodeURIComponent(key)}`);
 });
 
 // Session configuration
