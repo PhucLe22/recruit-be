@@ -281,7 +281,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Serve files from MongoDB GridFS
 const r2Storage = require('./services/r2Storage');
-app.get('/api/files/:key(*)', r2Storage.serveFile);
+app.get('/api/files/*key', r2Storage.serveFile);
 
 // Redirect legacy upload URLs to GridFS route
 app.use('/uploads', (req, res) => {

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const { GridFSBucket } = require('mongodb');
 const { Readable } = require('stream');
+const { GridFSBucket } = mongoose.mongo;
 
 const BUCKET_NAME = 'uploads';
 const BASE_URL = process.env.BASE_URL || '';
@@ -119,11 +119,13 @@ function extractKey(dbPath) {
 
 /**
  * Express route handler to serve files from GridFS.
- * Mount this at /api/files/:key(*) in your router.
+ * Mount this at /api/files/*key in your router.
  */
 async function serveFile(req, res) {
     try {
-        const key = decodeURIComponent(req.params.key || req.params[0]);
+        // Express 5: *key param may be an array or string
+        const rawKey = req.params.key;
+        const key = decodeURIComponent(Array.isArray(rawKey) ? rawKey.join('/') : rawKey);
         const gfs = getBucket();
         const files = await gfs.find({ filename: key }).toArray();
 
