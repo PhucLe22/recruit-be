@@ -16,9 +16,9 @@ const { isLogin, userDataMiddleware } = require('./middlewares/isLogin');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const flash = require('connect-flash');
 
-// Flexible BASE_URL: uses .env in production, falls back to localhost for local dev
-const BASE_URL = process.env.BASE_URL || `http://localhost:${port}`;
-const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
+// Read URLs from .env
+const BASE_URL = process.env.BASE_URL;
+const AI_SERVICE_URL = process.env.AI_SERVICE_URL;
 
 // Make URLs available to all views and controllers
 app.locals.baseUrl = BASE_URL;
@@ -37,6 +37,12 @@ app.engine(
             allowProtoMethodsByDefault: true
         },
         helpers: {
+            resolveUrl: (filePath) => {
+                if (!filePath) return '/images/default-avatar.png';
+                if (filePath.startsWith('http://') || filePath.startsWith('https://')) return filePath;
+                const key = filePath.startsWith('/') ? filePath.substring(1) : filePath;
+                return `${process.env.SUPABASE_STORAGE_PUBLIC_URL || ''}/${key}`;
+            },
             json: (context) => JSON.stringify(context),
             uppercase: (str) => {
                 if (!str || typeof str !== 'string') return '';
@@ -272,9 +278,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
-app.use('/uploads', express.static(path.join(__dirname, '../public/uploads')));
-// Serve AI agent uploaded files
-app.use('/ai-uploads', express.static(path.join(__dirname, '../../../ai-agent/chatbot_backend/uploads')));
+
+// Redirect legacy upload URLs to cloud storage
+const STORAGE_PUBLIC_URL = process.env.SUPABASE_STORAGE_PUBLIC_URL || '';
+app.use('/uploads', (req, res) => {
+    res.redirect(301, `${STORAGE_PUBLIC_URL}/uploads${req.path}`);
+});
+app.use('/ai-uploads', (req, res) => {
+    res.redirect(301, `${STORAGE_PUBLIC_URL}/ai-uploads${req.path}`);
+});
 
 // Session configuration
 const sessionConfig = {
@@ -288,7 +300,7 @@ const sessionConfig = {
         maxAge: 3 * 60 * 60 * 1000 // 3 hours
     },
     store: new (require('connect-mongodb-session')(session))({
-        uri: process.env.MONGODB_URI || 'mongodb://localhost:27017/your-db-name',
+        uri: process.env.MONGODB_URI,
         collection: 'sessions'
     })
 };

@@ -1,57 +1,55 @@
-const { S3Client, PutObjectCommand, DeleteObjectCommand, GetObjectCommand, HeadObjectCommand } = require('@aws-sdk/client-s3');
+const { createClient } = require('@supabase/supabase-js');
 
-const s3Client = new S3Client({
-    region: 'auto',
-    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
-    credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID,
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY,
-    },
-});
+const supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+);
 
-const BUCKET = process.env.R2_BUCKET_NAME;
-const PUBLIC_URL = (process.env.R2_PUBLIC_URL || '').replace(/\/$/, '');
+const BUCKET = process.env.SUPABASE_STORAGE_BUCKET;
+const PUBLIC_URL = (process.env.SUPABASE_STORAGE_PUBLIC_URL || '').replace(/\/$/, '');
 
 async function uploadFile(buffer, key, contentType) {
-    await s3Client.send(new PutObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-        Body: buffer,
-        ContentType: contentType,
-    }));
+    const { error } = await supabase.storage
+        .from(BUCKET)
+        .upload(key, buffer, {
+            contentType,
+            upsert: true,
+        });
+
+    if (error) throw new Error(`Storage upload error: ${error.message}`);
     return getPublicUrl(key);
 }
 
 async function deleteFile(key) {
     try {
-        await s3Client.send(new DeleteObjectCommand({
-            Bucket: BUCKET,
-            Key: key,
-        }));
+        const { error } = await supabase.storage
+            .from(BUCKET)
+            .remove([key]);
+        if (error) console.error('Storage delete error:', error.message);
     } catch (err) {
-        console.error('R2 delete error:', err.message);
+        console.error('Storage delete error:', err.message);
     }
 }
 
 async function getFileBuffer(key) {
-    const response = await s3Client.send(new GetObjectCommand({
-        Bucket: BUCKET,
-        Key: key,
-    }));
-    const chunks = [];
-    for await (const chunk of response.Body) {
-        chunks.push(chunk);
-    }
-    return Buffer.concat(chunks);
+    const { data, error } = await supabase.storage
+        .from(BUCKET)
+        .download(key);
+
+    if (error) throw new Error(`Storage download error: ${error.message}`);
+    const arrayBuffer = await data.arrayBuffer();
+    return Buffer.from(arrayBuffer);
 }
 
 async function fileExists(key) {
     try {
-        await s3Client.send(new HeadObjectCommand({
-            Bucket: BUCKET,
-            Key: key,
-        }));
-        return true;
+        const dir = key.substring(0, key.lastIndexOf('/'));
+        const filename = key.substring(key.lastIndexOf('/') + 1);
+        const { data, error } = await supabase.storage
+            .from(BUCKET)
+            .list(dir, { search: filename, limit: 1 });
+        if (error) return false;
+        return data.some(f => f.name === filename);
     } catch {
         return false;
     }
@@ -64,8 +62,8 @@ function getPublicUrl(key) {
 /**
  * Resolves a DB path (legacy or new) to a full public URL.
  * - Full URLs (http/https) are returned as-is
- * - Relative paths like /uploads/avatars/file.jpg -> R2_PUBLIC_URL/uploads/avatars/file.jpg
- * - Plain keys like ai-uploads/file.pdf -> R2_PUBLIC_URL/ai-uploads/file.pdf
+ * - Relative paths like /uploads/avatars/file.jpg -> PUBLIC_URL/uploads/avatars/file.jpg
+ * - Plain keys like ai-uploads/file.pdf -> PUBLIC_URL/ai-uploads/file.pdf
  */
 function resolveFileUrl(dbPath) {
     if (!dbPath) return null;
@@ -75,8 +73,8 @@ function resolveFileUrl(dbPath) {
 }
 
 /**
- * Extracts the R2 key from a full URL or DB path.
- * - Full R2 URL -> strips the public URL prefix
+ * Extracts the storage key from a full URL or DB path.
+ * - Full storage URL -> strips the public URL prefix
  * - /uploads/avatars/file.jpg -> uploads/avatars/file.jpg
  * - uploads/avatars/file.jpg -> uploads/avatars/file.jpg
  */
@@ -89,7 +87,7 @@ function extractKey(dbPath) {
 }
 
 module.exports = {
-    s3Client,
+    supabase,
     uploadFile,
     deleteFile,
     getFileBuffer,
